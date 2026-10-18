@@ -1,0 +1,5 @@
+# The source papers are never committed.
+papers/
+
+# macOS
+.DS_Store

@@ -1,0 +1,528 @@
+RAW TEXT LAYER — Schmitt, Ossendrijver & Hoyng (2001), Phys. Earth Planet. Inter. 125, 119–124.
+Extracted with PyMuPDF from papers/Magnetic_Field_Reversals_and_Secular_Var.pdf (vector PDF, good text quality).
+Equations lose their 2-D structure here; for equations use the structured summary resources/schmitt-2001-pepi-bistable-geodynamo-reversals.md.
+PDF page 1 = journal page 119.
+
+
+
+===== PAGE 1 =====
+Physics of the Earth and Planetary Interiors 125 (2001) 119–124
+Magnetic ﬁeld reversals and secular variation in
+a bistable geodynamo model
+D. Schmitt a,∗, M.A.J.H. Ossendrijver b, P. Hoyng c
+a Universitäts-Sternwarte Göttingen, Geismarlandstraße 11, 37083 Göttingen, Germany
+b Kiepenheuer-Institut für Sonnenphysik, Schöneckstraße 6, 79104 Freiburg, Germany
+c SRON Laboratorium voor Ruimteonderzoek, Sorbonnelaan 2, 3584 CA Utrecht, The Netherlands
+Received 22 December 2000; received in revised form 19 June 2001; accepted 19 June 2001
+Abstract
+A method is described which enables the calculation of statistical properties of geodynamo models. The result is a
+Fokker–Planck equation for the probability distribution of the dipole moment. The method only requires a non-oscillatory,
+predominantly dipolar magnetic ﬁeld and helicity ﬂuctuations. The ﬂuctuations perturb the fundamental dynamo mode and
+lead to the excitation of higher modes. This results in stochastic oscillations of the dipole ﬁeld amplitude in a bistable poten-
+tial with minima representing normal and reversed polarity, and occasional jumps between them. The shape of the potential
+is determined by supercritical dynamo excitation and nonlinear limitation of ﬁeld growth. Application of the method to a
+mean-ﬁeld dynamo model with random ﬂuctuations of the helicity parameter α reproduces the observed relation between the
+secular variation and the reversal rate of the geomagnetic ﬁeld, as well as the amplitude distribution of the dipole ﬁeld inferred
+from the Sint-800 record. © 2001 Elsevier Science B.V. All rights reserved.
+Keywords: Dynamo model; Helicity ﬂuctuations; Reversals; Secular variation
+1. Introduction
+One of the most fascinating topics of geomagnetism
+is that the Earth has reversed the polarity of its almost
+dipolar magnetic ﬁeld many times in the past at irreg-
+ular intervals of 105 to 107 years (Jacobs, 1994; Mer-
+rill et al., 1996). Reversals are fast events lasting only
+a few thousand years (Bogue and Merrill, 1992). In
+between reversals the ﬁeld strength ﬂuctuates consid-
+erably (Valet and Meynadier, 1993; Guyodo and Valet,
+1999). There are also episodes of small dipole moment
+∗Corresponding author. Present address: Max-Planck Institut
+für Aeronomie, Max-Planck-Straße 2, 37191 Katlenburg-Lindau,
+Germany.
+E-mail address: schmitt@linmpi.mpg.de (D. Schmitt).
+when the ﬁeld starts to reverse but aborts the attempt,
+called an excursion (Hoffman, 1981; Gubbins, 1999).
+The origin of the magnetic ﬁeld is generally as-
+cribed to dynamo action in the liquid outer core
+(Gubbins and Roberts, 1987; Fearn, 1998). In a
+recent 3D hydromagnetic simulation (Glatzmaier and
+Roberts, 1995) of a geomagnetic reversal, the dynamo
+in the outer core primarily generates a dipole that
+wants to oscillate on a time scale of about 100 years.
+The ﬁeld in the conducting solid inner core diffuses
+on a much longer time scale. This ﬁeld inhibits the
+oscillations in the outer core and has a stabilising ef-
+fect (Hollerbach and Jones, 1993). A reversal occurs
+only when the ﬁeld in the outer core is of the reversed
+polarity for a sufﬁcient long time to permit diffusion
+into the inner core. Much earlier it was shown that a
+0031-9201/01/$ – see front matter © 2001 Elsevier Science B.V. All rights reserved.
+PII: S0031-9201(01)00237-0
+
+
+===== PAGE 2 =====
+120
+D. Schmitt et al. / Physics of the Earth and Planetary Interiors 125 (2001) 119–124
+change in the latitudinal distribution of cyclonic ed-
+dies can cause a degeneration of the magnetic ﬁeld in
+favour of the other polarity, thus causing a sudden re-
+versal (Parker, 1969; Levy, 1972). More recent work
+on reversal models from dynamo calculations can be
+found in Sarson (2000).
+Our objective is to study the long-term statistical
+properties of the geomagnetic ﬁeld and to offer a
+physical explanation of the relation between the paleo-
+magnetic secular variation and reversal records. To
+this end very long simulations are required, which are
+at present impossible with 3D hydromagnetic codes,
+since they are limited to only a few reversals and still
+far away from a realistic parameter regime. We, there-
+fore, resort to the mean-ﬁeld approximation and use
+three key elements emerging from the simulations as
+well as observations: differential rotation in the outer
+core, the presence of helicity and large ﬂuctuations.
+This leads to a dynamo model which allows us to
+simulate many reversals over long periods of typically
+108 years.
+2. Dynamo model
+We study a spherical dynamo of a ﬁxed radius R
+with the mean magnetic ﬁeld depending on colatitude
+θ (Schmitt and Schüssler, 1989). After decomposing
+the ﬁeld into the toroidal part T and the vector poten-
+tial P of the poloidal ﬁeld, the mean-ﬁeld induction
+equation is written in non-dimensional form as
+∂
+∂t
+ P
+T
+
+=
+
+
+(α + δα)/α0
+C(∂/∂θ)sin θ
+
+  P
+T
+
+(1)
+Here  is the diffusion operator, and α = α0 cos θ
+parametrises the effect of helical convection, by
+which a poloidal ﬁeld is created from a toroidal ﬁeld.
+Differential rotation, in turn, converts a poloidal ﬁeld
+into a toroidal ﬁeld. For reasons of simplicity, we
+assume constant differential rotation in the radial
+direction, dΩ/dr = constant. Technically our dy-
+namo is of αΩ-type (Soward, 1991). The solution
+is controlled by the dynamo number C = RαRΩ,
+which is the product of the Reynolds numbers of the
+α-effect Rα = α0R/η and the differential rotation
+RΩ= dΩ/dr R3/η, with η the turbulent magnetic
+diffusivity. For positive C the ﬁrst excited mode of the
+1D dynamo model is a non-oscillatory dipole, while
+all higher modes, both antisymmetric (dipolar) and
+symmetric (quadrupolar) with respect to the equator,
+are oscillatory and need considerably larger ampliﬁ-
+cation (Schmitt and Schüssler, 1989). We call the ﬁrst
+excited mode the fundamental mode, the others are
+the overtones. The dynamo number is chosen such
+that the fundamental dipole is supercritical while the
+overtones are damped. Unlimited growth is prevented
+by the Lorentz force, which causes a backreaction of
+the magnetic ﬁeld on the ﬂow. This is modelled by
+allowing the α-coefﬁcient to be a decreasing function
+of the total energy of the fundamental mode, a com-
+monly used approach known as α-quenching (Stix,
+1992). Full details of the model are given in Hoyng
+et al. (2001).
+We
+interpret
+mean
+quantities
+as
+longitudinal
+averages, so that the mean ﬁeld is the axisymmetric
+component of the real ﬁeld. Because the number of
+convective eddies on a circle of constant latitude is
+ﬁnite, this averaging yields an α-effect with rapid
+residual ﬂuctuations δα in latitude and time around
+its mean value. These random ﬂuctuations are a key
+ingredient of our model and have, in a solar dy-
+namo model, proven able to account for the observed
+phase-amplitude correlation in the solar cycle (Hoyng,
+1993; Ossendrijver et al., 1996). They perturb the fun-
+damental dynamo mode and excite higher, otherwise
+damped modes, resulting in irregular ﬁeld variations
+and occasional reversals.
+The parameters that determine the ﬂuctuations δα
+are the mean relative amplitude f, the correlation length
+θcR and the correlation time τ c of individual eddies,
+with δα/α0 = fF/
+√
+N where F is a random number
+with zero mean and unit variance. The number F is
+updated once every correlation time τ c, independently
+for every eddy. N = 2Nc sin θ is the number of ed-
+dies on a circle of constant latitude and Nc = π/θc the
+number of cells from pole to pole. All the statistical
+properties of the model depend only on the combina-
+tion f 2θ2
+c τc, called the forcing parameter.
+3. Numerical results
+A typical numerical result is shown in Fig. 1,
+which displays the ﬁeld strength in a time-colatitude
+
+
+===== PAGE 3 =====
+D. Schmitt et al. / Physics of the Earth and Planetary Interiors 125 (2001) 119–124
+121
+Fig. 1. Numerical solution with parameters C = 100, Ccrit = 58, f = 6.4, θc = π/10 and τc = 5×10−2. (a) Colour plot of the ﬁeld strength
+at a representative radial position, R, in the outer core (red and blue mean positive and negative polarity, respectively); (b) normalised
+amplitude a of the fundamental, dipolar mode of the model. The unit of time is the turbulent diffusion time, estimated as 2000 years. The
+actual run lasted 25 times longer, we only display the ﬁrst 2000 diffusion times. Aborted reversals occur, e.g. at t = 648, 825, 863 and
+1048. As described in Section 5, we identify the amplitude a of the fundamental mode with the virtual axial dipole moment of the Earth’s
+magnetic ﬁeld. The relative variance ⟨(a −⟨a⟩)2⟩/⟨a⟩2 of the amplitude between reversals is 0.16, which is close to the secular variation
+of the Earth’s magnetic ﬁeld, estimated as 0.15–0.20 from records dated at 2–3 million years (Valet and Meynadier, 1993). The mean time
+between reversals is Tr ≈100 diffusion times, which is typical for that period. The time between reversals depends exponentially on the
+forcing parameter. For f = 6 we ﬁnd Tr ≈200, for f = 7 we obtain Tr ≈50 diffusion times. The relative variance of a is 0.11 in the ﬁrst
+case and 0.24 in the latter. The strength of the longitudinally averaged α-ﬂuctuations compared to their mean is approximately δα/α0 ≈2.
+diagram. The magnetic ﬁeld ﬂuctuates rapidly but
+the polarity stays constant for long times. There are
+occasional sudden reversals and also aborted rever-
+sals. The time intervals between reversals have a
+Poissonian distribution, as observed (Merrill et al.,
+1996). The mean time between reversals depends
+strongly on the forcing parameter.
+Between reversals the parity is predominantly
+antisymmetric (dipolar), because the fundamental
+dipole mode is dominant. At a reversal symmetric
+(quadrupolar) components come into play, and the
+ﬁeld strength becomes small. This is also found for
+the geomagnetic ﬁeld (Hoffman, 1991; McFadden
+et al., 1991). In addition, the ﬁeld has a tendency
+to become quasi-periodic during a reversal because
+the oscillatory overtones are temporarily dominant.
+This may be related to the observed rapid variability
+during reversals (Coe et al., 1995).
+4. Statistical analysis
+In order to clarify the physical mechanism behind
+the reversals we decompose the magnetic ﬁeld into
+the eigenfunctions of the unperturbed (δα = 0) linear
+dynamo operator at marginal excitation Ccrit = 58. By
+standard techniques we derive the following equation
+for the mode coefﬁcients ai:
+∂ai
+∂t = λiai + (1 −a2
+0)
+
+k
+Eikak +
+
+k
+Vik(t)ak
+(2)
+Details of the derivation of this as well as the other
+equations of this section can be found in Hoyng
+et al. (2001). The ﬁrst term on the right describes
+the linear evolution, the second term the supercri-
+tical excitation and the global α-quenching by the
+fundamental mode (amplitude a0) that drive the sys-
+tem to the nonlinear equilibrium. The third term
+represents the ﬂuctuations in α. The eigenvalues
+of the unperturbed linear dynamo operator are λi,
+and Eik and Vik are overlap integrals of the eigen-
+modes i and k. They cause a coupling between all
+eigenmodes.
+The statistical properties of the dipole mode
+amplitude a = a0 may be inferred from its probabi-
+lity distribution p(a). By averaging the system of Eq.
+(2) over the ﬂuctuations a Fokker–Planck equation
+
+
+===== PAGE 4 =====
+122
+D. Schmitt et al. / Physics of the Earth and Planetary Interiors 125 (2001) 119–124
+for p(a) is obtained:
+∂p
+∂t = −∂
+∂a Sp + 1
+2
+∂2
+∂a2 Dp
+(3)
+The drift coefﬁcient, S, given by S ≈Λ(1 −a2)a,
+results from the supercriticality and the nonlinear
+quenching, where Λ is the growth rate of the funda-
+mental mode at the dynamo number C of the model.
+The diffusion coefﬁcient D(a) describes the average
+effect of the ﬂuctuations and scales with the forcing
+parameter. The effect of the overtones has been taken
+into account in these coefﬁcients.
+The theory of the Fokker–Planck equation is well
+known (Van Kampen, 1992). Eq. (3) is identical to the
+Fokker–Planck equation of a heavily damped particle
+in a bistable potential U where −∂U/∂a = S (Fig. 2).
+The potential is symmetric with respect to a = 0, and
+this is ultimately due to the ±B invariance of the MHD
+equations. At a = 0 there is a central hill due to the
+supercriticality, and the side walls stem from the non-
+linearity. Most of the time the dipole mode resides in
+either of the wells, representing normal and reversed
+polarity, respectively. The ﬂuctuations, δα, make the
+fundamental mode amplitude perform a random mo-
+tion around one of the stable minima of the potential,
+with occasional jumps over the hill. The geodynamo
+is thus pictured as a bistable oscillator. It can be
+shown that reversals are always fast events, caused by
+the interaction of the dipole mode with the overtones.
+Fig. 2. The amplitude of the dipole mode behaves as the position
+a of a heavily damped particle, subject to random forcing (the
+α-ﬂuctuations), in a bistable potential U(a) = (1/4)Λ(1 −a2)2,
+whose shape is due to supercritical dynamo excitation at small a
+and nonlinear limitation of ﬁeld growth at large a. Also shown is
+the stationary amplitude distribution p(a), Eq. (4), for parameters
+γ and c2 corresponding to Fig. 1.
+The stationary solution of Eq. (3) can be shown
+to be
+p(a) ∝1
+D exp
+ a
+0
+2S
+D dx
+
+≃
+
+1 + a2
+c2
+γ c2+γ −1
+exp( −γ a2)
+(4)
+where the last expression is a useful approximation.
+The constants γ and c2 are dimensionless measures
+of U(0) and of D(0), respectively. This theoretical
+amplitude distribution has two peaks near the wells
+of the potential (Fig. 2), and turns out to describe
+the simulated and observed dipole distribution rather
+well.
+5. Comparison with geomagnetic record
+A variety of statistical properties may be inferred
+from (4) such as the relative variance ⟨(a−⟨a⟩)2⟩/⟨a⟩2,
+or the relative secular variation in geophysical par-
+lance. A classic problem in the theory of stochastic
+processes is the mean escape rate of the particle
+from a well. This allows us to express the mean
+time between reversals Tr in terms of p(a) and
+D(a):
+Tr ≃4
+ 1
+0
+dx [D(x)p(x)]−1
+ ∞
+x
+dy p(y)
+It depends exponentially on the forcing parameter
+f 2θ2
+c τc.
+Our numerical results show that the variability of
+the dipole amplitude between reversals increases with
+larger forcing, while at the same time Tr decreases
+sharply. Such a trend is also seen in the geomag-
+netic record. From the particle-in-well analogy the
+explanation is obvious. As the particle is subject
+to larger random perturbations it will oscillate with
+larger amplitude at the bottom of the well, but it
+will also jump more frequently from one side to the
+other. Tuning the forcing so that the mean reversal
+time of our model has the observed value, the model
+variability nicely reproduces the secular variation of
+the virtual axial dipole moment (cf. Fig. 1). This also
+explains why during long-lasting superchrons like
+the one in the late Cretaceous the secular variation
+was smaller than in the recent past (McFadden and
+
+
+===== PAGE 5 =====
+D. Schmitt et al. / Physics of the Earth and Planetary Interiors 125 (2001) 119–124
+123
+Fig. 3. Reversal record of a run covering 50,000 diffusion times (or ∼108 years). Normal polarity intervals are drawn in black, reversed
+polarity intervals in white. The mean forcing amplitude f increases linearly from f = 4 at the beginning to f = 6.5 at the end of the
+run. This moderate increase of the stochastic forcing causes a drastic decrease of the mean time between reversals, in conjunction with a
+continuous, approximately linear increase of the rms variability of the dipole amplitude with respect to the mean amplitude, ranging from
+17 to 41% (relative variance from 0.03 to 0.17). These results are in qualitative agreement with the behavior of the Earth’s magnetic ﬁeld
+during the last 108 years.
+Merrill, 1995). The observed decrease of the lengths
+of chrons from 107 to 105 years over the last 108
+years may be explained by a moderate increase of
+the forcing parameter f 2θ2
+c τc, by a factor ∼2.5, pre-
+sumably associated with small gradual changes in the
+mean properties of the convection in the outer core
+(Fig. 3). The strong dependence of the mean reversal
+rate on the outer boundary condition in the simu-
+lations of Glatzmaier et al. (1999) may likewise be
+due to small differences in the mean properties of the
+convection and forced by the boundary conditions, to
+which the reversal rate is exponentially sensitive as we
+have shown.
+Recently, the so-called Sint-800 record of the vir-
+tual axial dipole moment (VADM) in the past 800,000
+years has become available (Guyodo and Valet, 1999).
+The VADM represents the surface values of the l = 1,
+m = 0 spherical harmonic of the poloidal ﬁeld. We
+argue, that within the error bounds, the VADM is
+proportional to the dipole amplitude a0 in our model.
+Because of axisymmetry, m = 0. We note that a0
+gives the time dependence of the toroidal and poloidal
+ﬁeld of the fundamental mode. The dominating con-
+tribution to a0 is l = 1, while l = 3 contributes about
+20% to the amplitude, and higher l’s are negligible.
+The mean amplitude a2 of the next antisymmetric
+dynamo mode, which is only temporarily excited by
+the ﬂuctuations and otherwise decaying, is approx-
+imately 10% of a0. Both the l = 3 part of a0 as
+well as a2 fall off with height faster than the l = 1
+contribution of a0. We thus estimate that the error in
+identifying a0 with the l = 1, m = 0 harmonic at the
+surface is less than 10%. Since this is about the ob-
+servational error of the VADM record, we conclude
+that, within the error bounds, a0, and the VADM are
+proportional.
+The VADM amplitude exhibits a relative variance
+of 0.07. From the proportionality of the VADM and
+the dipole amplitude a, we infer that this corresponds
+to a forcing parameter f = 5.4 in our model, which
+yields a reversal time of 500 diffusion times or ∼1
+million years, and is consistent with the length of the
+Brunhes chron which now lasts for 780,000 years. By
+binning the Sint-800 data we have derived the dipole
+amplitude distribution and we compared the result
+with the theoretical distribution (4) (see Fig. 4). The
+close matching of the two demonstrates that our the-
+oretical analysis correctly interprets the geomagnetic
+data, and supports, by implication, the underlying
+physics of the model.
+Fig. 4. Amplitude distribution of the VADM of the geomagnetic
+ﬁeld over the past 800,000 years from the Sint-800 record (Guyodo
+and Valet, 1999), sampled in 30 bins. Overlayed is the theoretical
+amplitude distribution p(a) of the fundamental mode that ﬁts these
+data within 1σ. Error bars are indicated by the thin vertical lines.
+The ﬁt shown is not the optimal possibility but one that lies within
+1σ of the Sint data and the numerical run with f = 5.4. The
+ﬁt parameters are γ = 5.2 and c2 = 0.26, and the scaling factor
+between a and VADM was chosen such that the maxima of the
+distribution coincide (amax = 5.9 × 1022 A m2).
+
+
+===== PAGE 6 =====
+124
+D. Schmitt et al. / Physics of the Earth and Planetary Interiors 125 (2001) 119–124
+6. Discussion
+In our model linear multiplicative noise causes
+the dipole amplitude to perform a random walk of
+restricted amplitude around the nonlinear equilib-
+rium. During a reversal the model evolves as a linear
+system since a0 ≃0 in Eq. (2). But since the ﬂuctua-
+tions are a manifestation of nonlinear turbulence, the
+dipole amplitude variations and the reversals are ul-
+timately caused by nonlinear effects. The essence of
+our approach is the idea that on the fast time scale of
+the eddy-turnover time the effect of these nonlineari-
+ties is virtually indistinguishable from that of a noise
+term, so that the modelling may proceed in this way,
+without much loss of information. For longer time
+scales this is no longer true and nonlinearities remain
+essential. This is in fact a well known and powerful
+approach in many areas of physics. It follows that a
+unique physical cause for a reversal does not exist in
+our model, and given its success the implication is
+that that may hold for the geodynamo as well.
+Another advantage of our approach is that some
+of the properties that are inaccessible to theoretical
+analysis in fully nonlinear models may now actually
+be computed. But of course not all properties may
+be had in this way. For example, it is not possible
+to predict the magnitude of the geomagnetic ﬁeld of
+∼0.5 G without a fully nonlinear model.
+Although our dynamo model is clearly highly
+simpliﬁed, the statistical analysis can equally well be
+applied to more realistic models, such as 2D models.
+This is because the starting point, Eq. (2), features
+only the eigenvalues and certain overlap integrals of
+the eigenfunctions. The only requirement for its ap-
+plicability is the existence of a source of ﬂuctuations,
+and a dominant stationary dipole mode. In this respect
+the analysis presented here serves as a prototype.
+References
+Bogue, S.W., Merrill, R.T., 1992. The character of the ﬁeld
+during geomagnetic reversals. Ann. Rev. Earth Planet. Sci. 20,
+181–219.
+Coe, R.S., Prévot, M., Camps, P., 1995. New evidence for
+extraordinary rapid change of the geomagnetic ﬁeld during a
+reversal. Nature 374, 687–692.
+Fearn, D.R., 1998. Hydromagnetic ﬂow in planetary cores.
+Rep. Prog. Phys. 61, 175–235.
+Glatzmaier, G.A., Roberts, P.H., 1995. A three-dimensional self-
+consistent computer simulation of a geomagnetic ﬁeld reversal.
+Nature 377, 203–209.
+Glatzmaier, G.A., Coe, R.S., Hongre, L., Roberts, P.H., 1999.
+The role of the Earth’s mantle in control-ling the frequency of
+geomagnetic reversals. Nature 401, 885–890.
+Gubbins,
+D.,
+1999.
+The
+distinction
+between
+geomagnetic
+excursions and reversals, Geophys. J. Int. 137, F1–F3.
+Gubbins, D., Roberts, P.H., 1987. Magnetohydrodynamics of the
+Earth’s core. In: Jacobs, J.A., (Ed.), Geomagnetism, Vol. 2.
+Academic Press, New York, pp. 1–183.
+Guyodo, Y., Valet, J.P., 1999. Global changes in intensity of the
+Earth’s magnetic ﬁeld during the past 800,000 years. Nature
+399, 249–252.
+Hoffman, K.A., 1981. Paleomagnetic excursions, aborted reversals
+and transitional ﬁelds. Nature 294, 67–69.
+Hoffman, K.A., 1991. Long-lived transitional states of the
+geomagnetic ﬁeld and the two dynamo families. Nature 354,
+273–277.
+Hollerbach, R., Jones, C.A., 1993. Inﬂuence of the Earth’s inner
+core on geomagnetic ﬂuctuations and reversals. Nature 365,
+541–543.
+Hoyng, P., 1993. Helicity ﬂuctuations in mean ﬁeld theory: an
+explanation for the variability of the solar cycle? Astron.
+Astrophys. 272, 321–339.
+Hoyng, P., Ossendrijver, M.A.J.H., Schmitt, D., 2001. The
+geodynamo as a bistable oscillator. Geophys. Astrophys. Fluid.
+Dyn. 94, 263–314.
+Jacobs, J.A., 1994. Reversals of the Earth’s Magnetic Field.
+Cambridge University Press, Cambridge.
+Levy, E.H., 1972. Kinematic reversal schemes for the geomagnetic
+dipole. Astrophys. J. 171, 635–642.
+McFadden, P.L., Merrill, R.T., 1995. Fundamental transitions in
+the geodynamo suggested by paleo magnetic data. Phys. Earth
+Planet. Inter. 91, 253–260.
+McFadden, P.L., Merrill, R.T., McElhinny, M.W., Lee, S., 1991.
+Reversals of the Earth’s magnetic ﬁeld and temporal variations
+of the dynamo families. J. Geophys. Res. 96, 3923–3933.
+Merrill, R.T., McElhinny, M.W., McFadden, P.L., 1996. The
+Magnetic Field of the Earth. Academic Press, New York.
+Ossendrijver, A.J.H., Hoyng, P., Schmitt, D., 1996. Stochastic
+excitation and memory of the solar dynamo. Astron. Astrophys.
+313, 938–948.
+Parker, E.N., 1969. The occasional reversal of the geomagnetic
+ﬁeld. Astrophys. J. 158, 815–827.
+Sarson, G.R., 2000. Reversal models from dynamo calculations.
+Philos. Trans. R. Soc. Lond. A 358, 921–942.
+Schmitt, D., Schüssler, M., 1989. Non-linear dynamos. Part
+I. One-dimensional model of a thin layer dynamo. Astron.
+Astrophys. 223, 343–351.
+Soward, A.M., 1991. The Earth’s dynamo. Geophys. Astrophys.
+Fluid Dyn. 62, 191–209.
+Stix, M., 1992. Non-linear dynamo waves. Astron. Astrophys. 20,
+9–12.
+Valet, J.-P., Meynadier, L., 1993. Geomagnetic ﬁeld intensity and
+reversals during the past four million years. Nature 366, 234–
+238.
+Van Kampen, N.G., 1992. Stochastic Processes in Physics and
+Chemistry. North-Holland, Amsterdam.

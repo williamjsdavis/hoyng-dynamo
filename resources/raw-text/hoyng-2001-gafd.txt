@@ -1,0 +1,2059 @@
+RAW TEXT LAYER — Hoyng, Ossendrijver & Schmitt (2001), Geophys. Astrophys. Fluid Dyn. 94, 263–314.
+Extracted with PyMuPDF from papers/The_Geodynamo_as_a_Bistable_Oscillator.pdf (scanned, OCR text layer).
+WARNING: OCR quality is mediocre; nearly all displayed equations are MISSING and many symbols are garbled (e.g. 'a' for alpha).
+Use this file only for keyword search. For equations and numbers use resources/hoyng-2001-gafd-geodynamo-bistable-oscillator.md.
+PDF page 1 = journal page 263.
+
+
+
+===== PAGE 1 =====
+Geophys. hfrophys. Ruid Dynamics, Vol. 94. pp. 263-314 
+Reprints available directly from the publisher 
+Photocopying permitted by tiansc only 
+Q 2001 OPA (Overseas Publishers Association) N.V. 
+Publiahed by tiansc under 
+the Gordon and B m h Science Publishers imprint, 
+a member of the Taylor C Frands Group. 
+THE GEODYNAMO AS A BISTABLE 
+OSCILLATOR 
+P. HOYNGa9*, M. A. J. H. OSSENDRIJVERb 
+and D. SCHMITT" 
+aSRON Luboratorium voor Ruimteonderzoek, Sorbonnelaan 2, 3584 CA 
+Utrecht, The Netherland; bKiepenheuer Institut fGr Sonnenphysik, 
+Freiburg, Germany; Universitats-Sternwarte, Gottingen, Germany 
+(Received 1 June 2000; In find form 22 December MOO) 
+Our intent is to provide a simple and quantitative understanding of the variability of the 
+axial dipole component of the geomagnetic field on both short and long time scales. To 
+this end we study the statistical properties of a prototype nonlinear mean field model. An 
+azimuthal average is employed, so that (1) we address only the axisymmetric component 
+of the field, and (2) the dynamo parameters have a random component that fluctuates on 
+the (fast) eddy turnover time scale. Numerical solutions with a rapidly fluctuating a 
+reproduce several features of the geomagnetic field (1) a variable, dominantly dipolar 
+field with additional h e structure due to excited overtones, and sudden reversals during 
+which the field becomes almost quadrupolar, (2) aborted reversals and excursions, (3) 
+intervals between reversals having a Poisson distribution. These properties are robust, 
+and appear regardless of the type of nonlinearity and the model parameters. A technique 
+is presented for analysing the statistical properties of dynamo models of this type. The 
+Fokker-Planck equation for the amplitude a of the fundamental dipole mode shows that 
+a behaves as the position of a heavily damped particle in a bistable potential =(I - d)', 
+subject to random forcing. The dipole amplitude oscillates near the bottom of one well 
+and makes occasional jumps to the other. These reversals are induced solely by the 
+overtones. Theoretical expressions are derived for the statistical distribution of the dipole 
+amplitude, the variance ofthe dipole amplitude between reversals, and the mean reversal 
+rate. The model explains why the reversal rate increases with increasing secular 
+variation, as observed. Moreover, the present reversal rate of the geodynamo, once per 
+(2-3) x lo5 year, is shown to imply a secular variation of the axial dipole moment of 
+.-+ 15% (about the current value). The theoretical dipole amplitude distribution agrees 
+well with the Sint-800 data. 
+Keywords: Geodynamo; Reversals, Secular variation; Dynamo theory; Helicity fluctua- 
+tions; Stochastic processes; Bistable oscillator 
+*Corresponding author. e-mail: p.hoyng@sron.nl 
+263 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 2 =====
+264 
+P. HOYNG et nl. 
+1. INTRODUCTION 
+It is known on paleomagnetic evidence that the Earth has had a 
+magnetic field for at least 3.5 x 109yr. There are indications that the 
+field has always been largely dipolar. The dipole axis is aligned with 
+the rotation axis to within ;5 10". Otherwise, intensity and direction of 
+the field vary on all time scales of a few 100 years and longer. The most 
+spectacular aspect of the variability are the sudden polarity reversals. 
+During a reversal the intensity of the dipole component becomes small 
+and the dipole axis may make a few rapid swings. The dipole then 
+grows in the opposite direction, and in 5 10 kyr the whole process is 
+completed and the field has reversed its direction. The process may 
+also be interrupted and the dipole component may rebound to its 
+original polarity state. This is called an aborted reversal or a magnetic 
+excursion. The mean period between subsequent reversals is presently 
+about (2-3) x 105yr. These and other properties of the geomagnetic 
+field have been documented in great detail by Jacobs (1994) and 
+Merrill et al. (1996). 
+The field is generally believed to originate from dynamo action in 
+the liquid outer core of the Earth. Several groups have reported three- 
+dimensional hydromagnetic simulations of the geodynamo, demon- 
+strating that self-sustained dynamo action is able to overcome the 
+resistive decay of the currents in the outer core (Glatzmaier and 
+Roberts, 1995a,b, 1996; Kageyama and Sato, 1997; Kuang and 
+Bloxham, 1997; Olson et al., 1999). The solid inner core plays a 
+stabilising role and prevents the field from reversing too frequently 
+(Hollerbach and Jones, 1993). In the 2.5 dimensional simulation of 
+Sarson and Jones (1999) the stabilisation is achieved through a 
+convection-driven meridional circulation, and fluctuations in the 
+latter cause reversals. The simulations of Glatzmaier et al. (1999) 
+demonstrate that frequency and polar paths of reversals depend 
+strongly on the assumed radial heat flux pattern at the core-mantle 
+boundary. 
+The idea that some kind of rapid variability may induce reversals 
+has a long history, and the fact that the distribution of the intervals 
+between successive reversals is Poissonian (Jacobs, 1994; Merrill et al., 
+1996) also points in this direction. Parker (1969) and Levy (1972), and 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 3 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+265 
+later Olson (1983), Olson and Hagee (1990), Le Moue1 et al. (1997) 
+and Narteau et al. (2000) have proposed that fluctuations in the 
+helicity distribution of the convection may cause a reversal (see also 
+Gibbons, 1998). These models were all based on the mean field 
+concept. 
+The aim of this paper is to extend these mean field models just 
+mentioned in two new directions. In the first place we present a 
+theoretical framework with which the statistical properties of mean- 
+field dynamos of the geo-type can be analysed, and we illustrate this 
+technique by applying it to a specific model. In the second place we 
+shall compare the theoretical predictions of our model in detail with 
+the observed properties of the geomagnetic field. 
+In the mean field approximation the evolution of the large scale field 
+(B) is given by (Moffatt, 1978; Krause and Radler, 1980): 
+-- 
+a(B) - V X [v X + a - (p + q)V x ](B). 
+at 
+The fluid motion v+u consists of the mean flow v, on which the 
+turbulent convection u is superposed. The quantity q is the molecular 
+resistivity, and p the turbulent resistivity. The parameters a and p are 
+determined by the mean properties of the turbulent convection: 
+The convection has a correlation time T, (= eddy turnover time), and 
+a correlation length A, (= eddy size). The validity of the mean field 
+approach requires that the eddy Reynolds number d C / q be much 
+larger than 1 , or that q << /3 since UT, N A,. Here we simply assume that 
+we may ignore q with respect to p in (1). The mean helicity (u V X u) 
+is nonzero in a rotating convecting medium, such as the fluid outer 
+core of the Earth and the solar convection zone. The combined action 
+of advection and shear (term oc v X), diffusion (term oc q+p) and the 
+a-effect is able to sustain a mean field (B) (Moffatt, 1978; Krause and 
+Radler, 1980; Soward, 1991; Stix, 1991; Hoyng, 1992; Roberts and 
+Soward, 1992). 
+Since we compare our model eventually to observations of the 
+geomagnetic field, we indirectly apply the mean field concept to the 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 4 =====
+266 
+P. HOYNG et al. 
+geodynamo. This requires further discussion, which we postpone to 
+Section 5.2.3 as we amve to this topic. At this point the term “mean- 
+field model of the geo-type” which we coined above just means an aR 
+model with a non-periodic fundamental mode of the dipole type. We 
+focus on an aR model because there are now strong indications that 
+the inner core rotates 5 1” yr- faster than the outer core (Song and 
+Richards, 1996; Su et al., 1996; Vidale et al., 2000; Richards, 2000; for 
+a different opinion see Souriau et al., 1997; Laske and Masters, 1999). 
+A similar effect has been observed in the hydromagnetic simulations 
+(Glatzmaier and Roberts, 1996). 
+The average ( .) may be interpreted as an ensemble average or, as we 
+shall do here, as an azimuthal average (Braginskii, 1965a, b). The latter 
+may be regarded as an average over an incomplete ensemble, 
+comprising only the system itself and all azimuthally rotated states. 
+The fluctuations in our equations emerge as a natural consequence of 
+the azimuthal average. There is only a finite number of convecting 
+elements on a circle over which the average is taken, and these 
+elements are renewed after each correlation time T ~ . 
+Hence parameters 
+like a, p defined in (2) and also the mean flow v must have a 
+fluctuating component on the fast time scale 7,. Fluctuations in a are 
+probably the most important because u V X u may have either sign, 
+contrary to 1uI2 (Otmianowska-Mar et al., 1997). Such fluctuations 
+in a have been shown to explain the observed correlation between 
+phase and amplitude of the solar dynamo (Ossendrijver et al., 1996; 
+Hoyng, 1993, 1996). 
+Schmitt et al. (2000) have recently applied these ideas in the context 
+of the geodynamo. Their simulations reproduced important features of 
+the geomagnetic field, and a theoretical analysis delivered (1) the 
+amplitude distribution of the dipole component, (2) a simple physical 
+picture of the reversal mechanism, and (3) a relation between the 
+secular variation of the geomagnetic field and the mean time between 
+reversals that agrees with the observations. Here we present a detailed 
+numerical and theoretical study of this model that we define in Section 
+2. Numerical results are presented in Section 3, and an analysis of 
+the statistical properties of the model follows in Section 4. A 
+comparison of the theoretical predictions and the observed properties 
+of the geodynamo is given in Section 5, and we discuss our results in 
+Section 6. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 5 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+267 
+2. DYNAMO MODEL 
+2.1. The Linear System 
+We consider a simple axisymmetric dynamo in a spherical shell 
+representing the outer core of the Earth, very similar to the one studied 
+by Schmitt and Schussler (1989). We do so because this model is 
+adequate for our purpose, but as will become clear later, our method 
+allows us to handle more complex models without much extra 
+difficulty. The mean field (B) is written as 
+(B) = V x Ae, +Be,, 
+(3) 
+which splits (B) into its poloidal part l e , and toroidal part [lev, the 
+unit vector in the azimuthal direction (we employ spherical polar 
+co-ordinates r, 8, 4). As a further simplification we make a local 
+approximation to a radial spherical wave: 
+aoR2 
+cos kr 
+cos kr 
+P 
+k r ' 
+kr 
+A = -qe, 
+t) - 
+. B = zye, t) - 
+. 
+(4) 
+This allows a crude modeling of the effect of radial turbulent diffusion. 
+The factor aoRZ/P ensures that P and T have the same dimension. The 
+dynamo parameter /3 is considered to be a constant, and the constants 
+a. and R are reference values of a and the radial position. The mean 
+flow v in the outer core is written as v = 42 x r = Rr sin 8 erp' Ansatz (3) 
+and (4) are substituted in the dynamo Eq. (1) and we make the aR- 
+approximation to obtain (Ossendrijver et al., 1996) 
+= Gb with b(8,T) = 
+ab 
+8.T - 
+and 
+The dimensionless time T is measured in units of Td. The dynamo 
+number C, the diffusion time T d , and the diffusion operator L are 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 6 =====
+268 
+given by 
+P. HOYNG et ul. 
+(kR)2. 
+a
+1
+ 
+sine---- 
+L = - - i a 
+sineLW 
+LW 
+sin20 
+Here dR/dr=fP is the differential rotation which we take to be con- 
+stant. The radial co-ordinate r has become a free parameter and has 
+been set equal to the radial reference position R. The boundary con- 
+ditions are P = T= 0 at 8 = 0, T. We adopt the customary choice that a 
+o( cos0 (Moffatt, 1978; Soward, 1991; Schmitt and Schussler, 1989): 
+a/ao = case. 
+(9) 
+Here a. is the value of a at the North pole. Later, when we consider 
+nonlinear effects, relation (9) will contain a function of (B) on the 
+right-hand side. 
+2.1.1. Eigenfunetions and Parameters 
+The eigenfunctions b,{e) and eigenvalues Xi of G obey 
+The operator G is not self-adjoint, and the eigenvalues Xi and eigen- 
+modes bi are in general complex. The eigenfunctions of the adjoint 6 
+satisfy 
+where * indicates complex conjugation. With proper normalisation 
+{bi} and {hi} form a bi-orthonormal set 
+(bi, b,) = 6, 
+(12) 
+with respect to the inner product 
+r n 
+(bl,b2) = /o 
+dBsinf?(P;P2 + T;T2). 
+(13) 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 7 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+269 
+Details on the normal and adjoint eigenvalue problem may be found in 
+Kleeorin and Ruzmaikin (1984), Ossendrijver (1996) and Ossendrijver 
+et al. (1996). An arbitrary field b(0,T) may be expanded into 
+eigenfunctions: 
+with 
+ai = (bi, b). 
+(15) 
+This relation follows from (14) by using the bi-orthonormality 
+property. 
+The behavior of the eigenvalues as a function of C is quite 
+complicated (Schmitt and Schiissler, 1989). The requirement that the 
+fundamental mode be a non-periodic dipole restricts the values of the 
+parameters to 0 < kR < 1 and C > 0. For given kR there is a critical 
+dynamo number Co below which all eigenmodes are damped. We need 
+to be a little more precise in our notation, and associate henceforth 
+with Co the reference value ao. The dynamo number at which the 
+model operates is denoted as C,, with which we associate the reference 
+value a,: 
+CO a&Cl’//3’, 
+Cm G amR4Sz’//3’. 
+(16) 
+The model has three free parameters, kR, C, and one associated 
+with the strength of the fluctuations to be introduced later. In our 
+simulations we take kR=O.5, and then C0=57.9, while l/k=2R 
+measures the radial length scale of the field. Furthermore we adopt 
+C,= 100. More details are given in Table I and in Sections 5.2.3 
+and 5.2.4. 
+2.2. Nonlinear Feedback and Fluctuations 
+2.2.1. Nonlinearity 
+The model operates at C, > Co and is supercritical, featuring an 
+exponentially growing field. Nonlinearities will prevent unlimited 
+growth, but their role in the dynamo equation (1) is poorly understood 
+and simple models are frequently used in want of better. An example 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 8 =====
+270 
+P. HOYNG et af. 
+TABLE I First eigenvalues and eigenmode types of G for kR = 0.5 and a/ao = cos 0 
+Parity 
+C= Co = 57.9 
+c = c, = 100 
+i 
+of T (0)" 
+mi b 
+3 X ' C 
+92X'b 
+3 X ' C 
+0 
+a 
+0 
+0 
+0.527 
+0 
+1 
+s 
+- 2.76 
+4.41 
+-2.16 
+5.88 
+2 
+a 
+- 8.67 
+4.97 
+-8.21 
+6.04 
+3 
+S 
+- 15.9 
+6.13 
+- 15.7 
+7.70 
+' 8 = symmetric, a = antisymmetric with respect to the equator B = m//$ P(0) and T(0) have opposite 
+symmetry, P(0) and P(0) the same symmetry, as do T(0) and t ( 0 ) . 
+bThe eigenvalue problem being parabolic, the growth rate %A' is a decreasing series, asymptotically 
+- i(i+ 1). 
+'AU overtones are periodic, 3~'f0 for i 2 0. 
+is a-quenching, which in its simplest form amounts to replacing am in 
+a=a,,,cos13 by a,(l -const - (B)2) (Riidiger, 1973). The idea is that 
+an increasing magnetic field reduces the helicity of the flow, and 
+thereby a,,,. 
+In order to keep the theoretical analysis manageable we 
+shall adopt a simplified model (Brandenburg et al., 1989), and replace 
+local quenching by a global one: a,,,+a,,,(l -const 
+J(B)2 d3r): 
+q N const 
+( 8 ~ ) ~ 
+sin e de 
+In the second line we have used that the toroidal part of (B) is much 
+stronger than the poloidal part in the an approximation, and !R is 
+added because the fields are in general complex, but the quenching is 
+done by the real field. Due to the fluctuations in a (to be introduced 
+below) overtones will be excited besides the fundamental mode, and in 
+the third line we keep only the contribution of the fundamental mode 
+(expansion coefficient a,-,), as that is usually the dominant mode. 
+2.2.2. Nonlinear Equilibrium 
+The operator G in (6) has now h(q)cos 8 as its upper right element, and 
+C=C, in its lower left element. The quenching function 1 -(I is 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 9 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+271 
+written temporarily as h(q). Since global quenching leaves the angular 
+dependence of a intact, the dynamo possesses a unique nonlinear 
+equilibrium, independent of the shape of h(q). The evolution of b is 
+governed by an effective b-dependent dynamo number Cmh(q), and the 
+nonlinear equilibrium must coincide with the solution of the linear 
+equation at the critical dynamo number Co. The equilibrium is stable 
+if dh/dq<O, and the equilibrium value of q is determined by 
+Cmh(qo)=Co, or amh(qo)=aO. 
+This shows that the constants in (18) 
+and (19) are irrelevant, and that changing their value merely changes 
+the unit in which (B) is measured. It turns out to matter very little 
+what we choose for q in numerical simulations, as long as it is a 
+quadratic measure of the field strength. We shall adopt (17) and (19) 
+because a simple functional form of h(q) and q is an asset in the 
+theoretical analysis. 
+2.2.3. Fkctuations 
+As argued in Section 1, v, a and p will exhibit rapid residual variability 
+on the time scale T~ of the turbulent flow. Following earlier work on 
+the solar dynamo (Hoyng, 1993; Ossendrijver et al., 1996) we focus on 
+fluctuations in a, as these are expected to be the most important, and 
+(1 7) changes into 
+We reiterate that the fluctuations Sa in (20) are not added ad hoc. 
+They are a necessary consequence of the azimuthal average, but since 
+little is known about their strength and spatial distribution we resort 
+to a model. Helicity fluctuations with a correlation length (‘cell size’) 
+A, and correlation time T~ are assumed to be homogeneously 
+distributed in the outer core, so that Sa, being an azimuthal average, 
+is proportional to N - ‘I2, where N = 2N, sin 8 is the number of cells on 
+a circle of constant latitude. The total number of cells on a sphere is 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 10 =====
+272 
+P. HOYNG et ul. 
+4N,2/7r. F is a random function of B for given T , and of T for given 0, 
+with zero mean and unit variance. In numerical experiments, F is 
+updated once every correlation time, independently in every latitude 
+interval Bc = r/NC. The parameter f measures the unknown relative 
+strength of the fluctuations. In the nonlinear equilibrium, when 
+am( 1 - qo) = ao, each cell has a mean contribution a. cos B to a, while 
+the superposed fluctuations have an r.m.s. magnitude offao per cell. In 
+the simulations reported here we do not allow for magnetic quenching 
+of the fluctuations, and Section 3.3 explains why. 
+Our stochastic turbulence model is much simpler than the 
+hierarchical model of Narteau et al. (2000) but it is adequate for our 
+purposes. In fact most details of the model like cell size and 
+distribution are irrelevant. The only thing that matters is that the 
+mean part of a scales as cos B (which is standard) and the fluctuating 
+part as (sin8)-’’2, i.e., increasing towards the poles. There is no 
+problem near the poles as the field becomes zero there. In our 
+simulations we use 7, = 0.05 and Nc = 10, see further Section 5.2.4. It 
+will be shown later that all statistical properties depend only on the 
+combination f2?JN:. This is the third parameter of the model. 
+2.3. Model Equations 
+Equations (5) and (6) with (20) for a define our geodynamo model. It 
+is useful to express the value of q in equilibrium, qo, in terms of a new 
+supercriticality parameter s: 
+since Cm(l - qo) = Co. For kR = 0.5 and Cm = 100 we have s = 0.728 
+and qo=O.421. Next, q from (19) is written as 
+4 = 4o(=Ol2, 
+(23) 
+where a0 is now measured in units of its value in nonlinear equilibrium. 
+Since the amplitude %za, of the fundamental mode occurs so 
+frequently, we introduce 
+a = %I). 
+(24) 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 11 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+273 
+After some rearranging relation (20) becomes 
+In the numerical and theoretical analysis the field b will be expanded 
+in eigenfunctions belonging to Co. This is an expansion around the 
+nonlinear equilibrium and therefore rather efficient. In conformity 
+with (25), Eq. (5) for b is now replaced by 
+ab 
+-= [G+s(l -d)E+V]b, 
+br 
+where G pertains to the critical dynamo number CO, and a = !?I(&-,, 
+b) 
+according to (15), where bo is the adjoint of the fundamental mode 
+belonging to Co. Furthermore 
+The first term on the right-hand side of (26) describes the linear 
+evolution, the second term the nonlinearity and, for small a, the 
+supercriticality, while the third represents the effect of the fluctuations. 
+Since the nonlinearity does not depend on the sign of the field there are 
+two nonlinear equilibria, a = 1 and a = - 1. This feature reflects the 
+fact that the MHD equations are invariant under the transformation 
+B-t-B. 
+3. SIMULATIONS 
+3.1. Standard Case 
+Numerical solution of (26) is straightforward. The model is relatively 
+simple and simulations extending over N lo5 turbulent diffusion times 
+?-d or more are quite feasible. Figures 1 and 2 show our standard case. 
+It shares several characteristic features with the geomagnetic record 
+'The simulations shown in all figures have been generated on a 60 point equidistant 
+0-grid on [0,7r], time step AT= lo-', kR=0.5, C,= 100,7,=5 
+x IO-'and Nc= 10. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 12 =====
+toroidal magnetic field 
+0 
+0 
+V 
+3 
+0 
+0 
+0 
+5 4 2 
+- 
+n 
+2 
+1 
+0
+0
+ 
+-1 
+-2 
+0 
+500 
+1000 
+1500 
+2000 
+t [diffusion times] 
+FIGURE 1 Numerical solution of (26) for our standard case with forcing parameter f= 6.4. Shown is a colour plot of the toroidal field WT, together 
+with the normalised amplitude a = 3 2 ~ 
+of the fundamental dipole mode. The spacing of the printed data is 100 time steps, suppressing any variability at 
+shorter time scales. Transient excitation of the overtones produces a fine structure with the appearance of vertical stripes. Vertical bars mark the position 
+of a reversal. Aborted reversals are not well visible due to the reduced time resolution; they occur e.g., at T = 825,863, 1048, but also at T = 1475; the event 
+at ~ = 6 4 8 
+is an excursion. (See Color Plate I). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 13 =====
+GEODYNMO AS BISTABLE OSCILLATOR 
+275 
+- 
+- 
+B 0.75 
+0.00 
+30 
+F 20 
+10 
+0 
+Q 
+Q 
+500 
+550 
+600 
+650 
+700 
+t [diffusion times] 
+FIGURE 2 The section between T = 500 and T = 700 from Figure 1 at higher resolution 
+(spacing 5 time steps). From top to bottom: normalised magnitude of the complex 
+overtone amplitude lull and 1~21, both computed from (15), the parity P of the field and 
+the 'energy' g(giT)2 sin Ode. Vertical bars mark the position of a reversal. 
+(Jacobs, 1994; Merrill et al., 1996): 
+(1) A dominantly dipolar field of rapidly varying amplitude, on which 
+a fine structure is superposed due to transient excitation of the 
+overtones. The dipole mode amplitude a fluctuates around its 
+nonlinear equilibrium value. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 14 =====
+276 
+P. HOYNG et ul. 
+(2) Occasional sudden polarity reversals. The forcing parameter f has 
+been tuned so that the mean t h e between reversals is about 100 ?-d 
+(from a long run). 
+(3) Aborted reversals, where u changes sign for a short moment, after 
+which the field returns to its previous polarity state, and magnetic 
+excursions. 
+The agreement with the geomagnetic data is discussed in detail in 
+Section 5.2. Note that our definition' of (aborted) reversals and 
+excursions is dictated by theoretical convenience rather than by 
+geophysical practice. The parity of the field displayed in Figure 2 is 
+defined as (Brandenburg et al., 1989) 
+where &s4 = J ~ " ( ! R T s ~ ) ~ 
+sin Ode is a measure of the energy in the 
+symmetric, antisymmetric component of the toroidal field (TdO) 
+= 
+T(O)+ q x - 4); TA(0) = T(8) - T(A - 0)). Except during (aborted) 
+reversals and excursions, the field is largely antisymmetric (P 
+21 -l), 
+and therefore dipolar as the fundamental dipole mode is much 
+stronger than the antisymmetric overtones. 
+3.2. Reversals and Aborted Reversals 
+Figures 3 and 4 show the evolution of the toroidal field during an 
+(aborted) reversal in detail. From inspection of a number of these 
+events the following picture emerges: 
+(1) During an (aborted) reversal the field has a tendency to become 
+symmetric (P T +1 in Fig. 2) because the overtones dominate, and 
+frequently mode # 1 (a quadrupole) stands out. A quasi-periodic 
+behavior is sometimes observed with a period of the order of rd. 
+This is due to the fact that all overtones are periodic. For example, 
+*We define a reversal as an odd number of zero crossings of n within a few diffusion 
+times Td. An aborted r e v e d refers to an even number of zero crossings in rapid 
+succession. In an excursion a 'approaches zero' but does not change sign. This definition 
+is subjective, but there is no obvious alternative. There remain ambiguities, e.g., three 
+'closely spaced' zero crossings may also be an aborted event followed by a reversal. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 15 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+211 
+if mode # 1 dominates, the period would be about 2~/5.88 E 1.1 
+diffusion times, from Table I. 
+(2) The onset of a reversal is characterised by a decrease in la[, 
+combined with a sudden enhancement ( 5 0 . 5 ~ d ) of the amplitude 
+of mode # 1 and/or 2, or rather of the magnitude of the toroidal 
+field T+ of the overtones, defined in (38). However, the realisation 
+of 6a (0,T) must be ‘favorable’, as not all jumps in T+ and/or the 
+mode coefficients produce a reversal, (see Fig. 2). 
+(3) Just after the zero crossing during an (aborted) reversal, the whole 
+field b often ends up being small, i.e., all expansion coefficients are 
+small. In that case the field enters into a recovery phase to the 
+nonlinear equilibrium. This happens because when lal<<l the 
+nonlinearity is switched off and then (26) says, very roughly, that b 
+grows exponentially. 
+(4) Although there are fast events lasting N O S T ~ , the typical duration 
+of a reversal is ~ 3 T d . The observed duration of a reversal is 
+5 10 kyr (Merrill et al., 1996), and it would follow that Td - 3 kyr. 
+The mean time between reversals is then 10k-d N 3 x lo5 yr, which 
+is about the observed value of the geodynamo in recent times. 
+3.3. Other Cases and Scaling 
+Figure 5 shows a for two different values of the forcing parameter f. It 
+is evident that the reversal rate is extremely sensitive to the strength of 
+the forcing. We have verified that the dominant scaling of mean 
+properties (such as the mean time between reversals and the r.m.s. 
+variability between reversals) with the strength of the forcing is 
+through the combination f 2~c/N:. We demonstrate later that the 
+reversal rate depends exponentially on f 2 ~ c / N : . 
+We have tried other types of nonlinearity, such as: (1) Q as in (17) 
+and q from (18), (2) a=~,cosO/(l+q) and q from (19), and (3) 
+local instead of global quenching, cf. Section 2.2.1. We have also 
+investigated the effect of changing C, and kR, and we have allowed 
+for magnetic quenching of the fluctuations 6a. The conclusion from all 
+these tests is that the statistical properties of the dipole mode are not 
+materially affected. For example, we found that magnetic quenching 
+of the fluctuations reduces the mean reversal rate and the r.m.s. 
+variability between reversals of the dipole amplitude, because the 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 16 =====
+FIGURE 3 Two reversals of Figure 1 at full resolution. The black line indicates where the toroidal field is zero. The top panel shows a very fast 
+event. In the bottom panel the field becomes quasi-periodic. This is due to the 6rst overtone, a quadrupole, with a period of 1.1 (see text). The 
+recovery phase after T = 1135 is roughly an exponential growth with a time scale of the order of A-', see (34). The grey scale in this and the next 
+figure has a steep gradient near zero, to enhance the contrast between the two polarities. (See Color Plate 11). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 17 =====
+FIGURE 4 An aborted reversal (top) and an excursion at T N 1282 (bottom), both from Figure 1. The black line indicates where the toroidal field 
+is zero. Aborted reversals and excursions are formally Merent in that the dipole mode does or does not change sign, but have often a similar 
+appearance. (See Color Plate III). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 18 =====
+2 
+1 
+0
+0
+ 
+- 1 
+-3 L 
+c I 'I 
+I'll 
+'I I I1 I ' I1 ' 11111'I 
+I 1 1 1 ' I I I II' 
+r 
+I 
+' 111 II IIII 
+2 
+1 
+0
+0
+ 
+-1 
+-2 
+I 
+I 
+I 
+I 
+I 
+0 
+500 
+1000 
+1500 
+2000 
+t [diffusion times] 
+FIGURE 5 Amplitude a of the fundamental dipole mode for f= 5.4 (top) and f= 7.4 (bottom). The case f= 6.4 is shown in Figure 1. The other 
+parameters are as in Figure 1, and in all three cases the same random series has been used. Vertical bars mark the position of reversals. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 19 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+28 1 
+effective strength f of the forcing diminishes. However, the quenching 
+may be offset by increasing the free parameter$ Such a simulation has 
+very similar statistical properties as a run with a smaller f and no 
+quenching. Similar observations hold when we change the model 
+parameters or the type of nonlinearity. For that reason there is no 
+magnetic quenching of the fluctuations in the simulations reported 
+here, and we concentrate our efforts on the standard case defined 
+by (26). 
+4. STATISTICAL ANALYSIS 
+Let us recapitulate where we stand. We employ a well-known Eq. (1) 
+for the axisymmetric component of the magnetic field, and add 
+fluctuations in the dynamo parameter a as a new element. These 
+fluctuations must be present on general grounds, and they are seen in 
+the hydromagnetic simulations, but their impact has never been 
+analysed in the context of the geodynamo. Apart from the model 
+parameters C,,, 
+and kR, the only free parameter isf, or rather f2rc/Nz. 
+This defines the physics in our model, which is by all means simple. 
+The multiplicative noise term excites all eigenmodes of (1). The 
+fundamental mode has a rapidly varying amplitude and occasional 
+random reversals, and we shall show in Sections 5.2 and 6 that it 
+reproduces the behavior of the geomagnetic dipole field on short as 
+well as long time scales. 
+It is straightforward to infer the statistical properties of the model 
+from simulations of the type presented above. The advantage of a 
+simple model is that these properties may also be determined 
+theoretically, by applying techniques from the theory of stochastic 
+processes. This is the second new element of our work. It requires a 
+considerable amount of analysis, but the reward is a clear insight in the 
+physics of the model. The dipole amplitude turns out to behave as a 
+randomly forced particle in a bistable potential, and the mean reversal 
+rate is given by the equivalent of the Kramers escape rate of a 
+thermally activated strongly damped particle. The technique that we 
+introduce below does not rely on the details of the model. It is assumed 
+that the fundamental mode is non-periodic, but otherwise our analysis 
+can be readily applied to more complicated dynamo models. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 20 =====
+282 
+P. HOYNG et al. 
+4.1. Coupled Mode Equations 
+The starting point is the equation for the mode amplitudes ab which 
+follows by taking d/dr of (15) and using (26) and (14): 
+with a = %ao. In these coupled mode equations all ak are in units of the 
+value of a0 in nonlinear equilibrium. We adopt henceforth the 
+summation convention for double lower indices as in E@k and V&&, 
+but not in Xiai. The matrix elements are defined as 
+Ek = ( b i , E b k ) = 
+d8 sinOcosOFTTk, 
+(30) 
+A special role will be played by Em = xdde sin8 cosB~oT0 = 1.048. 
+The first term on the right-hand side in (29) describes the linear 
+evolution, and the Xi are the eigenvalues at C = CO listed in Table I. 
+The second term is due to the supercriticality and the nonlinearity that 
+drive the system to the nonlinear equilibrium (ao= f 
+1; ai=O, i2 1). 
+The third term is a multiplicative noise term, representing the 
+perturbations by the fluctuations. 
+4.2. Fokker-Planck Equation 
+The behavior of the mode amplitudes is illustrated in Figure 6. The 
+proper tool for analysing the statistical properties of the fundamental 
+mode is the probability distribution p(a, r) of its amplitude a = Rae, 
+which obeys the following Fokker-Planck equation 
+l a z 
+- 
+”- 
+&--& 
+2 aa2 
+a Sp + - - D p . 
+The derivation of this equation is rather complex and relegated to 
+Appendices A and B. Here we simply summarize the result of these 
+computations, and much of the physical interpretation follows later. 
+The Fokker-Planck equation describes how the probability density p 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 21 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+283 
+1 .o 
+I 
+- 
+. . . . . . . . - 
+- 
+- 1 .o 
+I 
+I 
+I 
+evolves under the influence of systematic effects (drift coefficient S) 
+and random effects (diffusion coefficient D), (see Risken, 1984; 
+Gardiner, 1990 or Van Kampen, 1992). The drift coefficient S is 
+given by 
+S = p( 1 - a2)a + gl (a) II A( 1 - d ) ~ 
+(33) 
+with 
+(34) 
+0 
+p G SEW = 0.763, 
+A E X 
+= 0.527. 
+The second expression in (33) is an approximation for small a which is 
+adequate for our purposes. Details may be found in Appendix B.l. 
+The diffusion coefficient D is equal to (see Appendix B.2) 
+D = 002 +&(a), 
+(35) 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 22 =====
+284 
+P. HOYNG ef af. 
+The integral 
+do sin 0 
+defined as the toroidal field of the overtones: 
+in (36) equals 3.529. The symbol T , is 
+The fluctuations have a direct effect on a through the term V O ~ , , 
+in 
+(29). The corresponding diffusion coefficient is D@’. There is also an 
+indirect effect (the term Vogk, k 2 1) that produces a fluctuating 
+contribution to a through stochastic forcing of overtones, represented 
+by Dl(a). For later use we expand D to order h: 
+D 21 AoaZ + A1 
+(39) 
+with 
+A0 = Do + iD’,(O); 
+A1 = Dl(0). 
+(40) 
+Here we have used that D1(O) = 0 since it is clear from (37) that 
+Dl( -a) = Dl(a). The approximations in (33) and (39) will be justified 
+in Section 5.1. 
+4.3. Particle-in-well Analogy 
+Readers not familiar with stochastic methods should retain just one 
+thing from the previous section: the fluctuations Sa render the dipole 
+amplitude a a stochastic variable with a probability distribution p 
+evolving according to a kind of diffusion equation (32). This should be 
+intuitively clear by itself, regardless of any mathematical detail. The 
+only remarkable thing is that the diffusion coefficient D depends on the 
+total non-dipole toroidal field, see (35) - (37). This means that all 
+dependence on individual overtones has disappeared from (32), 
+although we set out from Eq. (29) in terms of individual mode 
+amplitudes. Appendix E explains how this comes about. 
+The Fokker-Planck Eq. (32) admits a simple interpretation, since it 
+also determines the probability distribution of the position a of a 
+heavily damped, randomly forced particle in a bistable potential U 
+given by - a U p a = S: 
+U 2i $(l - d)*. 
+(41) 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 23 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+285 
+This particle-in-well paradigm will be used extensively below. The 
+particle (k, 
+the dipole amplitude) resides in one of the wells and 
+performs a random motion near the bottom at a = f 
+1 due to 
+fluctuations, with occasional jumps to the other side, see Figure 7. 
+These correspond to the irregular magnetic field variations during 
+intervals of one polarity and to a reversal, respectively. The 
+geodynamo is thus pictured as a bistable oscillator. The central hill 
+of U at a=O is due to the supercriticality, and the walls beyond 
+a = zk 1 are due to the nonlinearity. The fluctuations Sa determine 
+the variability of the dynamo. It is straightforward to obtain the 
+stationary solution of (32): 
+I 
+6a 
+01 (a) 
+OVERTONES 
+I 
+\ 
+FIGURE 7 The amplitude of the fundamental dipole mode behaves as the position of 
+a heavily damped particle subject to random forcing, in a bistable potential U(u)= 
+(1/4)A(l-d)’. As shown in the text, the fluctuations act directly on u (diffusion 
+coe5cient D&), but this causes no reversals, and through the overtones (diffusion 
+d c i e n t Dl(u)). The effect of the overtones is not restricted to a small region near u = 0. 
+For the standard run D1 is larger than D& for lul 5 1 (Section 5.1). The dashed curve is 
+the stationary amplitude distribution p(u) from (43) for 7 = 3 and 2 = 0.2. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 24 =====
+286 
+P. HOYNG et al. 
+This is the theoretical distribution of the amplitude a of the dipole 
+mode. The parameters 7 and c2 and are defined as dimensionless 
+measures of U(0) and D(O), respectively: 
+7 = h/Ao; I? = Al/Ao. 
+(44) 
+They determine p(a) and therefore many statistical properties of the 
+dipole amplitude. The combination of a steeply rising power-law and a 
+sharply decreasing exponential makes that p(a) has two peaks near 
+a = f 1 where most of the probability is concentrated, (see Fig. 7). We 
+shall show in Section 5.2 that the observed dipole amplitude 
+distribution follows the theoretical expression (43) rather well. 
+We note that c2xDI(0)/Do, or in view of (36) and (37): 
+)2 . 
+(45) 
+r.m.s. toroidal field at a reversal 
+r.m.s. toroidal field between reversals 
+c20( ( 
+Hence c2 may also be interpreted as a dimensionless measure of the 
+r.m.s. toroidal field at a reversal. The scaling of c2 and 7 with the 
+model parameters is discussed in Appendix E. 
+4.4. The Reversal Mechanism 
+It is straightforward to show that reversals must be fast events, caused 
+by interaction with the overtones. The argument consists of three 
+steps: 
+(1) If there are no overtones then (29) reduces to ( a k = O for k > 1; 
+XO = 0) 
+h
+0
+ 
+- 
+d r = s(1 -a2)Eooao + Voo(r)ao. 
+The noise term is multiplicative, and the noise amplitude becomes 
+arbitrarily small for small ao. This prevents reversals, as can be 
+seen by rewriting (46) in terms of a = %ao, using that Eoo and Voo 
+are real: 
+i.e., In a performs a restricted random walk and a cannot change 
+sign: no reversals. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 25 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+287 
+(2) For most of the time the dipole amplitude a resides near one of the 
+minima of U(a) at a = f 1. Now consider what happens if a goes 
+rapidly to zero, through a series of favorable fluctuations. The 
+overtones, although damped, do not follow suit immediately. 
+According to (29) the evolution of a is then governed by these 
+overtones: 
+Hence a is temporarily driven by additive noise, and if the 
+realisation of the fluctuations is right, a reversal may ensue. 
+(3) We may now conclude that a reversal cannot be a slow event, 
+because if the evolution toward a reversal is slow, the overtones 
+have the opportunity to decay. The system then enters into the 
+state described by (47) and the result is an excursion. The flip 
+becomes a flop, so to speak. 
+Let’s rephrase the argument from the point of view of the Fokker- 
+Planck equation. We begin with a dipole amplitude a=l, i.e., we 
+consider Eq. (32) with initial condition p(a, 0) = S(a- 1). For T > 0 the 
+probability distribution p(a, T ) broadens and a quasi-equilibrium 
+distribution is quickly established in the well at a = 1, on a time scale 
+A-’. On a much longer time scale, the probability starts to creep 
+diffusively over the hill at a = 0 (ix., reversals set in) and the well at 
+a= - 1 gets slowly filled in, leading to the final distribution (43). 
+Writing (32) as ap/& = - aF//da, then F= Sp - (1/2)8(Dp)/aa is the 
+probability current. Since S and dD/da vanish at a = 0, the probability 
+current at a = 0 is, according to (35), equal to 
+There is no contribution from 002. 
+Reversals are caused by a small 
+but bite diffusion coefficient Dl(0) solely due to the overtones, cf. (37) 
+and (38): Dl(0) is determined by (T:)I,=o, the mean square non-dipole 
+toroidal field during reversals. Since this does not favor any overtone, 
+it also follows that it will, in the long run, be impossible to attribute a 
+reversal to any overtone in particular. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 26 =====
+288 
+P. HOYNG et d. 
+4.5. The Statistics of Field Reversals 
+A variety of statistical properties of a may be inferred from (43), and 
+here we consider three that are directly linked to observable features. 
+For analytical work a ‘parabolic approximation’ to p(a) is often useful 
+(Van Kampen, 1992), valid for saciently large 7: 
+from which we infer that 
+The value of 7 is restricted to 7 > 1 otherwise p(a) consists of a single 
+peak at a=O. 
+4.5.1. Variability of the Field Between Reversals 
+The average amplitude (a) between reversals follows by integrating 
+over a single peak of p(a): 
+where p(a) is taken from (50), assuming that the field (the particle) 
+resides in the well at a = 1. The mean value of a is smaller than 1. In 
+Figures 1 and 5, a fluctuates asymmetrically around + 1 or - 1, so that 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 27 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+289 
+the mean of la1 between reversals is indeed smaller than 1. The physical 
+origin is the asymmetry of the well around la1 = 1 in Figure 7, and the 
+fact that D(a) increases with a. The amplitude stays longer in the 
+region la1 < 1 because the random motion is slower there than in 
+In a similar manner we may compute the variance around the mean. 
+la[ > 1. 
+The result may be written as 
+This is independent of the units in which a is expressed, and may thus 
+be directly connected to the measured relative variability of the dipole 
+field between reversals. 
+4.5.2. Mean Reversal Rate 
+A classic problem in the theory of stochastic processes is the mean 
+escape time of a stochastically driven particle from an interval [al, a2]. 
+Presently we may relate the mean reversal time to the mean escape 
+time (T,) of the particle from the region 0 5 a < 00, starting from an 
+initial position d > 0, which according to standard theory is equal to 
+(Gardiner, 1990; Van Kampen, 1992) 
+This expression is almost independent of the initial position d as long 
+as it is near the bottom of the well (d M 1). As the particle escapes from 
+[0, 001 it is located at the top of U at a = 0. It may then make one or 
+more additional rapid zero crossings, but irrespective of that, one 
+would think it has a chance of 1/2 to fall in the well at a = - 1, and of 
+1/2 to fall back to a= 1 where it came from. According to our 
+terminology2 the former event is a reversal, the latter an aborted 
+reversal. It would follow that the mean waiting time for a reversal is 
+2(T,), and this is then also the mean time (T,) between successive 
+reversals (see Van Kampen, 1992, exercise on p. 47). But the two 
+probabilities are not equal, and (T,) is only approximately equal to 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 28 =====
+290 
+P. HOYNG et al. 
+2(Te), see Appendix F, where we show that 
+(T,) M 2(Te) N - 
+with 
+Relation (59) is an asymptotic expansion of (58) for large 7. It 
+shows that (T,) scales approximately as exp[const . U(O>/(f2~,/N:)], 
+see Appendix E, which explains the very strong dependence on f. 
+There is a close analogy with the escape rate of a strongly damped 
+thermal particle from a potential well, a problem first considered by 
+Kramers in 1940 (Van Kampen, 1992). A thermal particle has an 
+energy N kT (k = Boltzmann's constant, T= temperature), but must 
+acquire an energy U(0)- U(1)= U(0) to be able to escape to the 
+other well in Figure 7. The chance for this to happen (i.e., the 
+inverse mean escape time) is cx exp[- U(O)/kT]. The parameter 
+f2Tc/N: thus serves as a kind of effective temperature. We demon- 
+strate in Section 5 that relation (56) and (58) agree well with our 
+simulations and with the observed properties of the geomagnetic 
+dipole moment. 
+4.5.3. Distribution of Polarity Intervals 
+According to standard theory (Risken, 1984; Gardiner, 1990; Van 
+Kampen, 1992) the distribution of the lengths T, of polarity intervals 
+between successive reversals can be proven to be Poissonian, 
+cx exp(-T,/(T,)) for T,>>A-', and from a number of long runs we 
+have verified this Poissonian character. We shall not enter into any 
+details, as this result is intuitively evident, given the stochastic nature 
+of the model and the short memory of the fluctuations. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 29 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+29 1 
+5. MODEL VALIDATION 
+We wish to raise two issues here. The first is how reliable are the 
+analytical results derived in the previous section, and the second how 
+do the properties of the model compare to those of the geodynamo. 
+5.1. Internal Consistency 
+In order to verify the results of the previous sections, we must be able 
+to express cz and +y in terms of the model parameters, but this is 
+unfortunately not yet possible, cf. Appendix E. As next best option we 
+have determined D1 numerically from a long run, as follows. During 
+the simulations T , is known at all times, which permits computing a 
+value of D1 at the current value of a with the help of (37) - omitting 
+the averaging there. We do so with a spacing of 1 diffusion time to 
+ensure statistically independent draws, and the result is plotted in 
+Figure 8. The data are then fitted to a quadratic function of a. For the 
+standard case the result is 
+D1 N - 
+?rf2Tc (1.36 + 2 . 0 0 ~ ~ ) 
+2% 
+or, upon adding 002, 
+?rf2Tc w 
+D N - 
+(1.36 + 5.522) , 
+from which A. and A1 follow. Since nf2~c/W: 
+= 3.22 x 
+obtain 
+we 
+I? N 0.246; 7 N 2.96 . 
+(63) 
+It follows from (56) and (58) that ((a- (a))z)/(a)2~0.17 
+and (T,) 
+~ 9 4 . 
+The simulation had 468 reversals in 5 x lo4 diffusion times, whence 
+(T,) = 107 f 
+5, while ((a- (u))~)/(u)’ 
+was measured to be 0.16. These 
+results are summarised in Table 11, together with those of a few more 
+simulations for different values of the forcing parameter f. The 
+agreement between the values predicted by (56) and (58), and the 
+values measured from the simulations is satisfactory, certainly in view 
+of the fact that (58) holds only approximately. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 30 =====
+292 
+P. HOYNG et d. 
+15 
+10 
+LL \ 
+n 
+5 
+0 
+0.0 
+0.5 
+1 .o 
+1.5 
+la I 
+FIGURE 8 The dots, 5 x lo4 in total, are the numerically computed values of D1/F 
+(F = nf2rc/2N~) 
+for the standard case, as explained in the text. The histogram is 
+constructed by determining the average in the corresponding bin. The continuous curve 
+(1.36+2.00d) is the result of a least-square-fit of a quadratic function to the histogram 
+levels, weighted by the number of points in the bin, for a 5 1.1. For larger (I the contri- 
+bution of a4 becomes appreciable. 
+TABLE I1 Comparison of numerical and analytic results 
+ma 
+((a - (a),2)/(42 
+( Tr) 
+# 
+f 
+2 
+7 
+(56) 
+from run 
+(58) 
+from M 
+1 
+4.4 
+0.318 
+9.04 
+0.04 
+0.03 
+12000 
+10700 f 5300 
+2 
+5.4 
+0.299 
+5.15 
+0.08 
+0.07 
+480 
+519 f 53 
+3 
+6.4 
+0.246 
+2.96 
+0.17 
+0.16 
+94 
+107 rt 5 
+4 
+7.4 
+0.240 
+1.82 
+0.47 
+0.30 
+35 
+37.6 & 1 
+5b 
+8.4 
+0.228 
+1.09 
+1.0 
+0.50 
+35 
+18.7 & 0.4 
+*All runs have Nc = 10, T~ = 5 x lo-*, and comprise 5 x lo4 diffusion times. Run # 3 is the standard 
+case. 
+bRun # 5 is outside the validity range of the asymptotic analysis of Section 4.5 because 7 is so close 
+to 1. 
+Figure 9 compares the numerically determined amplitude dis- 
+tribution p(u) with the theoretical result (43). Here the agreement 
+seems less good. The origin of the discrepancy lies in the 
+approximate expression (33) for S. We have computed gl(u) 
+numerically, in the same way as we did for D1, 
+and found that 
+expression (33) is correct for lal50.4, but for larger la( deviations 
+occur. In view of the dependence of (42) on S deviations in p(a) 
+should be expected. The discrepancy virtually disappears if we use 
+a more accurate expression for S by evaluating the next term in 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 31 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+293 
+0.0 
+0.5 
+1 .o 
+1.5 
+I0 I 
+FIGURE 9 Numerically determined amplitude distributionp(a), constructed by binning 
+subsequent values of a during the simulation, and the theoretical distribution (43) (drawn 
+curve). Both curves have been normalised to unit area. The discrepancy is explained in 
+the text. 
+gl(u) as indicated in Appendix B.l (Hoyng et ul., 2001). This 
+correction can be shown to have little effect on the mean reversal 
+time (T,). 
+5.2. Comparison with the Geodynamo 
+The observed properties of geomagnetic field reversals may be 
+summarised as follows (Jacobs, 1994; Merrill et al., 1996). The mean 
+time (T,) between successive polarity reversals has decreased over the 
+last 160 Myr, and is now (2-3) x 105yr. A reversal takes 5 10 kyr. 
+There is no correlation between the lengths of subsequent polarity 
+intervals, nor between polarity and length of polarity intervals. The 
+distribution of the interval lengths T, between reversals is well 
+described by a nonstationary Poisson process (because the mean 
+reversal rate is changing). 
+These features are all reproduced by our model, where a typical 
+reversal lasts 3~~ and (T,) is about 100 diffusion times for f = 6.4. It 
+follows that Td - 3 kyr and (T,) N 3 x lo5 yr. And the statistics of the 
+reversals is, by construction, independent of the field direction. A 
+reversal is necessarily a fast event in our model. The quasi-periodic 
+behavior that we sometimes observe during a reversal due to the 
+temporary dominance of periodic overtones may be related to the 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 32 =====
+294 
+P. HOYNG et al. 
+rapid variability the geomagnetic field is sometimes reported to have 
+during a reversal (Coe et al., 1995). 
+5.2.1. Secular Variation and Mean Reversal Rate 
+Our model cannot predict the mean reversal rate of the geodynamo as 
+the effective forcing parameterf2~,/N~ 
+is free. However, it does predict 
+the correct relation between the variance of the dipole amplitude 
+between reversals (the secular variation of the dipole mode, in 
+geophysical parlance) and the mean reversal rate. From the particle- 
+in-well analogy it is obvious that such a relation must exist. As the 
+particle is subjected to larger random perturbations it will oscillate in 
+the well with larger amplitude, but it will also jump more frequently 
+from one side to the other, as is evident from Table I1 and Figure 5. 
+Such a trend between secular variation and mean reversal rate is 
+indeed suggested in the geomagnetic record (McFadden and Merrill, 
+1995), and in hydromagnetic simulations (Glatzmaier et al., 1999). We 
+thus offer a very simple theoretical explanation for this phenomenon. 
+The agreement is more than qualitative, as the numbers work out 
+quite well. The current mean reversal rate of once per - 100 diffusion 
+times, implies ((a- (a))*)/ ( ~ ) ~ - 0 . 1 6 , 
+cf. Table 11. In order to compare 
+this with the geodynamo we have determined the relative variance of 
+the dipole component from three Virtual Axial Dipole Moment 
+(VADM) records: (1) the last 130 kyr (Fig. 4.9 of Merrill et al. (1996)), 
+(2) between 2 and 2.5Myr ago in the Matuyama chron and (3) 
+between 2.5 and 3 Myr ago in the Gauss chron, both from Valet and 
+Meynadier (1993). We may take a to be proportional to the ordinate 
+in the figures, because the amplitude of the poloidal dipole field, 
+which determines the VADM, is proportional to a. The result is that 
+((a- ( ~ ) ) ~ ) / ( a ) * 
+equals 0.1, 0.15 and 0.2, respectively, in reasonable 
+agreement with the prediction of our model. 
+5.2.2. The Sint-800 Data 
+After completion of the simulations reported here, detailed VADM 
+measurements have become available (Guyodo and Valet, 1999). 
+These data allowed us to construct the observed dipole amplitude 
+distribution. A preliminary comparison with the theoretical dis- 
+tribution p(a) of (43) is shown in Figure 10. The parameters 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 33 =====
+GEQDYNAMO AS BISTABLE OSCILLATOR 
+295 
+Amplitude Distribution 
+80 
+rn 60 
+Y 
+C 
+0 a 
+0 
+.- 
+.u 40 
+u- 
+0 
+6 
+20 
+C 
+0 
+0 
+2 
+4 
+6 
+8 
+10 
+VADM (10A22 A mA2) 
+FIGURE 10 The Sint-800 data is a 800 kyr record of the Virtual Axial Dipole Moment 
+(VADM) of the geomagnetic field comprising 800 data points with a spacing of 1000 yr 
+(Guyodo and Valet, 1999). The histogram is the amplitude distribution of these data 
+sampled in 35 bins. The drawn curve is a fit to the theoretical amplitude distributionp(a) 
+from (43) for 7=5.15 and c2=0.25. The 2 of the fit corresponds to lo. A fit to the 
+parameters of run #2 (7 = 5.15 and c? = 0.3) has a xz of 2a. Data for t > 780 kyr (the 
+time of the last reversal) are treated as positive because of the p( - a) =p(a) symmetry. 
+correspond closely to run #2 (Tab. 10, except that c2 = 0.25 instead of 
+0.3. The agreement is surprisingly good in view of the fact that we have 
+made no attempt to improve the fit by changing the model parameters 
+kR and C,. A parameter study is now in progress, and the results will 
+be reported elsewhere (Hoyng et al., 2001). We anticipate that a 
+modest change of the parameters will sufXce to bring our model into 
+agreement with the data. It appears therefore that over the past 
+800 kyr the geodynamo behaved rather closely conform run #2. The 
+mean reversal time (T,)-500~, - 1.5Myr of that run would be 
+consistent with the fact that the last reversal took place 780 kyr ago, 
+but this requires more careful statistics. 
+5.2.3. Mean Field Approximation 
+Last but not least, we discuss the applicability of the mean field 
+approximation with which all our results have been obtained. From 
+r d = R2/p - 3 kyr and R N 3500 km we infer /3 N lo6 cm2 s - '. Since the 
+conductivity of the core is 6 x 105Sm-' (Merrill et al., 1996, p. 274) 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 34 =====
+296 
+P. HOYNG et ul. 
+the resistivity is qN 1.3 x 104cm2s-'. Hence the eddy magnetic 
+Reynolds number would be p/v N 80. We conclude that application 
+of mean field theory seems reasonable, although estimates of this kind 
+may always be stretched one way or the other. 
+To verify the consistency of the aR approximation we consider the 
+Reynolds numbers C,=a,R/p 
+and Cn=R3R'/p. A value for R' 
+follows from claims that the inner core rotates 5 1" yr- ' faster than 
+the outer core (references quoted in Section 1). This suggests that 
+there is a negative gradient R' N - 1" yr- '/AR. Taking AR = 2300 km 
+(difference of outer and inner core radii) and R = 3500 km we obtain 
+Cn- -lOOandCa- 
+-1,since Cm=C,Cn.Hence IC,l<lCnl. Weare 
+not claiming to prove that mean field theory and the aR approxima- 
+tion actually hold in the geodynamo, but merely that their application 
+here is self-consistent. 
+5.2.4. Characteristic Numbers 
+The aR approximation would in fact apply for any C, larger than 
+Co = 57.9, and C,,, = 100 is chosen for two reasons. (1) It leads to a 
+reasonable time scale for oscillations around the nonlinear equilibrium 
+of (2A)-'el diffusion time or about 3 kyr. The fine structure of 
+vertical spikes in Figure 1, due to variable excitation of the first few 
+overtones, would thus have a typical time scale of (%A)-' 5 1 kyr, 
+according to Table I. This is in fair agreement with the geomagnetic 
+data (Merrill et al., 1996). (2). It follows that am- - 3 x 10-3cms-'. 
+This is a reasonable value in the sense that la1 is everywhere smaller 
+than the typical convective speed U N 10-2cms-' in the outer core.3 
+The specific values of T,, X, and N, are not very important as only 
+f 2 ~ , / N : matters. But an eddy turnover time of 7, = 0.05 corresponds 
+to 150 yr and implies an eddy size of X, - 
+UT,N 500 km. And N, = 10 
+would mean 20 convective cells on a great circle, or 4N:/7r 
+N 130 
+on a sphere. The fluctuations in a are large. In the nonlinear 
+equilibrium the ratio of the fluctuating and the systematic term in 
+(20) is Sa,,., /a0 cos 8 = ( a $ / d m ) 
+/ao 
+cos 8 2.5 for the stan- 
+dard run. 
+%e maximum possible value of IQI is the r.m.s. convective flow speed and is attained 
+for maximally helical convection. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 35 =====
+GEODYNAhtO AS BISTABLE OSCILLATOR 
+297 
+6. DISCUSSION AND SUMMARY 
+We have presented a technique to analyse the statistical properties of 
+the axisymmetric component of the geomagnetic field in the mean 
+field approximation. Key elements are: (1) nonlinear restriction of 
+the magnitude of the field, and linear supercritical operation for 
+small fields, (2) a non-periodic fundamental dipole mode and periodic 
+overtones, (3) fluctuations in the dynamo parameter a. Application to 
+a geodynamo model shows a variable, dominantly dipolar magnetic 
+field, with sudden reversals during which the field tends to be 
+quadrupolar. These features are generic, and appear irrespective of the 
+type of nonlinearity and the model parameters, which allowed us to 
+work with a simple nonlinearity (global a-quenching). The amplitude 
+of the fundamental mode turns out to behave as the position of a 
+stochastically driven particle in a bistable potential. This simple 
+physical picture provides a conceptual framework for understanding 
+the variability of the axial dipole component of the geomagnetic field 
+on short as well as long time scales. Our main results are 
+(1) A theoretical prediction for the amplitude distribution of the 
+dipole mode that is confirmed by the observed distribution (the 
+Sint-800 record). 
+(2) A relation between the secular variation of the dipole mode and 
+the mean reversal rate. The current mean time between reversals 
+of (2-3) x 10Syr was shown to imply the observed relative 
+variability of the axial dipole moment of about 15%. More 
+generally, the model predicts that during epochs of smaller secular 
+variability the reversal rate is also smaller, and the available 
+observations indicate that this is actually the case (McFadden and 
+Merrill, 1995). 
+(3) Reversals are sudden events, lasting SlOkyr, during which the 
+field structure becomes almost symmetric (quadrupolar). Some- 
+times a rapid variability is visible during a reversal with a period of 
+the order of a diffusion time (-3kyr), 
+due to the periodic 
+overtones. 
+Our work is a generalisation of that of Parker (1969), and is also 
+related to the interacting-dipoles model of Mazaud and Laj (1989) and 
+the multiple-scale turbulence model of Narteau et al. (2000). Instead of 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 36 =====
+298 
+P. HOYNG et ul. 
+the reaction of the dynamo to a single jump in a as Parker did, the 
+effect of a stationary level of fluctuations in a is studied over long 
+times. The model permitted a detailed theoretical analysis and long 
+simulations (here up to - 150 Myr), both far beyond what three- 
+dimensional hydromagnetic simulations can afford. Other statistical 
+features not considered here, for example the autocorrelation function 
+of the dipole amplitude, the relative frequency of excursions of a given 
+magnitude, etc., may also be computed. 
+We stress that our results are not contingent on the simplicity of the 
+dynamo model, as they depend only on the eigenvalues and certain 
+overlap integrals of the eigenfunctions. In particular, they do not rely 
+on our model being one-dimensional. Any model having a nonperiodic 
+fundamental mode and periodic first overtones would exhibit 
+qualitatively similar properties, and the technique developed here 
+can be directly applied to these more complicated models. The most 
+desirable generalisation would be a two-dimensional model, with 
+radial distance as an independent co-ordinate. That would permit us 
+to allow for the effect of the inner core, and to verify, for example, the 
+suggestion of Gubbins (1999) that the duration of a reversal is gauged 
+by the resistive decay time of the inner core, since the field must 
+penetrate the inner core for a full reversal. 
+The statistical properties of the dipole amplitude turned out to 
+depend only on (Z':), 
+the mean square toroidal field of the overtones. 
+For that reason we have refrained from analysing the cause of a 
+reversal. Such a cause, e.g., a particularly strong overtone, may always 
+be found in individual cases, but it will be impossible to discern a 
+general pattern. In our model reversals can, in the mean, not be 
+pinpointed to any overtone in particular. The situation is however not 
+completely satisfactory because it remains unclear why we did not find 
+reversals in a comparable study of an a' 
+dynamo (Hoyng and Van 
+Geffen, 1993). And our analysis is not complete as we have not been 
+able to express (7':)la=o and hence the parameters c2 and y in terms of 
+f2Tc/Nz. Solution of this problem would enable us to bypass the 
+elaborate fitting procedure of Section 5.1. 
+The origin of the fluctuations lies in the turbulent convection and 
+the azimuthal average. This is an average over an incomplete 
+ensemble, and therefore all averages (a, 
+p, etc.) will have a random 
+component, fluctuating on the correlation time scale T, (the eddy 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 37 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+299 
+turnover time). ‘Normal‘ ensemble averages are constant because 
+the ensemble contains all possible states of the system. Motivated by 
+our work on the phase-amplitude correlation in the solar dynamo 
+(Ossendrijver et al., 1996; Hoyng, 1993,1996), we have concentrated 
+on fluctuations in a. However, the effect of fluctuations in /3 and v has 
+never been studied yet. 
+Technically, the fluctuations appear as multiplicative noise. Some 
+authors have studied the effect of additive noise (Crossley et al., 1986; 
+Meinel and Brandenburg, 1990; Farrell and Ioannou, 1999a, b). While 
+this is interesting in itself, care is needed to ascertain a physical basis 
+for the extra term. For example, an additive noise term in the dynamo 
+equation (1) renders it inhomogeneous, leading to the unphysical 
+feature that the magnitude of the field would be fixed, even when 
+nonlinearities are ignored. 
+Predictions of the magnitude of the fluctuations, the parameter f 
+in our model, are not available, neither from theory nor from 
+hydromagnetic simulations. A model of randomly renovating ‘cells’, 
+homogeneously distributed in the outer core, has so far proven to 
+be adequate. The required fluctuations are large. In the nonlinear 
+equilibrium the ratio of the fluctuating and the systematic term in (20) 
+is 6ay,.,.,./ao cos822.5 for the standard run. Roughly the same 
+number is required to explain the observed phase-amplitude correla- 
+tion in the solar cycle (Ossendrijver et al., 1996), but this is probably a 
+coincidence. Mean field dynamos are apparently very insensitive to 
+rapid variations of a. But it remains unknown if such high fluctuation 
+levels can actually be attained. This, together with the scaling of 
+(T:)la=o with f2rc/N:, are the two main unresolved issues. 
+The mean reversal rate is extremely sensitive to the forcing due to 
+the exponential scaling with f2rC/Nz. If f2rc/N: changes by a factor 2 
+cffrom 6.4 to 4.4 in Tab. 11) the mean time between reversals increases 
+by a factor 100 to about 20 Myr. This might explain the long polarity 
+bias in the Cretaceous, some 100 Myr ago (Jacobs, 1994; Merrill et al., 
+1996). Our model illustrates that a relatively small change of the mean 
+properties of the convection in the outer core may appear observa- 
+tionally as if the geodynamo switches to a different, non-reversing 
+physical state, as suggested by McFadden and Merrill(1995), while in 
+reality the reversal mechanism remains operative all the time, but the 
+reversal rate becomes very small. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 38 =====
+300 
+P. HOYNG et al. 
+The slow increase of the reversal rate and the secular variation since 
+the Cretaceous (Jacobs, 1994; Merrill et al., 1996; McFadden and 
+Merrill, 1995) could likewise be due to a slow increase of the parameter 
+f2rc/Nz by a factor 2. This idea has been elaborated by Schmitt et al. 
+(2000). It is tempting to speculate that such a change in the parameters 
+of the convection is related to the gradual evolution of the inner core 
+with time, or to changes in the heat flux pattern at the core-mantle 
+boundary (Glatzmaier et al., 1999). 
+A final remark on the role of nonlinearities. The nonlinearity in our 
+model restricts the dipole amplitude a to a finite range, while the 
+supercriticality forces it away from zero. In this ‘backbone structure’, 
+linear multiplicative noise causes the dipole amplitude to perform a 
+random walk of restricted amplitude. During a reversal the model 
+dynamo evolves as a linear system, since 1 -2 II 1 in (26) and (29). 
+That may hold for the geodynamo as well, because the field decreases 
+by a factor 4 or more, and the Lorentz force is then a factor 10 - 20 
+smaller than normal, at least globally. Under those circumstances a 
+linear evolution is not unreasonable. The fluctuations, however, are a 
+manifestation of nonlinear turbulence, and the question whether 
+nonlinear interactions or fluctuations cause variability and reversals is 
+therefore semantic. They are ultimately caused by nonlinear effects. 
+The point of our work is that on the fast timescale of the eddy 
+turnover time the effect of these nonlinearities is practically 
+indistinguishable from that of a multiplicative noise term. For the 
+longer timescales this is no longer true and nonlinearities remain 
+essential. The added advantage is that many properties of the 
+nonlinear system are now open to analytic evaluation, as we have 
+shown. This is in fact a well-known and very successful approach in 
+many areas of physics. 
+Acknowledgements 
+SRON is supported financially by NWO, the Netherlands Organisa- 
+tion for Scientific Research. M.A.J.H.O. acknowledges funding by the 
+Deutsche Forschungsgemeinschaft. We are indebted to Prof. N. G. van 
+Kampen for helpful discussions, and to Mr. J. Wiersma who suggested 
+to us the compact proof of Appendix D. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 39 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+301 
+References 
+Braginskii, S. I., “Self-excitation of a magnetic field during the motion of a highly 
+Braginskii, S. I., “Theory of the hydromagnetic dynamo,” Sov. Phys.-JETP 20, 
+Brandenburg, A., Krause, F., Meinel, R., Moss, D. and Tuominen, I., “The stability 
+of nonlinear dynamos and the limited role of kinematic growth rates,” Astron. 
+Astrophys. 213,411 -422 (1989). 
+Christensen, U., Olson, P. and Glatzmaier, G. A., “A dynamo model interpretation of 
+geomagnetic field structures,” Geophys. Res. Lett. 25, 1565- 1568 (1998). 
+Coe, R. S., Prkvof M. and Camps, P., “New evidence for extraordinarily rapid change 
+of the geomagnetic field during a reversal,” Nature 374, 687-692 (1995). 
+Crossley, D., Jensen, 0. and Jacobs, J., “The stochastic excitation of reversals in simple 
+dynamos,” Phys. Earth Planet. Inter. 42, 143-153 (1986). 
+Farrell, B. F. and Ioannou, P. J., “Optimal excitation of magnetic fields,” Astrophys. J. 
+522, 1079-1087 (1999a). 
+Farrell, B. F. and Ioannou, P. J. “Stochastic dynamics of field generation in conducting 
+fluids,” Astrophys. J. 522, 1088- 1099 (1999b). 
+Gardiner, C. W., Handbook of Stochastic Methodr, Springer-Verlag, Berlin (1990). 
+Gibbons, S. J., “The Parker-Levy reversal mechanism,” Phys. Earth Planet. Inter. 106, 
+Glatzmaier, G. A. and Roberts, P. H., “A three-dimensional self-consistent computer 
+simulation of a geomagnetic field reversal,” Nature 377, 203-209 (1995a). 
+Glatzmaier, G. A. and Roberts, P. H., “A three-dimensional convective dynamo 
+solution with rotating and finitely conducting inner core and mantle,” Phys. Earth 
+Planet. Inter. 91, 63-75 (1995b). 
+Glatzmaier, G. A. and Roberts, P. H., “Rotation and magnetism of the Earth’s inner 
+core,” Science 274, 1887-1891 (1996). 
+Glatzmaier, G. A., Coe, R. S., Hongre, L. and Roberts, P. H., “The role of the Earth’s 
+mantle in controlling the frequency of geomagnetic reversals,” Nature 401,885 - 890 
+(1999). 
+Gubbins, D., “The distinction between geomagnetic excursions and reversals,” Geophys. 
+J. Int. 137, F1 -F3 (1999). 
+Guyodo, Y. and Valet, J.-P., “Global changes in intensity of the Earth‘s magnetic field 
+during the past 800 kyr,” Nature 399, 249 - 252 (1999). 
+Hollerbach, R. and Jones, C. A., “Influence of the Earth’s inner core on geomagnetic 
+fluctuations and reversals,” Nature 365, 541 -543 (1993). 
+Hoyng, P., “Mean field dynamo theory,” In: The Sun, A Laboratory for Astrophysics 
+(Us. 
+Schmelz, J. T. and Brown, J. C.), Kluwer Academic Publishers, Dordrecht, 
+Hoyng, P., “Helicity fluctuations in mean field theory: an explanation for the variability 
+Hoyng, P., “Is the solar cycle timed by a clock?” Sol. Phys. 169, 253-264 (1996). 
+Hoyng, P. and Van Geffen, J. H. G. M., “Stochastic excitation of global magnetic 
+fields by fluctuations in the mean helicity,” Geophys. Astrophys. Fluid Dynum. 68, 
+Hoyng, P., Schmitt, D. and Ossendrijver, M. A. J. H., “A theoretical analysis of the 
+observed variability of the geomagnetic dipole field,” Phys. Earth Planet. Inter., 
+submitted (2001). 
+Jacobs, J. A., Reversals of the Earth’s Magnetic Field, Cambridge University Press 
+(1994). 
+Kageyama, A. and Sato, T., “Generation mechanism of a dipole field by a magne- 
+tohydrodynamic dynamo,” Phys. Rev. E 55,4617-4626 (1997). 
+conducting fluid,” Sov. Phys.-JETP 20, 726-735 (1965a). 
+1462- 1471 (1965b). 
+129-137 (1998). 
+99-138 (1992). 
+of the solar cycle?” Astron. Astrophys. 272, 321 -339 (1993). 
+203-236 (1993). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 40 =====
+302 
+P. HOYNG et al. 
+Kleeorin, N. I. and Rmaikin, A. A., “Mean-field dynamo with cubic non-linearity,” 
+Krause, F. and Radler, K.-H., 
+Mean Field Magnetohydrodynamics and Dynamo Theory, 
+Kuang, W. and Bloxham, J., “An Earth-like numerical dynamo model,” Nature 389, 
+Laske, G. and Masters, G., “Limits on differential rotation of the inner core from an 
+Le Mouel, J.-L., Allbgre, C. J. and Narteau, C., “Multiple scale dynamo,” Proc. Natl. 
+Levy, E. H., “Kinematic reversal schemes for the geomagnetic dipole,” Astrophys. J. 
+Mazaud, A. and Laj, C., “Simulation of geomagnetic polarity reversals by a model of 
+interacting dipole sourcq” Emth Planet. Sci. Lett. 92, 299-306 (1989). 
+McFadden, P. L. and Merrill, R. T., “Fundamental transitions in the geodynamo 
+as suggested by paleomagnetic data,” Phys. Earth Planet. Inter. 91, 253-260 
+Meinel, R. and Brandenburg, A., “Behaviour of highly supercritical a-effect dynamos,” 
+Merrill, R. T., McElhinny, M. W. and McFadden, P. L., The Magnetic Field of the 
+Merzbacher, E., Quantum Mechanics, Wiley, New York (1970). 
+Moffatt, H. K., Magnetic Field Generation in Electrically Conducting Fluids, Cambridge 
+University Press (1978). 
+Narteau, C., Blanter, E., Le Mouel, J.-L., Shirnman, M. and Allbgre, C. J., “Reversal 
+sequence in a multiple scale dynamo mechanism,” Phys. Earth Planet. Inter. 120, 
+Olson, P., “Geomagnetic polarity reversals in a turbulent core,” Phys. Earth Planet. 
+Inter. 33, 260-274 (1983). 
+Olson, P. and Hagee, V. L., “Geomagnetic polarity reversals, transition field 
+structure, and convection in the outer core,” J. Geophys. Res. 95, 4609-4620 
+Olson, P., Christensen, U. and Glatzmaier, G. A., ‘‘Numerical modeling of the 
+geodynamo: Mechanisms of field generation and equilibration,” J. Geophys. Res. 
+Ossendrijver, A. J. H., Fluctuations andenergy balance in solar andstellar dynamos, Ph. D. 
+Thesir, University of Utrecht, 1996. 
+Ossendrijver, A. J. H., Hoyng, P. and Schmitt, D., “Stochastic excitation and memory 
+of the solar dynamo,” Astron. Astrophys. 313, 938 -948 (1996). 
+Otmianowska-Mazur, K., Riidiger, G., Elstner, D. and Ark, R., “The turbulent EMF as 
+a time series and the ‘quality’ of dynamo cycles,” Geophys. Astrophys. Fluid Dynam. 
+Parker, E. N., “The occasional reversal of the geomagnetic field,” Astrophys. J. 158, 
+Richards, P. G., “Earth’s inner core - discoveries and conjectures,” Astron. Geophys. 
+Risken, H., The Fokker-Planck Equation, Springer-Verlag, Berlin (1984). 
+Roberts, P. H. and Soward, A. M., “Dynamo theory,” Ann. Rev. Fluid Mech. 24, 
+Riidiger, G., “Behandlung eines einfachen hydromagnetischen Dynamos mittels 
+Sarson, G. R. and Jones, C. A., “A convection driven geodynamo reversal model,” Phys. 
+Schmitt, D. and Schiissler, M., “Non-linear dynamos,” Astron. Astrophys. 223, 343 - 351 
+Astron. Nachr. 305, 265-275 (1984). 
+Akademie-Verlag. Berlin (1980). 
+371-374 (1997). 
+analysis of the Earth’s free oscillations,” Nature 402, 66-69 (1999). 
+Acad. Sci. USA 94, 5510-5514 (1997). 
+171, 635-642 (1972). 
+(1995). 
+Astron. Astrophys. 238, 369-376 (1990). 
+Earth, Academic Press (1996). 
+271 -287 (2000). 
+(1990). 
+104, 10383-10404 (1999). 
+86, 229-247 (1997). 
+815-827 (1969). 
+41, 1.20-1.24 (2000). 
+459-512 (1992). 
+Linearisierung,” Astron. Nachr. 294, 183- 186 (1973). 
+Earth Planet. Inter. 111, 3-20 (1999). 
+(1989). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 41 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+303 
+Schmitt, D., Ossendrijver, M. A. J. H. and Hoyng, P., “A bistable dynamo model 
+explaining the geomagnetic secular variation and reversal records,” Phys. Earth 
+Pluner. Inter., submitted (2000). 
+Song, X. and Richards, P. G., “Seismological evidence for differential rotation of the 
+Earth’s inner core,” Nature 382, 221 -224 (1996). 
+Souriau, A., Roudil, P. and Moynot, B., “Inner core differential rotation: facts and 
+artefacts,” Geophys. Res. Lett. 24,2103-2106 (1997). 
+Soward, A. M., “The Earth’s dynamo,” Geophys. Asrrophys. FluidDynmn. 62, 191 -209 
+(1991). 
+Stix, M., “The solar dynamo,” Geophys. Asrrophys. Fluid Dynmn. 62, 211 -228 (1991). 
+Su, W., 
+Dziewonski, A. M. and Jeanloz, R., “Planet within a planet: rotation of the inner 
+core of the Earth,” Science 274, 1883-1887 (1996). 
+Valet, J.-P. and Meynadier, L., “Geomagnetic field intensity and reversals during the 
+past four million years,” Nature 366, 234-238 (1993). 
+Van Kampen, N. G., “Stochastic Differential Equations,” Phys. Reports UC, 
+171 -228 
+(1976). 
+Van Kampen, N. G., Stochastic Processes in Physics and Chemistry, North-Holland, 
+Amsterdam (1992). 
+Vidale, J. E., Dodge, D. A. and Earle, S. E., “Slow differential rotation of the Earth’s 
+inner core indicated by temporal changes in scattering,” Nature 405, 44-448 
+(2000). 
+APPENDIX A DERIVATION OF THE FOKKER-PLANCK 
+EQUATION 
+A.l. Notation 
+The fist step is to rewrite (29) in terms of real numbers only. This 
+is just a matter of book-keeping. Consider a complex equation of the 
+type (’ = d/dr): 
+Ui = BkUk. 
+(A-1) 
+Its real and imaginary parts may be grouped together in a real super- 
+vector a and a real supermatrix B with twice as many components: 
+Equation (A.l) can now be written in terms of real numbers only: 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 42 =====
+304 
+P. HOYNG et al. 
+Supervectors with 200 elements and 200 x 200 supermatrices are 
+indicated by boldface symbols, and as a further distinction Greek 
+indices are employed. The mode equations (29) now read 
+where a,, E, and V, 
+are the 'superpartners' of ui, Eik and Vik in (29), 
+and 
+with %Ao = SXo = 0. 
+A.2. Probability Distribution of {a,} 
+The second step is to derive the joint probability distribution II(a, T ) of 
+{a"}. Equation (A.4) defines an orbit in a-space (Fig. 6). Consider 
+many copy systems (A.4) each with a different realisation Sa. The 
+density f(a, T ) of these systems (A.4) obeys the continuity equation in 
+a-space: 
+The operators A and V are defined as 
+a 
+8% 
+V = -- Vpua,,. 
+Equation (A.6) is a stochastic differential 
+multiplicative noise term V. To get the 
+equation for f with a 
+probability distribution 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 43 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+305 
+n(a, ~ ) = ( f ) , 
+an average must be performed over the fluctuations. 
+According to standard theory (Van Kampen, 1976, 1992): 
+1 
+m 
+an 
+- 
+= [. + 1 &(V(T) exp(sd)V(.r - s)) exp(-sd) n, 
+a- 
+(A.9) 
+provided the correlation time T~ is sufficiently small: 
+lV1TC 
+1, 
+(A.lO) 
+where IVI is the order of magnitude of V. The validity of (A.10) is 
+verified in Appendix C. The exponential operators can be elaborated 
+with the help of Lagrangian co-ordinates (Van Kampen, 1992), but 
+this is rather complicated. Since (V(T)V(T - s)) vanishes for JsI Z T ~ , 
+we 
+make the approximation exp( fsd) N 1 (‘no appreciable evolution 
+during a correlation time T:). This seems reasonable for the lower 
+order eigenmodes in d with their long time scales. But the higher order 
+modes with shorter time scales are also present, and hence there are 
+time scales in d compared to which T~ is not small. We are thus 
+effectively assuming that high-order modes contribute little. Inserting 
+the operators A and V in (A.9) we obtain 
+with 
+N = L + s ( ~ - &E, 
+(A.12) 
+m 
+M,, 
+= 1 WV,Vt~)Vpa(T - 4). 
+(A.13) 
+The fluctuations are taken to be stationary so that M does not depend 
+on T. The operator identity 
+(A.14) 
+is inserted, together with the fact that M,,,=O. 
+This identity is a 
+consequence of the specific form of V in (27) and the completeness of 
+the eigenfunctions, see Appendix D. Then we h d a Fokker-Planck 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 44 =====
+306 
+P. HOYNG et ol. 
+equation for n: 
+The matrix elements M, 
+are constants, but N, is a function of ao. 
+A.3. Probability Distribution of 
+Since we are only interested in the behavior of the fundamental 
+mode, the third step is to eliminate the higher modes by integrating 
+(A.15) over all a,, except ao. The probability distribution of a. is 
+defined as 
+(A.16) 
+The bar on K indicates that the value tc = 0 is excluded. We integrate 
+(A.15) as in (A.16), using (1) that terms of the type a(. -.)/aa, vanish 
+since they can be integrated and II + 0 when any ap approaches f 
+00, 
+and (2) that l& J daR commutes with 
+and hence with a/aao and the 
+matrices N and M. The integrations are straightforward and the result 
+is Eq. (32). The drift coefficient S and diffusion coefficient D are given 
+by 
+s = Nooa + N0c(ac)Ia1 
+(A.17) 
+The overbars indicate that the fundamental mode 0 is excluded 
+from the summation, and we have reverted to the simpler notation 
+a = ao. The conditional averages are to be evaluated at a k e d value 
+of a: 
+(A.19) 
+and similarly for (ap)la. In principle, these averages may be computed 
+from the stationary solution ll of (A.15), or by taking appropriate 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 45 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+307 
+moments of that equation. This would in turn permit evaluation of 
+(A.19), and hence of (A.17) and (A.18), but we have not obtained any 
+useful results. 
+APPENDIX B DRIFT AND DIFFUSION COEFFICIENTS 
+B.l. Drift Coefficient 
+The first part of (33) follows from (A.17) and No0 =LOO+ 
+s( 1 - 4)b = p( 1 - a2), since Xo = 0; p = sEm. Then we compute 
+because 
+Noc(av)l,, we insert (B.l) and then (30), and define 
+= 0 (due to SXo=O), and SEoo=O. To get gl(a) = 
+which is the physical toroidal field minus the contribution of the 
+fundamental mode. Finally the averaging is applied, and we obtain 
+On symmetry grounds, (T+) 1, 
+is zero for a = 0, so that (T,) la cc a for 
+small a. This leads to a series expansion of the type gl(u)/(l -2) = 
+Aa( 1 +I32 +. - .). For our purposes the lowest order approximation 
+g,(a)=A(l-d)a is sufficient. In that case the drift coefficient S 
+as a whole will behave as S=const (1 - 2 ) ~ . 
+Since S describes 
+the systematic evolution of a, the constant must be equal to the 
+exponential growth rate Xo at C= C,, which proves expression (33) for 
+small a. Numerical experiments have confirmed (33) to be accurate for 
+la1 ;5 0.4 (Section 5.1). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 46 =====
+308 
+P. HOYNG et al. 
+B.2. Diflusion Coefficient 
+We begin with Do = 2Mm. According to (A. 13): 
+rm 
+since Vm is real. Insert (31): 
+The autocorrelation function of bQ(e, ~ ) / ( y o =p(e, T
+)
+/
+J
+~
+ 
+follows from that of F. According to the definition of F in Section 
+2.2.3: 
+In (B.6) the correlation function is understood to be zero for ICI > 0, or 
+101 > T,. The last expression (B.7) is a good approximation when T~ is 
+much smaller than the relevant time scales and O,=x/N, is much 
+smaller that the relevant spatial scales. This applies here as we are 
+dealing with the fundamental mode which has a large-scale structure. 
+It follows that Mm is equal to 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 47 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+309 
+which leads directly to (36), since 
+Next in line is 
+S(s)ds = 1/2 and DO = 2 M m . 
+First, Vo,a, is evaluated with the help of (A.2): 
+since 9Voo=0. Insert (31) and use (B.2): 
+(B.lO) 
+(B. 11) 
+Substitution in (B.9) and replacing the averaging brackets at the right 
+places, and use of (B.7) yields 
+which leads to (37), allowing for a factor 2. Relation (B.12) assumes 
+that the low order modes are the dominant contributors to T+ , so that 
+the assumption of a 6-peaked correlation function in 8 is justified. 
+The last contribution to D is gz(a) = 2u(Mma(aa)I, + MOm(afi)la), 
+the evaluation of which has no novel surprises. It turns out that both 
+terms are equal, and the computation is quite analogous to those 
+above: 
+g2(a) = 2a- Tf2Tc ~'d8sin8~~To(T+)IU 
+. 
+(B.13) 
+m,' 
+Numerical experiments have shown that g&z) is always small with 
+respect to D as given by (35), and therefore g2(a) is not mentioned in 
+the main text. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 48 =====
+310 
+P. HOYNG et al. 
+APPENJIM C SHORT CORRELATION TIME 
+To be able to verify condition (A.10), the order of magnitude lV( of V 
+is needed. According to (A.8), V - Vpv, so that we may estimate IVl as 
+the r.m.s. of a typical matrix element V,: 
+(no summation over i, k.) Inspection of (B.6) and (B.3, shows that 
+the appropriate value of the correlation function in (C.1) is 
+(f2/2Nc sin O)Oc6(0 - tj), and it follows that 
+The eigenfunctions become more structured for increasing k, i, re- 
+sulting in destructive interference, and we expect that the integral will 
+be largest for i= k = 0, in which case (C.2) equals  do/^,. Accordingly, 
+an appropriate condition for the correlation time to be short is 
+IV)Tc 
+(&Tc)”2 << 1. 
+(C-3) 
+This appears to be satisfied, since for our standard run 
+mf2</2Nz 21 1.6 x 
+and the integral in (36) equals 3.529, so that 
+( ~ ~ T c ) ” 2 
+21 7.5 X 10 -2. 
+APPENDIX D PROOF OF M, 
+= 0 
+We infer from (A.13) that M,,, 
+= 
+ds (V(T)-V(T - s ) ) ~ , and by 
+using the definition (A.2) for V we obtain, writing time arguments 
+temporarily as upper indices: 
+%{ v7 VT-3) 
+-S{ v7. v7-s} 
+v*v‘-s = (+) S{ v7 V++} 
+%{ v+ v-3) 
+7 
+(D.1) 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 49 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+311 
+where V is the matrix defined in (31). We shall show that 
+V V”-”=O, 
+using the efficient bra and ket notation b = Ib), 5 = 
+(bl from quantum mechanics (Merzbacher, 1970). Specifically for 
+eigenfunctions bi= 10, & = (jl. The inner product (13) is written as 
+(bllb2), while (12) now reads (ib)=bp The expansion (14) may be 
+written as Ib) = (k1b)lk) = Ik)(klb). Since this must hold for any Ib) it 
+follows that Ik)(kl= 1 (summation convention), the unit operator in 
+function space. Explicitly: 
+n, m enumerate the poloidal and toroidal components of Ik)(kl as a 
+2 x 2 matrix, and the continuous indices 0, $ are the arguments of lk) 
+and (kl, respectively. Relation (D.2) is a consequence of the supposed 
+completeness of the eigenfunctions and is known as the completeness 
+relation (Menbacher, 1970). For example, the n, in = 1,2 element of 
+(D.2) reads explicitly: Ck 
+Fl($)Pk(0) = 0. 
+After these preliminaries the proof is simple. Since V given by (27) 
+obeys V(1) V(2) = 0, where 1 and 2 stand for two different sets of argu- 
+ments 0, 7 of ba, all matrix elements must also vanish. With (D.2) 
+we get 
+0 = (ilV(1)V(2)[j) = (ilV(l)lk)(klV(2)[i) = Vl.&(71)Vkj(72), 
+(D.3) 
+where Vik is the matrix element (3 1). In the notation of relation (D. 1) it 
+follows that Vq 9 V‘2 = 0. The bottom line is that since V(1) V(2) = 0 in 
+the representation of (27), it is zero in any equivalent representation. 
+APPENDIX E THE SCALING OF c2 AND y 
+The parameters c2 and 7 are defined as combinations of the constants 
+A, A. and A, that occur in the drift coefficient S and diffusion 
+coefficient D, and these are in turn fixed by the dynamo model. The 
+Fokker-Planck equation (32) and therefore c2 and 7 derive ultimately 
+from (A.15). This equation depends on the model parameters kR and 
+C, and on the overall factor f2rc/N: in My as may be gleaned e.g., 
+from relation (B.8) for Morn. This proves that c2 and 7 depend on the 
+parametersf, T~ and N, only through the combinationfZ?,/N~, but the 
+exact functional dependence remains unknown. The big challenge is to 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 50 =====
+312 
+P. HOYNG et al. 
+h d the dependence of (2':) lad 
+onf2Tc/N:. If we ignore this and take 
+(T:)lad constant, we get, for fixed kR and Cm, 
+y N y+)-' 
+, 2 -constant 
+which is not too bad as a first approximation, see Table 11. 
+The fact that c2 and y depend only on (T:) near a = 0 is remarkable. 
+It suggests that there should be a simpler way to arrive at (32) than 
+through Appendices A and B, where b is first expanded in overtones, 
+which then magically recombine into (T:) upon integration. Accord- 
+ingly, the Ansatz 
+b = abo + b+ 
+is made, where b+ is the field of the overtones, and inserted in (26) 
+which we write symbolically as b = Ob. The result is irbo + b+ = 
+Oh + Ob+. Taking the inner product with bo we get u = (bo, Obo)+ 
+(bo,Ob+), which is then used to eliminate ubo from the previous 
+equation. The result is two coupled equations for a and b+ alone. 
+These are not reproduced here because we have not been able to 
+extract a credible derivation of (32) from them. But the fact that they 
+exist proves that the statistical properties of the dipole mode will only 
+depend on the collective effect of all overtones together. 
+(E.2) 
+APPENDIX F EVALUATION OF (T,) 
+To evaluate the integrals in (57) write p(a) =exp[$(a)] as in (50) and 
+Since Q(0) = Q'(0) = 0 and r$"(O) = -2y/c? = 4: we may write 
+[qY)p(y)l-' = AT1 ..P[Q(Y)l, 
+with Q(r) = %v2-Y(c2+ 1)W 
++r2/c2). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 51 =====
+GEODYNAMO AS BISTABLE OSCILLATOR 
+313 
+The approximation exp[q5(y)] II exp(( 1/2)q5:y2) is adequate when the 
+integration limit d in (F.l) is about 1, see Figure 11. Subsequently, d 
+may be replaced by 00 because exp((l/2)&3) = exp(-d/2) --t 0. 
+Likewise, the integration limit y in (F.l) may be replaced by zero 
+because r p ( z ) dz w r p ( z ) dz in the interval [0, c / a ] where 
+exp[q5(y)] = exp( -r3/c2) contributes most, Figure 11, and after $(z) 
+has been expanded it may be replaced by - 
+00. The remaining integrals 
+in (F.2) are simple. 
+As the particle escapes from [0, 001 it is located at a = 0 and has two 
+options: to fall in the well at a= 1, or in the well at a= - 1. The 
+probabilities for these two events would be equal if the subspace 
+a=ao=O is the separatrix of the two basins of attraction. That is, 
+when ao=O, it should remain zero in the absence of fluctuations. But 
+this is not the case since for a. = 0 and V, = 0, Eq. (29) says that duo/ 
+d7 = s&+&-,~k 
+# 0. It follows that there is a residual pulling on the 
+dipole mode by the overtones that destroys the equal probability 
+for escape to the left and to the right. Consequently, the relation 
+(T,) 
+= 2( T,) is only approximate. 
+0 
+1 
+- Y 
+2 
+FIGURE 11 The fmctions exp[d(y)]=A,[D(y)p(y)]-' and r p ( z ) d z that occur in 
+(57) and (F.l), for 7 = 3 and 2 = 0.2. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 52 =====
+314 
+P. HOYNG et al. 
+After substitution of 4:, 
+of (54) and use of (44) we obtain (58). 
+Subsequent substitution of (53) produces a complicated expression, 
+whose asymptotic expansion is straightforward. The only nontrivial 
+hurdle on the road to (59) is that 
+for 7 large. 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 53 =====
+toroidal magnetic field 
+0 
+e, 
+- 
+0 
+u 
+n 
+2 
+1 
+0
+0
+ 
+-1 
+-2 
+0 
+500 
+1000 
+1500 
+2000 
+t [diffusion times] 
+COLOR PLATE I (See P. Hoyng et al., page 274). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 54 =====
+COLOR PLATE I1 (See P. Hoyng el al., page 278). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
+
+
+===== PAGE 55 =====
+COLOR PLATE 111 (See P. Hoyng el aL, page 279). 
+Downloaded by [Humboldt-Universitt zu Berlin Universittsbibliothek] at 03:29 03 April 2013 
