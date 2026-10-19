@@ -1,0 +1,9 @@
+[project]
+name = "hoyng-viz"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "h5py>=3.16.0",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.4",
+]

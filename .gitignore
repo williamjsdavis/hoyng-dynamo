@@ -3,3 +3,14 @@ papers/
 
 # macOS
 .DS_Store
+
+# Julia: environments resolve from the compat bounds in Project.toml.
+Manifest.toml
+
+# Simulation outputs (HDF5) are written here and never committed.
+results/
+
+# Python plotting environment (viz/).
+.venv/
+__pycache__/
+.ipynb_checkpoints/

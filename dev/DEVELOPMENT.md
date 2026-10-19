@@ -2,7 +2,7 @@
 
 Working document for a fast, modern reimplementation of the bistable-oscillator geodynamo of Hoyng, Ossendrijver & Schmitt (2001, "HOS"), Schmitt, Ossendrijver & Hoyng (2001, "SOH") and Hoyng, Schmitt & Ossendrijver (2002, "HSO"). The paper content lives in `resources/`; this file holds the model summary an implementer needs in one place. The validation gates are in `VALIDATION.md`, open research questions in `QUESTIONS.md` and implementation decisions in `DECISIONS.md`. Notation is HOS's unless stated. The SOH/HSO translation is in `resources/00-series-overview-and-shared-notation.md` §3.
 
-**Status (2026-10-18).** Reading pass over `resources/` complete. Validation gates and operational definitions accepted by the user (`VALIDATION.md`). No code yet. All implementation decisions closed (`DECISIONS.md`): Julia package, type-stable and allocation-free hot path, two run modes (record and stream) over one stepping loop, running aggregators behind a fit!/merge!/value interface (OnlineStats.jl optional), HDF5 output, Python `viz/` for plots, MIT licence.
+**Status (2026-10-18).** Reading pass over `resources/` complete. Validation gates and operational definitions accepted by the user (`VALIDATION.md`). Build step 0 (scaffold) complete the same day: package `HoyngDynamo` (Julia 1.11) with tier-tagged tests, D14 quality tests, benchmarks, CI, MIT licence and the `viz/` uv project; the smoke test passes. Next: step 1, the eigenproblem. All implementation decisions closed (`DECISIONS.md`): Julia package, type-stable and allocation-free hot path, two run modes (record and stream) over one stepping loop, running aggregators behind a fit!/merge!/value interface (OnlineStats.jl optional), HDF5 output, Python `viz/` for plots, MIT licence.
 
 Files in `dev/`:
 
@@ -139,7 +139,7 @@ var   ≡ ⟨(a−⟨a⟩)²⟩/⟨a⟩² ≃ (γc² + γ − 1) / [4(γ − 1)�
 
 ## 4. Suggested build order
 
-0. Scaffold: Julia package (Project.toml, `src/`, `test/`, `bench/`), CI workflow, MIT licence, `viz/` uv project, `.gitignore` for `results/`.
+0. Scaffold: Julia package (Project.toml, `src/`, `test/`, `bench/`), CI workflow, MIT licence, `viz/` uv project, `.gitignore` for `results/`. **Done 2026-10-18.**
 1. Grid, L, shear operator, G(C). Eigen/adjoint solver with bi-orthonormalisation. Gates T0.1–T0.11.
 2. Deterministic integrator (f = 0). Gates T1.1–T1.6. Fix the integrator here.
 3. Noise generator and V₀₀ diagnostic. Gates T2.1–T2.5.
