@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: Tier 0 passed on 2026-10-18 (57 tests; results in §4). Tiers 1–5 not yet run.
+Status: Tier 0 (57 tests) and Tier 1 (42 tests) passed on 2026-10-18; results in §4. Tiers 2–5 not yet run.
 
 ## 1. Conventions
 
@@ -155,3 +155,28 @@ Conservative second-order finite differences, poles as Dirichlet nodes (`DECISIO
 Also passed: parity pattern and periodicity (T0.4), bi-orthonormality residual < 10⁻¹⁰ over ten modes at both C₀ and C_m (T0.5), s, q₀, μ within ±0.002 (T0.8), spectral equivalence of G(C₀) + sE and G(C_m) to 10⁻⁸ (T0.9).
 
 Observations. The N = 240 values agree with the printed ones to the last printed digit in every case, so the papers' eigenvalues are grid-converged; our 60-point values differ from them by 0.1–0.4% (second-order error), which suggests the papers' 60-point discretisation was either higher-order or differently placed. The grid convergence is cleanly second order (C₀: 57.897 → 57.884 → 57.881). The discrete C₀(60) = 57.897 is what the model equation will use (D4), not 57.9.
+
+### Tier 1 (2026-10-18): passed, 42/42 tests
+
+N = 60, Δτ = 0.01. Production stepper: exponential integrator with the quenching coefficient at a midpoint-predicted a (`DECISIONS.md` D3, correction found by T1.4). Cross-check: IMEX Euler, held to 5% instead of 1% because it is first order. "Discrete" is the value from the 60-point operator (`ModelConstants`), the exact target for the integrator; "paper" is the printed value.
+
+| Gate | Quantity | Paper | Discrete | Exponential | IMEX | Result |
+|---|---|---|---|---|---|---|
+| T1.1 | \|a − 1\| after 100 τ_d from b₀ | 0 | 0 | 1×10⁻¹⁴ | 1×10⁻¹⁴ | pass (field drift 2×10⁻¹²) |
+| T1.2 | Λ, kR = 0.5, C_m = 100 | 0.527 | 0.52834 | 0.52856 | 0.52125 | pass; IMEX 1.1% off the paper |
+| T1.2 | Λ, kR = 0.3, C_m = 120 | 0.815 | 0.81635 | 0.81690 | 0.80997 | pass |
+| T1.3 | saturation from a random field, 50 τ_d | \|a\| = 1 | — | < 10⁻⁶ | < 10⁻⁶ | pass, overtones < 10⁻⁶ |
+| T1.4 | 2μ, kR = 0.5 | 1.526 *(derived)* | 1.52586 | 1.52580 | 1.4727 | pass; not 2Λ = 1.057 |
+| T1.4 | 2μ, kR = 0.3 | 2.97 *(derived)* | 2.96766 | 2.96717 | 2.8282 | pass; not 2Λ = 1.633 |
+| T1.5 | b → −b | exact | — | bitwise | bitwise | pass |
+
+T1.6 (diagnostic). Relative rate errors against the discrete values, Δτ = 0.01 → 0.001:
+
+| Stepper | Λ, kR 0.5 | 2μ, kR 0.5 | Λ, kR 0.3 | 2μ, kR 0.3 |
+|---|---|---|---|---|
+| exponential | 4.3×10⁻⁴ → 4.3×10⁻⁶ (×100) | 3.7×10⁻⁵ → 2.3×10⁻⁶ | 6.8×10⁻⁴ → 6.8×10⁻⁶ (×100) | 1.6×10⁻⁴ → 5.2×10⁻⁵ |
+| IMEX | 1.3% → 0.13% (×10) | 3.5% → 0.36% (×10) | 0.78% → 0.08% (×10) | 4.7% → 0.49% (×10) |
+
+The exponential stepper is second order in the growth rate; its relaxation error at Δτ = 0.001 sits on the measurement floor (round-off relative to the decayed 10⁻⁶ perturbation), so only its monotone decrease is asserted. IMEX is first order throughout; its 2μ error is large because b̃₀ is not a left eigenvector of the IMEX amplification matrix, so overtones leak into a at O(Δτ). The IMEX amplification matrix at C₀ has spectral radius 1 − 10⁻¹⁵ at Δτ = 0.01 for both kR: stable. Cost (BenchmarkTools, Apple silicon): exponential 2.0 µs per step, IMEX 1.4 µs; both `step!` methods pass the D14 type-stability and zero-allocation tests.
+
+Observation for `QUESTIONS.md` Q5: the deterministic relaxation about a = 1 is 2μ to 10⁻⁴, and 2Λ is 31–45% lower, so the two rates are cleanly distinguishable. Whether the noisy autocorrelation follows 2Λ (HSO Eq. 15) or 2μ is for T5.13.

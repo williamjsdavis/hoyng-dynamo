@@ -33,8 +33,11 @@ export Grid, inner, diffusion_operator, shear_operator, alpha_operator, dynamo_o
 export Modes, eigenmodes, fundamental, leading_eigenvalues, biorthogonality_residual,
     toroidal_parity, poloidal_parity, growth_rate, critical_dynamo_number, overlap_E00,
     diffusion_integral, ModelConstants, model_constants
+export Model, State, Cache, NoNoise, update_noise!, AbstractStepper, ExponentialStepper,
+    IMEXStepper, step!, timestep, dipole_amplitude, overtone_residual
 
 include("grid.jl")
 include("eigen.jl")
+include("stepper.jl")
 
 end # module

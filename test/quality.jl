@@ -9,6 +9,12 @@ using JET
 
 const HOT = Vector{Tuple{Any,Tuple}}()
 
+let model = Model(; kR = 0.5, Cm = 100.0, N = 60), cache = Cache(model)
+    for sp in (ExponentialStepper(model, 0.01), IMEXStepper(model, 0.01))
+        push!(HOT, (step!, (State(model, 0.1 .* model.b0), sp, NoNoise(), cache)))
+    end
+end
+
 function allocations(f, args...)
     f(args...)                 # warm-up: compile
     @allocated f(args...)

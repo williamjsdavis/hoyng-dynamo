@@ -50,7 +50,7 @@ Affects: Tier 0 values at N = 60, T0.11. Status: adopted 2026-10-18 as recommend
 
 The noise is a piecewise-constant coefficient (redrawn every 5 steps), so the model is an ODE with time-dependent coefficients, not an SDE: ordinary ODE methods apply, there is no Itô/Stratonovich question, and the Fokker–Planck theory is the τ_c → 0 limit. Write Eq. 26 as ∂b/∂τ = G b + B(τ) b with G = G(C₀) constant and B = s(1 − a²)E + V(τ).
 
-*(derived here)* E and V both read the T rows and write the P rows, so E² = V² = EV = VE = 0. Hence exp(Δτ B) = I + Δτ B exactly for frozen a and F: an explicit Euler update of the quenching and noise terms is not an approximation, and the only time-stepping error is the splitting between G and B.
+*(derived here)* E and V both read the T rows and write the P rows, so E² = V² = EV = VE = 0. Hence exp(Δτ B) = I + Δτ B exactly for frozen a and F: an explicit Euler update of the quenching and noise terms is not an approximation *for frozen coefficients*. **Correction (gate T1.4, 2026-10-18):** freezing a over the step is explicit Euler on the amplitude equation da/dτ = (ã, B b) and shifts the relaxation rate about a = ±1 by a relative μΔτ (0.8% at kR = 0.5, 1.5% at kR = 0.3, both measured). The production stepper therefore evaluates s(1 − a²) at a midpoint prediction a_{n+½} = a_n + (Δτ/2)(ã, B_n b_n), which is one extra dot product because (b̃₀, G b) = λ⁰a = 0 at the discrete C₀. With it the rate errors are second order: 4×10⁻⁴ (Λ) and 1×10⁻⁴ (2μ) at Δτ = 0.01, falling 100× per decade.
 
 Options:
 
@@ -64,13 +64,13 @@ Options:
 
 | Stepper | Cost per step | Working memory | Error in Λ at Δτ = 0.01 | Remarks |
 |---|---|---|---|---|
-| (a) IMEX Euler | ~0.3 µs | a few KB (tridiagonal factors, four vectors) | ~0.3%, first order | stability of the explicit coupling to be shown (T1.6) |
-| (b) exp(ΔτG) with exact B | ~3 µs (one 116×116 gemv) | ~110 KB for X plus vectors; fits in L2 | O(Δτ²) *(derived here)* | exact linear dynamics; b₀ an exact fixed point |
+| (a) IMEX Euler | 1.4 µs measured (N = 60) | a few KB (tridiagonal factors, four vectors) | 1.3% measured (ΛΔτ, first order); 3.5–4.7% on 2μ because b̃₀ is not a left eigenvector of the IMEX amplification matrix | amplification matrix at C₀ has spectral radius 1 − 10⁻¹⁵ at Δτ = 0.01: stable (T1.6) |
+| (b) exp(ΔτG) with midpoint-predicted B | 2.0 µs measured (N = 60; one 116×116 gemv, two dot products) | ~110 KB for X plus vectors; fits in L2 | 4×10⁻⁴ measured, second order | exact linear dynamics; b₀ a fixed point to 10⁻¹⁴ over 10⁴ steps; sign symmetry bitwise |
 | (d) exp(ΔτL) with explicit coupling | ~0.6 µs (two 58×58 gemv) | ~55 KB | first order | same stability question as (a) |
 | Galerkin in M eigenmodes (HOS Eq. 29) | O(M²) per step, O(N_c M²) per redraw | O(N_c M²) | truncation in M | not the papers' computation; a later research tool for Q1 |
 | (e) DifferentialEquations.jl | adaptive | allocation-free only with care | adaptive | coefficients jump every 5 steps, which defeats adaptivity; no benefit |
 
-Recommendation: (b) as the production stepper, (a) alongside as the cheap cross-check (same operator assembly). T1.6 and T4.17 compare them. Keep Eq. 26's form, G(C₀) with coefficient 1 + s(1 − a²), rather than G(C_m) − s a² E, so that b₀ is an eigenvector of the operator that is exponentiated. Do not build X from the eigendecomposition (non-normal, possibly ill-conditioned); use `expm`.
+Recommendation: (b) as the production stepper, (a) alongside as the cheap cross-check (same operator assembly). T1.6 and T4.17 compare them. Implemented 2026-10-18 as `ExponentialStepper` and `IMEXStepper` in `src/stepper.jl`; both type stable and allocation-free (D14 tests). Keep Eq. 26's form, G(C₀) with coefficient 1 + s(1 − a²), rather than G(C_m) − s a² E, so that b₀ is an eigenvector of the operator that is exponentiated. Do not build X from the eigendecomposition (non-normal, possibly ill-conditioned); use `expm`.
 
 Affects: Tier 1, T4.17, run cost. Status: adopted 2026-10-18 as recommended.
 

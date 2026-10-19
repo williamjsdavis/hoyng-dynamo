@@ -11,7 +11,15 @@ using BenchmarkTools
 using HoyngDynamo
 
 const SUITE = BenchmarkGroup()
-# SUITE["step!"] = @benchmarkable ...        (build step 2)
+
+let model = Model(; kR = 0.5, Cm = 100.0, N = 60)
+    SUITE["step!"] = BenchmarkGroup()
+    for (name, sp) in (("exponential", ExponentialStepper(model, 0.01)), ("imex", IMEXStepper(model, 0.01)))
+        st = State(model, model.b0)
+        cache = Cache(model)
+        SUITE["step!"][name] = @benchmarkable step!($st, $sp, NoNoise(), $cache)
+    end
+end
 # SUITE["aggregators"] = BenchmarkGroup()    (build step 4)
 
 results = run(SUITE; verbose = true)
