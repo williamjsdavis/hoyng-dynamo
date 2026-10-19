@@ -59,16 +59,6 @@ end
 
 Cache(model::Model{T}) where {T} = Cache{T}(zeros(T, 2 * model.grid.M), zeros(T, model.grid.M))
 
-"The deterministic model: V ≡ 0."
-struct NoNoise end
-
-"""
-    update_noise!(v, noise, n)
-
-Bring the noise field `v[j] = δα/α₀ at node j` up to date for step `n`. Nothing to do for `NoNoise`.
-"""
-@inline update_noise!(v::AbstractVector, ::NoNoise, n::Integer) = nothing
-
 abstract type AbstractStepper{T<:AbstractFloat} end
 
 """

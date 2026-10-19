@@ -93,6 +93,8 @@ Recommendation: as listed. Affects: Tier 0, T1.1. Status: adopted 2026-10-18 as 
 
 Recommendation: as listed. Affects: Tier 2, T4.12, T4.18. Status: adopted 2026-10-18 as recommended.
 
+Implementation (2026-10-19, `src/noise.jl`): `Xoshiro(seed)` per noise object; `run_seed(master, index)` is a SplitMix64 hash of the pair written out in the package, so it is fixed across Julia versions; the distributions are the dispatch types `GaussianF`, `UniformF`, `BinaryF`. The F stream depends only on (seed, distribution, N_c, n_c). Julia documents that the sequence of a seeded generator may change between minor Julia versions, so the Julia version is part of the run metadata (D7).
+
 ### D6. State layout and step bookkeeping
 
 - State: one vector b of length 2(N−2), P then T, Float64. Precomputed per node: sin θ, cos θ, noise factor g_j = 1/√(2N_c sin θ_j), bin index k_j.
@@ -100,7 +102,7 @@ Recommendation: as listed. Affects: Tier 2, T4.12, T4.18. Status: adopted 2026-1
 - Schedules by integer step count n, never by floating τ: redraw when n mod n_c = 0 with n_c = τ_c/Δτ (require it to be an integer), snapshots when n mod n_d = 0 with n_d = 1/Δτ.
 - Ramped forcing (SOH): f(τ) as a piecewise-linear table evaluated at each redraw, constant within a τ_c interval; schedules are small structs (`ConstantForcing`, `LinearRamp`) dispatched on type (D14).
 - Step counter `Int64` (10¹⁸ steps), τ = nΔτ computed from it, never accumulated.
-- Checkpoint = (b, n, RNG state, aggregator states), written to the HDF5 file at a fixed cadence so an arbitrarily long run can be stopped and resumed bitwise.
+- Checkpoint = (b, n, RNG state, aggregator states), written to the HDF5 file at a fixed cadence so an arbitrarily long run can be stopped and resumed bitwise. The current F is not stored, so the cadence is a multiple of n_c and a resume starts at a redraw step (noted in `noise.jl`, 2026-10-19).
 
 Recommendation: as listed. Affects: all runs. Status: adopted 2026-10-18 as recommended.
 
@@ -207,7 +209,7 @@ Status: accepted 2026-10-18 as a requirement; the measures listed are the propos
 | D2 | Spatial discretisation | Conservative 2nd-order FD, poles as Dirichlet nodes, N parameter; spectral as Tier 0 cross-check | adopted 2026-10-18 |
 | D3 | Time integrator | Exponential integrator exp(ΔτG) with exact (nilpotent) update of quenching and noise; IMEX Euler as cross-check; O(1)-memory `step!` | adopted 2026-10-18 |
 | D4 | Eigenproblem and adjoints | LAPACK geev, weighted left eigenvectors, discrete C₀(N), s derived from C_m | adopted 2026-10-18 |
-| D5 | RNG | Library generator per D1, hashed per-run seeds, Gaussian default with switch | adopted 2026-10-18 |
+| D5 | RNG | Library generator per D1, hashed per-run seeds, Gaussian default with switch | adopted 2026-10-18; implemented 2026-10-19 |
 | D6 | State and bookkeeping | Single Float64 vector, precomputed projection weights, Int64 step schedules, checkpointable | adopted 2026-10-18 |
 | D7 | Run modes and output | Record mode (time series to HDF5) and stream mode (aggregators only), same results for the same seed; HDF5 per run with streamed extendible datasets and checkpoints | accepted 2026-10-18 |
 | D8 | Running aggregators | Constant-memory online statistics behind a fit!/merge!/value interface; OnlineStats.jl optional, allocation-checked if used; offline = replay | accepted 2026-10-18 |
