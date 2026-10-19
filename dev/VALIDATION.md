@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: no gate has been run yet. Results will be recorded against each gate once code exists.
+Status: Tier 0 passed on 2026-10-18 (57 tests; results in §4). Tiers 1–5 not yet run.
 
 ## 1. Conventions
 
@@ -129,3 +129,29 @@ Each item: reproduce the plot with the paper's axes and run parameters, place be
 | T6.3 | Sint-800 autocorrelation shape | zero crossing ≈ 27 kyr, minimum ≈ −0.2 near 40 kyr | HSO Fig. 7 |
 | T6.4 | τ_d by autocorrelation overlap (τ_av ≈ 5 kyr) | 11 ± 2 kyr (reference run); 16 ± 4 kyr (second run) | HSO pp. 152–154 |
 | T6.5 | HOS Fig. 10 / SOH Fig. 4 fits (35 and 30 bins) | (5.15, 0.25) and (5.2, 0.26) within 1σ | HOS p. 295; SOH p. 123 |
+
+## 4. Results
+
+### Tier 0 (2026-10-18, commit after a5d0b8c): passed, 57/57 tests
+
+Conservative second-order finite differences, poles as Dirichlet nodes (`DECISIONS.md` D2), dense LAPACK eigensolver with weighted left eigenvectors (D4). "Paper" is the printed value.
+
+| Quantity | Paper | N = 60 | N = 120 | N = 240 | Gate |
+|---|---|---|---|---|---|
+| C₀ (kR = 0.5) | 57.9 | 57.897 | 57.884 | 57.881 | T0.1 pass |
+| λ¹ at C₀ | −2.76 + 4.41i | −2.757 + 4.409i | −2.757 + 4.412i | −2.757 + 4.413i | T0.2 pass |
+| λ² at C₀ | −8.67 + 4.97i | −8.663 + 4.964i | — | −8.670 + 4.974i | T0.2 pass |
+| λ³ at C₀ | −15.9 + 6.13i | −15.845 + 6.108i | −15.873 + 6.126i | −15.880 + 6.130i | T0.2 pass |
+| Λ = λ⁰ at C_m = 100 | 0.527 | 0.5283 | 0.5277 | 0.5275 | T0.3, T0.8 pass |
+| λ¹ at C_m | −2.16 + 5.88i | −2.159 + 5.875i | −2.158 + 5.880i | −2.158 + 5.882i | T0.3 pass |
+| λ² at C_m | −8.21 + 6.04i | −8.201 + 6.024i | — | −8.207 + 6.039i | T0.3 pass |
+| λ³ at C_m | −15.7 + 7.70i | −15.644 + 7.672i | −15.670 + 7.696i | −15.676 + 7.702i | T0.3 pass |
+| E₀₀ | 1.048 | 1.0491 | 1.0483 | 1.0481 | T0.6 pass |
+| ∫ sin θ (P̃₀T₀)² dθ | 3.529 | 3.5323 | 3.5294 | 3.5288 | T0.7 pass |
+| C₀ (kR = 0.3) | — | 49.722 | — | 49.702 | T0.10 (recorded) |
+| Λ (kR = 0.3, C_m = 120) | 0.815 | 0.8163 | — | 0.8148 | T0.10 pass |
+| μ/Λ (kR = 0.3, C_m = 120) | 1.82 | 1.818 | — | 1.821 | T0.10 pass |
+
+Also passed: parity pattern and periodicity (T0.4), bi-orthonormality residual < 10⁻¹⁰ over ten modes at both C₀ and C_m (T0.5), s, q₀, μ within ±0.002 (T0.8), spectral equivalence of G(C₀) + sE and G(C_m) to 10⁻⁸ (T0.9).
+
+Observations. The N = 240 values agree with the printed ones to the last printed digit in every case, so the papers' eigenvalues are grid-converged; our 60-point values differ from them by 0.1–0.4% (second-order error), which suggests the papers' 60-point discretisation was either higher-order or differently placed. The grid convergence is cleanly second order (C₀: 57.897 → 57.884 → 57.881). The discrete C₀(60) = 57.897 is what the model equation will use (D4), not 57.9.

@@ -2,7 +2,7 @@
 
 A fast, modern implementation of the bistable-oscillator geodynamo: the one-dimensional (colatitude) stochastic αΩ mean-field dynamo of Hoyng, Ossendrijver & Schmitt (2001), Schmitt, Ossendrijver & Hoyng (2001) and Hoyng, Schmitt & Ossendrijver (2002). Random fluctuations of the α-effect drive damped overtones whose back-reaction turns the dipole amplitude into an overdamped particle in a bistable potential; secular variation and reversals follow from one mechanism.
 
-**Status:** scaffold only, no physics yet. Progress is tracked in the gate table below and in `dev/`.
+**Status:** the linear operator and eigenproblem are implemented and reproduce HOS Table I (Tier 0 passed). No time stepping yet. Progress is tracked in the gate table below and in `dev/`.
 
 ## What is here
 
@@ -39,7 +39,7 @@ Gates are defined in `dev/VALIDATION.md`. A = automated, D = diagnostic, J = jud
 
 | Tier | Content | Status |
 |---|---|---|
-| 0 | linear operator and eigenproblem (Table I, C₀ = 57.9, E₀₀, …) | not run |
+| 0 | linear operator and eigenproblem (Table I, C₀ = 57.9, E₀₀, …) | passed 2026-10-18, 57 tests (`dev/VALIDATION.md` §4) |
 | 1 | deterministic dynamics, noise off (fixed point, growth rate Λ, saturation) | not run |
 | 2 | noise construction and reproducibility | not run |
 | 3 | closed-form Fokker–Planck theory (Table II theory columns) | not run |
