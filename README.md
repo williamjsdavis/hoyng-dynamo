@@ -2,7 +2,7 @@
 
 A fast, modern implementation of the bistable-oscillator geodynamo: the one-dimensional (colatitude) stochastic αΩ mean-field dynamo of Hoyng, Ossendrijver & Schmitt (2001), Schmitt, Ossendrijver & Hoyng (2001) and Hoyng, Schmitt & Ossendrijver (2002). Random fluctuations of the α-effect drive damped overtones whose back-reaction turns the dipole amplitude into an overdamped particle in a bistable potential; secular variation and reversals follow from one mechanism.
 
-**Status:** eigenproblem (Tier 0), deterministic time stepping (Tier 1) and the stochastic α (Tier 2) implemented and validated; 2.0 µs per step with noise. No aggregators, run driver or output yet. Progress is tracked in the gate table below and in `dev/`.
+**Status:** eigenproblem (Tier 0), deterministic time stepping (Tier 1), the stochastic α (Tier 2) and the constant-memory running aggregators implemented and validated; 2.0 µs per step with noise. No run driver, theory module or HDF5 output yet. Progress is tracked in the gate table below and in `dev/`.
 
 ## What is here
 

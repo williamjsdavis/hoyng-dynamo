@@ -38,10 +38,13 @@ export NoNoise, update_noise!, AbstractFDistribution, GaussianF, UniformF, Binar
     redraw_interval, noise_projection, binned_D0
 export Model, State, Cache, AbstractStepper, ExponentialStepper, IMEXStepper, step!, timestep,
     dipole_amplitude, overtone_residual
+export Aggregator, fit!, value, Moments, Histogram, AutoCorrelation, Sampled, MovingAverage, smooth!,
+    Event, SchmittTrigger, CrossingGroups, ExclusionVariance, BinnedMean, even_quadratic_fit
 
 include("grid.jl")
 include("eigen.jl")
 include("stepper.jl")
 include("noise.jl")
+include("aggregators.jl")
 
 end # module

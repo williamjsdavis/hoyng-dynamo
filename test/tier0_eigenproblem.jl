@@ -6,7 +6,6 @@ using LinearAlgebra
 const TABLE_I_C0 = [0.0 + 0.0im, -2.76 + 4.41im, -8.67 + 4.97im, -15.9 + 6.13im]
 const TABLE_I_CM = [0.527 + 0.0im, -2.16 + 5.88im, -8.21 + 6.04im, -15.7 + 7.70im]
 
-relerr(x, ref) = abs(x - ref) / abs(ref)
 
 # ℜ and ℑ each within 1% of the printed value; a printed zero must be |·| < 0.01 (real) or
 # exactly zero (imaginary part of a steady mode).

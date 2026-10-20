@@ -1,7 +1,7 @@
 # dev/DECISIONS.md D14: the hot path must be type stable and allocation-free.
 #
 # Register each hot function here as (f, example_args) once it exists: step! (with and
-# without noise), the noise redraw and update, every aggregator's fit!. JET checks that the call is fully inferred and
+# without noise), the noise redraw and update, every aggregator's fit! and merge!. JET checks that the call is fully inferred and
 # optimised inside HoyngDynamo; the allocation test compiles with one warm-up call and
 # then measures a second call.
 
@@ -22,6 +22,21 @@ let model = Model(; kR = 0.5, Cm = 100.0, N = 60), cache = Cache(model)
         push!(HOT, (redraw!, (BinnedNoise(model, 0.01; distribution = dist, seed = 2),)))
     end
     push!(HOT, (noise_projection, (model, zeros(model.grid.M))))
+end
+
+let aggs = (Moments(), Histogram(-3.0, 3.0, 600), AutoCorrelation(500; Δt = 0.01), Sampled(Moments(), 100),
+            SchmittTrigger(; Δt = 0.01), CrossingGroups(; Δt = 0.01), ExclusionVariance(; Δt = 0.01))
+    for agg in aggs
+        push!(HOT, (fit!, (agg, 0.9)))
+    end
+    push!(HOT, (fit!, (aggs, 0.9)))                                  # a Tuple of aggregators
+    push!(HOT, (fit!, (BinnedMean(0.0, 1.5, 30), (0.9, 2.5))))
+    push!(HOT, (smooth!, (MovingAverage(50), 0.9)))
+    # merge! of the O(1)/fixed-size aggregators; the event detectors append their event lists
+    for make in (Moments, () -> Histogram(-3.0, 3.0, 600), () -> AutoCorrelation(500), () -> Sampled(Moments(), 100),
+                 ExclusionVariance, () -> BinnedMean(0.0, 1.5, 30))
+        push!(HOT, (merge!, (make(), make())))
+    end
 end
 
 # Specialised on f and the argument types so the call is inferred: a dynamically

@@ -28,7 +28,17 @@ let model = Model(; kR = 0.5, Cm = 100.0, N = 60)
     SUITE["noise"]["quiet step"] = @benchmarkable update_noise!($v, $noise, 1)
     SUITE["noise"]["projection V00"] = @benchmarkable noise_projection($model, $v)
 end
-# SUITE["aggregators"] = BenchmarkGroup()    (build step 4)
+let aggs = (("Moments", Moments()), ("Histogram", Histogram(-3.0, 3.0, 600)), ("AutoCorrelation L=500", AutoCorrelation(500)),
+            ("Sampled", Sampled(Moments(), 100)), ("SchmittTrigger", SchmittTrigger(; Δt = 0.01)),
+            ("CrossingGroups", CrossingGroups(; Δt = 0.01)), ("ExclusionVariance W=5", ExclusionVariance(; Δt = 0.01)))
+    SUITE["aggregators"] = BenchmarkGroup()
+    for (name, agg) in aggs
+        SUITE["aggregators"][name] = @benchmarkable fit!($agg, 0.9)
+    end
+    tuple = map(last, aggs)
+    SUITE["aggregators"]["all seven (Tuple)"] = @benchmarkable fit!($tuple, 0.9)
+    SUITE["aggregators"]["BinnedMean"] = @benchmarkable fit!($(BinnedMean(0.0, 1.5, 30)), (0.9, 2.5))
+end
 
 tune!(SUITE)                 # pick evals per sample; without it sub-µs entries read as 0 ns
 results = run(SUITE; verbose = true)

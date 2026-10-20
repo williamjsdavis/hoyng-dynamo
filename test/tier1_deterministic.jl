@@ -4,7 +4,6 @@
 
 using LinearAlgebra, Random
 
-relerr(x, ref) = abs(x - ref) / abs(ref)
 
 function integrate!(st, sp, cache, nsteps)
     for _ in 1:nsteps
