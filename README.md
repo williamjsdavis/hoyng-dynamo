@@ -2,7 +2,7 @@
 
 A fast, modern implementation of the bistable-oscillator geodynamo: the one-dimensional (colatitude) stochastic αΩ mean-field dynamo of Hoyng, Ossendrijver & Schmitt (2001), Schmitt, Ossendrijver & Hoyng (2001) and Hoyng, Schmitt & Ossendrijver (2002). Random fluctuations of the α-effect drive damped overtones whose back-reaction turns the dipole amplitude into an overdamped particle in a bistable potential; secular variation and reversals follow from one mechanism.
 
-**Status:** eigenproblem (Tier 0), deterministic time stepping (Tier 1), the stochastic α (Tier 2) and the constant-memory running aggregators implemented and validated; 2.0 µs per step with noise. No run driver, theory module or HDF5 output yet. Progress is tracked in the gate table below and in `dev/`.
+**Status:** eigenproblem (Tier 0), deterministic time stepping (Tier 1), the stochastic α (Tier 2), the constant-memory running aggregators and the Fokker–Planck theory module (Tier 3) implemented and validated; 2.0 µs per step with noise. No run driver or HDF5 output yet. Progress is tracked in the gate table below and in `dev/`.
 
 ## What is here
 
@@ -42,7 +42,7 @@ Gates are defined in `dev/VALIDATION.md`. A = automated, D = diagnostic, J = jud
 | 0 | linear operator and eigenproblem (Table I, C₀ = 57.9, E₀₀, …) | passed 2026-10-18, 57 tests (`dev/VALIDATION.md` §4) |
 | 1 | deterministic dynamics, noise off (fixed point, growth rate Λ, saturation, 2μ relaxation) | passed 2026-10-18, 42 tests |
 | 2 | noise construction and reproducibility | passed 2026-10-19, 362 tests (record/stream equivalence tested at build step 6) |
-| 3 | closed-form Fokker–Planck theory (Table II theory columns) | not run |
+| 3 | closed-form Fokker–Planck theory (Table II theory columns) | passed 2026-10-20, 301 tests |
 | 4 | stochastic runs (⟨T_r⟩, variance, D₁ fit, sweeps, Poisson intervals) | not run |
 | 5 | figures of the three papers, judged by eye | not run |
 | 6 | Sint-800 comparison | deferred |

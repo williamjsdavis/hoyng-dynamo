@@ -184,6 +184,8 @@ Closed forms (Eqs. 52–60, HSO A.1–A.2) as pure functions of (γ, c², Λ, μ
 
 Recommendation: as stated; QuadGK and Optim in Julia (the fits stay on the Julia side so that `viz/` is plotting only). Status: adopted 2026-10-18 as recommended.
 
+Implementation (2026-10-20, `src/theory.jl`): `BistableTheory{T}(γ, c², Λ, κ)` with κ = μ/Λ − 1 selects between the HOS forms (κ = 0) and HSO's Eq. A.1 through one ψ(a) = γ[(κ(1 + c²) − 1)a² − ½κa⁴] + [γ(1 + c²)(1 − κc²) − 1] ln(1 + a²/c²); the peak, the variance and ⟨T_r⟩ are written in terms of a_m, ψ_m, ψ_m'' and φ₀'' (HSO Eq. A.2, with a_m from the quadratic of HSO p. 156) so that one code path reduces to Eqs. 52–58 at κ = 0 (checked to 10⁻¹²) and stays valid for κ ≠ 0. Every quadrature integrand is exp[ψ − max ψ]; ⟨T_r⟩, ⟨T_e⟩ and Z have `log_` forms that never overflow. The nested escape integral (Eq. 57) is the one place where D14's JET check is waived: a `quadgk` inside a `quadgk` trips Julia's inference recursion limit inside QuadGK whatever the integrands look like, so its return type is asserted and checked with `@inferred` instead (it is not hot: milliseconds, a few calls per analysis). Constructors from `ModelConstants` connect the module to the eigensolver's Λ and μ, and `diffusion_from_fit`/`shape_parameters` implement Eqs. 61–63 for the Tier 4 D₁ measurement. Dependency: QuadGK 2. Optim is not added until Tier 6 fitting is planned.
+
 ### D13. Figures and visualisation (Python, `viz/`)
 
 User's decision: plotting and visualisation live in Python, not Julia. `viz/` is a small, self-contained project managed by uv (`pyproject.toml`, `uv.lock`) with matplotlib, numpy and h5py; it reads the HDF5 outputs of D7 and is never a dependency of the simulation. One script or function per paper figure, paper axes and run parameters, a shared style module. T(θ, τ) colour plots use a diverging colour map with a > 0 mapped to the same colour sense as HOS Plate I. Interactive exploration (notebooks) also goes here.
@@ -218,6 +220,6 @@ Status: accepted 2026-10-18 as a requirement; the measures listed are the propos
 | D9 | Parallelism | Single-threaded runs, pool over runs | adopted 2026-10-18 |
 | D10 | Architecture | Module list above; package from the first commit; `runs/` committed, `results/` ignored; licence MIT | accepted 2026-10-18 |
 | D11 | Testing and CI | Tier-tagged tests; slow script writes gate table; CI for default suite | accepted 2026-10-18 |
-| D12 | Theory numerics | Log-space quadrature; closed forms cross-checked | adopted 2026-10-18 |
+| D12 | Theory numerics | Log-space quadrature; closed forms cross-checked | adopted 2026-10-18; implemented 2026-10-20 |
 | D13 | Figures | Python `viz/` with a uv environment (matplotlib, h5py); one script per paper figure; not a simulation dependency | accepted 2026-10-18 |
 | D14 | Performance discipline | Type-stable, allocation-free hot path, enforced by tests and benchmarks | accepted 2026-10-18 |

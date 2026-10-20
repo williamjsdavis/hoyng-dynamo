@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: Tier 0 (57 tests) and Tier 1 (42 tests) passed on 2026-10-18; results in §4. Tiers 2–5 not yet run.
+Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); results in §4. Tiers 4–5 not yet run.
 
 ## 1. Conventions
 
@@ -67,11 +67,11 @@ These close gaps G2–G5 and G9 of `DEVELOPMENT.md` §2. Every reported statisti
 |---|---|---|---|---|---|
 | T3.1 | Eq. 43 equals Eq. 42 evaluated numerically with S = Λ(1−a²)a, D = Δ₀a² + Δ₁ | — | 10⁻⁸ after normalisation | Eqs. 42–44 | A |
 | T3.2 | Peak a_m, ψ_m, ψ_m'' (Eqs. 52–54) vs numerical maximisation of ψ | — | 10⁻⁸ | Eqs. 50–54 | A |
-| T3.3 | Variance Eq. 56 for the five Table II (c², γ) pairs | 0.04, 0.08, 0.17, 0.47, 1.0 | last printed digit | Table II | A |
+| T3.3 | Variance Eq. 56 for the five Table II (c², γ) pairs | 0.04, 0.08, 0.17, 0.47, 1.0 | last printed digit. Run 5 (γ = 1.09) recorded only: Eq. 56 gives 10.4 and the table's footnote b puts the run outside the validity of the approximation (§4, 2026-10-20) | Table II | A |
 | T3.4 | ⟨T_r⟩ Eq. 58 for the five Table II pairs | 12000, 480, 94, 35, 35 | 1% (hand check: 93.9 for run 3) | Table II | A |
 | T3.5 | Eq. 58 with Λ = 0.527 for HSO Table 1 cases 1–3 (γ, c²) = (6.3, 0.32), (8, 0.50), (7, 0.45) | 1090, 928, 665 | 0.5% (hand check: 1089, 927, 665) | HSO Table 1 | A |
 | T3.6 | dv (HSO Eq. 12) from Eq. 10 over a > 0, numerically, cases 1–3 | 0.076, 0.070, 0.079 | ±0.001 | HSO Table 1 | A |
-| T3.7 | Eq. A.1 and the generalised A.2 with μ/Λ = 1.45 (case 4) and 1.82 (case 5) | ⟨T_r⟩ 1097, 138; dv 0.071, 0.091 | 1%; ±0.001 | HSO Table 1, App. A | A |
+| T3.7 | Eq. A.1 and the generalised A.2 with μ/Λ = 1.45 (case 4, Λ = 0.527) and 1.82 (case 5, Λ = 0.815) | ⟨T_r⟩ 1097, 138; dv 0.071, 0.091 | 2% and within the bracket of γ ± 0.05 (the printed γ, c² have two figures and ⟨T_r⟩ is exponentially sensitive; §4, 2026-10-20); ±0.001 | HSO Table 1, App. A | A |
 | T3.8 | Numerical escape integral (Eq. 57, SOH's 4∫ form) vs the Gaussian-approximated Eq. 58 at (γ, c²) = (3, 0.2) and (6, 0.3) | — | report the ratio (quantifies the approximation in F.2) | Eq. 57, F.1–F.3, Fig. 11 | D |
 | T3.9 | Asymptotic Eq. 59–60 vs Eq. 58 | ratio → 1 as γ → ∞ | monotone approach | Eqs. 59–60 | A |
 
@@ -215,3 +215,33 @@ Observations.
 ### Aggregators (2026-10-19): 150 unit tests, not a tier
 
 `src/aggregators.jl` (`DECISIONS.md` D8) is tested on synthetic series against offline reference implementations written in the test file: Welford moments against direct sums (10⁻¹²; variance preserved under a 10⁸ offset), fixed-bin histograms, the autocorrelation estimator at lags 0 … L against the direct lagged sums (10⁻¹⁰, including a series longer than one 2²⁰-sample accumulation chunk) and against ρ^l for an AR(1) series, cadence sampling, the moving average, the Schmitt-trigger detector on hand-built series (reversals, aborted reversals, excursions, dips, zero-duration band jumps, crossings on entering the band) and on a random walk (reversal count equals the offline polarity flips), the papers' crossing-grouping rule, the exclusion-window variance against an offline implementation of the §2 definition (10⁻¹⁰), binned means with the weighted even-quadratic fit (recovers 1.36 + 2.00a² to 0.01), `merge!` of every aggregator against pooling, and Tuple composition. The random-walk test found two detector defects before any simulation data existed: a jump from +a_h to −a_h within one sample (possible at τ_d sampling) was not a reversal, and a crossing on the sample that enters the band was not counted. Every `fit!` and the fixed-size `merge!` methods are type-stable and allocation-free (D14 tests). Cost per sample (BenchmarkTools, Apple silicon): `Moments` 12 ns, `Histogram` 3.5 ns, `SchmittTrigger` 3.7 ns, `CrossingGroups` 3.5 ns, `ExclusionVariance` 12 ns, `BinnedMean` 7.6 ns, `Sampled` 2.3 ns, `AutoCorrelation` with 500 lags 322 ns (fed at τ_d cadence it is negligible); all seven scalar aggregators in a Tuple 324 ns, i.e. the every-step statistics of a run add about 1% to the 2.0 µs step.
+
+### Tier 3 (2026-10-20): passed, 301/301 tests
+
+`src/theory.jl` (`DECISIONS.md` D12): `BistableTheory(γ, c²; Λ, μ)` with κ = μ/Λ − 1; the drift S = Λ(1 − a²)a(1 + κa²), D = Δ₀(a² + c²), the potential, ψ = ln p and its derivatives; the closed forms (a_m, ψ_m, ψ_m'', Eq. 56, ⟨T_r⟩ as HSO Eq. A.2, Eqs. 59–60) written so that one code path reduces to HOS Eqs. 52–58 at κ = 0 and remains valid for HSO's A.1; the quadratures (normalisation, the moments over a > 0 for dv, the escape integral Eq. 57) with every exponential relative to max ψ. Λ = 0.527 and κ = 0 unless stated.
+
+| Gate | Check | Target | Computed | Result |
+|---|---|---|---|---|
+| T3.1 | Eq. 43 (and A.1 at κ = 0.45) vs Eq. 42 integrated numerically, a ∈ [−2, 2] | 10⁻⁸ | < 10⁻⁸ after normalisation; ∫p = 1 to 10⁻⁸ | pass |
+| T3.1 | log-space quadrature at γ = 1500, where exp ψ_m overflows | finite | ln Z, ln⟨T_r⟩, dv finite; ψ(∞) = −∞, no NaN | pass |
+| T3.2 | a_m, ψ_m, ψ_m'' vs bisection on a finite-difference ψ' and Richardson derivatives, five (γ, c², κ) sets | 10⁻⁸ | < 10⁻⁸; the general forms equal Eqs. 52–54 to 10⁻¹² at κ = 0 | pass |
+| T3.3 | Eq. 56, Table II runs 1–4 | 0.04, 0.08, 0.17, 0.47 | 0.042, 0.083, 0.175, 0.467 | pass |
+| T3.3 | Eq. 56, Table II run 5 (γ = 1.09) | 1.0 | 10.45 | recorded, see below |
+| T3.4 | Eq. 58, Table II runs 1–5 | 12000, 480, 94, 35, 35 | 11843, 483.0, 93.9, 35.4, 34.8 | pass (run 1 is 1.3% off, within its last printed digit) |
+| T3.5 | Eq. 58, HSO Table 1 cases 1–3 | 1090, 928, 665 | 1088.7, 927.1, 664.6 | pass (0.1%) |
+| T3.6 | dv (HSO Eq. 12) from Eq. 10 over a > 0, cases 1–3 | 0.076, 0.070, 0.079 | 0.0758, 0.0696, 0.0792 | pass |
+| T3.7 | A.1 with the generalised A.2, case 4 (Λ = 0.527, μ/Λ = 1.45) | 1097; dv 0.071 | 1109 (1.1%); 0.0705 | pass at 2%, see below |
+| T3.7 | case 5 (Λ = 0.815, μ/Λ = 1.82) | 138; dv 0.091 | 137.6; 0.0910 | pass |
+| T3.7 | model constants at N = 240: (Λ, μ/Λ) for kR = 0.5, C_m = 100 and kR = 0.3, C_m = 120 | (0.527, 1.45); (0.815, 1.82) | (0.5275, 1.446); (0.8148, 1.821) | pass (1%) |
+| T3.8 | Eq. 57 at a′ = 1 (SOH's 4∫ form) over Eq. 58 at (γ, c²) = (3, 0.2), (6, 0.3) | ratio | 1.180, 1.123; a′ = 0.8 → ×0.990, ×0.998; a′ = 1.2 → ×1.005, ×1.001 | recorded (D) |
+| T3.9 | ln(Eq. 59 / Eq. 58) at c² = 0.25, γ = 2, 5, 10, 20, 50, 100, 10³, 10⁴, 10⁵ | → 0 monotonically | −0.325, −0.109, −0.052, −0.026, −0.010, −0.0050, −5.0×10⁻⁴, −5.0×10⁻⁵, −5.0×10⁻⁶ | pass (Eq. 59 = Eq. 58 × (1 − 0.5/γ) at this c²) |
+| Eq. 63 | (c², γ) from the D₁ fit 1.36 + 2.00a², D0int = 3.529, ℱ = 3.22×10⁻² | 0.246, 2.96 | 0.2460, 2.960 | pass |
+
+Observations.
+
+- Table II run 5 (f = 8.4, γ = 1.09): Eq. 56 gives (γc² + γ − 1)/[4(γ − 1)²] = 10.4, not the printed 1.0; the tracked text layer confirms the print and no reading of the formula gives 1.0. Footnote b of the table says the run is outside the validity of the parabolic approximation because γ is close to 1. For these parameters dv on the exact p(a) over a > 0 is 0.48, close to the run's 0.50. The gate asserts runs 1–4 and records run 5.
+- HSO case 4: the generalised A.2 gives 1109 against the printed 1097 (1.1%). ⟨T_r⟩ is exponentially sensitive to the shape parameters: with the printed two figures, γ = 4.8 ± 0.05 spans 1046–1176 and c² = 0.22 ± 0.005 spans 1041–1183, so a 1% gate is below the resolution of the inputs. Cases 1–3 agree to 0.1%, so the formula is the same and HSO evidently evaluated those from the printed values; case 4 presumably from unrounded fit output. The test asserts 2% and that the target lies inside the γ ± 0.05 bracket. Case 5 needs Λ = 0.815, the growth rate of the kR = 0.3, C_m = 120 run of HSO Fig. 8 (with Λ = 0.527 it would be 213); our eigensolver gives Λ = 0.8148 and μ/Λ = 1.821 for that model, matching HSO's 0.815 and 1.82, an extra check of the eigenproblem at a second parameter set.
+- The exact escape integral (Eq. 57) exceeds the Gaussian-approximated Eq. 58 by 18% at (3, 0.2) and 12% at (6, 0.3), and by 8%, 14%, 17% and 2% for Table II runs 1–4 (run 5, with barely a well, gives 46% of Eq. 58). This quantifies the F.2 approximation and moves the theory toward the measured values of runs 2 and 3 (552 and 110 against the runs' 519 ± 53 and 107 ± 5); it is also the sense in which HSO (p. 151) call A.2 "only approximate". The dependence on a′ is weak, as HOS p. 289 states (1% between a′ = 0.8 and 1.2).
+- dv on the exact p(a) over a > 0 (HSO's definition) exceeds Eq. 56 for the first three Table II runs (0.046, 0.099, 0.196 against 0.042, 0.083, 0.175) and falls below it for run 4 (0.330 against 0.467) because it includes the reversal region near a = 0 and uses the full distribution rather than the parabola; it is not the between-reversal variance of §2. Both will be compared with the run statistics at Tier 4.
+- D14: the closed forms are type-stable and allocation-free. The quadratures allocate (QuadGK's segment heap) and are checked for inference only. The nested escape integral (Eq. 57, a `quadgk` inside a `quadgk`) cannot be made JET-clean: Julia's inference recursion limit fires when QuadGK's internals are re-entered, whether the integrands are closures or callable structs and whether the inner interval is finite or not; its return type is asserted in the source, the two functions are checked with `@inferred` only, and the cost (milliseconds, a few calls per analysis) is irrelevant.
+

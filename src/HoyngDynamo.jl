@@ -27,6 +27,7 @@ module HoyngDynamo
 
 using LinearAlgebra
 using Random
+using QuadGK: quadgk
 
 export Grid, inner, diffusion_operator, shear_operator, alpha_operator, dynamo_operator,
     quenching_operator
@@ -40,11 +41,19 @@ export Model, State, Cache, AbstractStepper, ExponentialStepper, IMEXStepper, st
     dipole_amplitude, overtone_residual
 export Aggregator, fit!, value, Moments, Histogram, AutoCorrelation, Sampled, MovingAverage, smooth!,
     Event, SchmittTrigger, CrossingGroups, ExclusionVariance, BinnedMean, even_quadratic_fit
+export BistableTheory, diffusion_constants, shape_parameters, diffusion_prefactor, diffusion_from_fit,
+    drift, diffusion, potential, psi, dpsi, d2psi, phi, phi0_curvature, bistable, peak_amplitude,
+    peak_log_density, peak_curvature, mean_amplitude, relative_variance, log_mean_reversal_time,
+    mean_reversal_time, kramers_exponent, log_mean_reversal_time_asymptotic, mean_reversal_time_asymptotic,
+    psi_max, log_normalisation, StationaryDensity, stationary_density, logpdf, half_moments,
+    dipole_variation, log_escape_time, escape_time, log_mean_reversal_time_quadrature,
+    mean_reversal_time_quadrature
 
 include("grid.jl")
 include("eigen.jl")
 include("stepper.jl")
 include("noise.jl")
 include("aggregators.jl")
+include("theory.jl")
 
 end # module
