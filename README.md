@@ -10,7 +10,7 @@ A fast, modern implementation of the bistable-oscillator geodynamo: the one-dime
 |---|---|
 | `src/`, `test/`, `bench/` | The Julia package `HoyngDynamo`, its tier-tagged tests and the hot-path benchmarks. |
 | `viz/` | Python plotting and visualisation (a uv project: matplotlib, numpy, h5py). Reads the package's HDF5 output. Not needed to simulate. |
-| `dev/` | Development notes: model summary (`DEVELOPMENT.md`), validation gates (`VALIDATION.md`), open questions (`QUESTIONS.md`), implementation decisions (`DECISIONS.md`). |
+| `dev/` | Development notes: model summary (`DEVELOPMENT.md`), validation gates (`VALIDATION.md`), open questions (`QUESTIONS.md`), implementation decisions (`DECISIONS.md`), discrepancies between the papers and this implementation (`DISCREPANCIES.md`). |
 | `resources/` | Verified, agent-readable summaries of the three papers: every equation, parameter, table and result with page references. Start at `resources/README.md`. |
 
 ## Using the package

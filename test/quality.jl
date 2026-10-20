@@ -41,12 +41,10 @@ let aggs = (Moments(), Histogram(-3.0, 3.0, 600), AutoCorrelation(500; Δt = 0.0
 end
 
 # Theory module (D12): the closed forms are allocation-free; the quadratures allocate
-# (QuadGK's segment heap) and are only checked for inference. The nested escape integral
-# (a quadgk inside a quadgk) defeats JET: Julia's recursion limit fires when QuadGK's
-# internals are re-entered, whatever the integrands look like; its return type is asserted
-# in the source and checked here with @inferred only.
+# (QuadGK's segment heap) and are only checked for inference. This includes the nested
+# escape integral, whose inner quadgk goes through a BatchIntegrand precisely so that JET
+# stays clean (see the comment in theory.jl).
 const INFERRED = Vector{Tuple{Any,Tuple}}()
-const NESTED = Vector{Tuple{Any,Tuple}}()
 let th = BistableTheory(2.96, 0.246), thA = BistableTheory(4.8, 0.22; μ = 1.45 * 0.527)
     for t in (th, thA)
         for f in (diffusion_constants, peak_amplitude, peak_log_density, peak_curvature, relative_variance,
@@ -56,11 +54,9 @@ let th = BistableTheory(2.96, 0.246), thA = BistableTheory(4.8, 0.22; μ = 1.45 
         for f in (drift, diffusion, potential, psi, dpsi, d2psi, phi)
             push!(HOT, (f, (t, 0.7)))
         end
-        for f in (log_normalisation, half_moments, dipole_variation, stationary_density)
+        for f in (log_normalisation, half_moments, dipole_variation, stationary_density, log_escape_time,
+                  log_mean_reversal_time_quadrature)
             push!(INFERRED, (f, (t,)))
-        end
-        for f in (log_escape_time, log_mean_reversal_time_quadrature)
-            push!(NESTED, (f, (t,)))
         end
     end
     push!(HOT, (log_mean_reversal_time_asymptotic, (th,)))
@@ -83,9 +79,6 @@ end
     end
     for (f, args) in INFERRED
         JET.test_opt(f, Tuple{map(typeof, args)...}; target_modules = (HoyngDynamo,))
-        @test (@inferred f(args...)) !== nothing
-    end
-    for (f, args) in NESTED
         @test (@inferred f(args...)) !== nothing
     end
     @test allocations((c0, c2) -> diffusion_from_fit(c0, c2; D0int = 3.529, prefactor = 3.22e-2), 1.36, 2.00) == 0

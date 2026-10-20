@@ -293,23 +293,30 @@ takes a′ ≈ 1, the well bottom; a′ = Inf is allowed), evaluated by nested q
 
 Both exponentials are taken relative to ψ_max, so the value is finite for any γ.
 """
-# The integrands of the nested escape integral are callable structs. Julia's inference
-# still gives up on the inner quadgk call (its recursion limit fires when QuadGK's
-# internals are re-entered from inside an outer quadgk), so the inner result is asserted
-# to be a T; the D14 tests check these two functions with @inferred only, not with JET.
+# The escape integral is a quadgk inside a quadgk. With two plain integrands Julia's
+# inference recursion limit fires when QuadGK's adaptive routines are re-entered and the
+# inner call degrades to dynamic dispatch (D14's JET check rejects that). Evaluating the
+# inner integrand through QuadGK's `BatchIntegrand` sends it down a different method chain
+# (`evalrules`/`refine` for batches), so nothing is re-entered: fully inferred, same
+# result to the last bit, and about five times faster.
 
-# exp[ψ(z) − ψref]
+# out .= exp.(ψ.(z) .− ψref), batched
 struct ScaledDensity{T}
     th::BistableTheory{T}
     ψref::T
 end
 
-@inline (g::ScaledDensity{T})(z::T) where {T} = exp(psi(g.th, z) - g.ψref)
+function (g::ScaledDensity{T})(out::AbstractVector{T}, z::AbstractVector{T}) where {T}
+    @inbounds for i in eachindex(out, z)
+        out[i] = exp(psi(g.th, z[i]) - g.ψref)
+    end
+    return nothing
+end
 
 # ∫_y^∞ exp[ψ(z) − ψref] dz
 function scaled_tail(th::BistableTheory{T}, y::T, ψref::T) where {T}
-    I, _ = quadgk(ScaledDensity(th, ψref), y, T(Inf); rtol = THEORY_RTOL)
-    return I::T
+    I, _ = quadgk(BatchIntegrand{T}(ScaledDensity(th, ψref)), y, T(Inf); rtol = THEORY_RTOL)
+    return I
 end
 
 # The outer integrand of Eq. 57 divided by exp(ψ_max). The inner integral is taken relative

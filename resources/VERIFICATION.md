@@ -48,3 +48,8 @@ Overall confidence for Paper 1: high. Residual approximations are figure read-of
 ## Overview file
 
 `00-series-overview-and-shared-notation.md` was written by the coordinator from the three verified resources only; every number in it is traceable to one of them. The forcing-parameter conversion table was computed from f, τ_c = 0.05 and N_c = 10 (the SOH column is π² times the HOS column); the year conversions in section 5 are products of the quoted dimensionless values with the quoted τ_d.
+
+## Implementation-time checks (2026-10-20)
+
+Not a transcription pass; recorded because two Notes were added to the resources. While implementing the theory module (`src/theory.jl`, validation gates T3.3 and T3.7), Eq. (56) for Table II run 5 of Paper 1 gave 10.4 against the printed 1.0. The tracked text layer `raw-text/hoyng-2001-gafd.txt` was checked and reads "1.0", so the resource is faithful to the print; no PDF was opened. A **Note:** to that effect was added after the Table II discussion in the Paper 1 file (section 6.8), and a **Note:** on the reproduction of Table 1's ⟨T_r⟩ column (cases 1–3 and 5 to 0.3%, case 4 to 1.1%) after the case 4 bullet in the Paper 3 file (section 6.4). Nothing transcribed from the papers was changed. Details in `dev/DISCREPANCIES.md`.
+

@@ -27,7 +27,7 @@ module HoyngDynamo
 
 using LinearAlgebra
 using Random
-using QuadGK: quadgk
+using QuadGK: quadgk, BatchIntegrand
 
 export Grid, inner, diffusion_operator, shear_operator, alpha_operator, dynamo_operator,
     quenching_operator
