@@ -17,9 +17,9 @@ Package layout (`dev/DECISIONS.md` D10), in build order:
 - `noise.jl`        the stochastic α: binned, piecewise-constant F(θ, τ), forcing schedules
 - `stepper.jl`      constant-memory time steppers (exponential integrator, IMEX Euler)
 - `aggregators.jl`  running statistics behind `fit!`, `merge!`, `value`
-- `io.jl`           HDF5 streams and checkpoints
-- `run.jl`          parameters and observers → a run in record or stream mode
 - `theory.jl`       the Fokker–Planck formula module (closed forms and quadratures)
+- `run.jl`          `RunSpec`, `Simulation`, observers and the `run!` loop (record or stream mode)
+- `io.jl`           HDF5 run files: streams, results, checkpoints
 
 Plotting lives outside the package, in `viz/` (Python).
 """
@@ -28,6 +28,9 @@ module HoyngDynamo
 using LinearAlgebra
 using Random
 using QuadGK: quadgk, BatchIntegrand
+using HDF5
+using Serialization: serialize, deserialize
+import Dates
 
 export Grid, inner, diffusion_operator, shear_operator, alpha_operator, dynamo_operator,
     quenching_operator
@@ -48,6 +51,11 @@ export BistableTheory, diffusion_constants, shape_parameters, diffusion_prefacto
     psi_max, log_normalisation, StationaryDensity, stationary_density, logpdf, half_moments,
     dipole_variation, log_escape_time, escape_time, log_mean_reversal_time_quadrature,
     mean_reversal_time_quadrature
+export RunSpec, Diagnostics, Simulation, current_time, steps, amplitude, absamplitude, overtone, overtone1, overtone2,
+    parity, toroidal, poloidal, toroidal_energy, d1_sample, d1_pair, Observer, Probe, observe!, flush!, run!,
+    standard_observers, summarize
+export RunFile, open_run, metadata, Recorder, SnapshotRecorder, read_stream, streams, write_results!, write_summary!,
+    read_results, checkpoint!, restore!, checkpoint_step
 
 include("grid.jl")
 include("eigen.jl")
@@ -55,5 +63,7 @@ include("stepper.jl")
 include("noise.jl")
 include("aggregators.jl")
 include("theory.jl")
+include("run.jl")
+include("io.jl")
 
 end # module

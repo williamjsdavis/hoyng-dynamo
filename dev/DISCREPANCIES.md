@@ -39,3 +39,12 @@ A running log of places where a number in the papers cannot be reproduced from t
 - **Ours.** Eq. 57 at a′ = 1 exceeds Eq. 58 by 8%, 14%, 17%, 2% for Table II runs 1–4 (12761, 552, 110, 36.1 against 11843, 483, 93.9, 35.4) and by 18% and 12% at (γ, c²) = (3, 0.2) and (6, 0.3); for run 5 it is 46% of Eq. 58. The dependence on a′ is 1% between 0.8 and 1.2.
 - **Interpretation.** Not an error, a quantification of the F.2 approximation; it moves the theory toward the measured values of runs 2 and 3 (519 ± 53, 107 ± 5) and is part of the gap discussed in `QUESTIONS.md` Q2. When Tier 4 compares measured reversal times with theory, both Eq. 58 and Eq. 57 are reported.
 - **Gate.** T3.8 (diagnostic). Status 2026-10-20: recorded.
+
+### DR-5. The intercept of the D₁ fit depends on how the bin averages are weighted
+
+- **Where.** HOS Eq. 61 and Fig. 8 (p. 291–292): "histogram of bin averages, fitted curve 1.36 + 2.00a² for a ≤ 1.1"; our Tier 4 results, `VALIDATION.md` §4.
+- **Paper.** D₁/ℱ ≃ 1.36 + 2.00a², hence c² = 0.246, γ = 2.96 (Eq. 63); the histogram "rises from ≈ 1.4 at a = 0" (figure read-off).
+- **Ours.** Three seeds × 5×10⁴ τ_d pooled: an unweighted least-squares fit through the bin means for |a| ≤ 1.1 gives 1.46 + 2.08a²; weighting the bins by their counts gives 1.58 + 1.91a²; the direct mean of the samples with |a| ≤ 0.2 gives 1.24 ± 0.1. Hence c² = 0.261 (unweighted) or 0.291 (weighted) against 0.246; γ is 2.93 or 3.02 against 2.96 either way.
+- **Interpretation.** D₁(a) is only approximately quadratic: the bin averages bend upward beyond |a| ≈ 0.8 (HOS note the a⁴ term beyond 1.1), so the intercept is an extrapolation whose value depends on the weighting. The paper does not say how it fitted; a curve through the histogram is an unweighted fit, which is what the gate uses, and the paper's 1.36 lies between our unweighted fit and our direct small-|a| estimate. The physically relevant number, D₁(0) = Δ₁, is best estimated directly from the small-|a| bins once enough samples exist; the forcing sweep (step 7) will pool more.
+- **Gate.** T4.3 and T4.4 pass at 10% with the unweighted fit (7.6% and 6%); the weighted fit would fail both. `summarize` reports all three estimates. Status 2026-10-20: open; revisit with the sweep statistics (T4.7).
+

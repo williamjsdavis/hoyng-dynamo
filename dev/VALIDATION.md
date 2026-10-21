@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); results in §4. Tiers 4–5 not yet run.
+Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard-run gates T4.1–T4.4 passed on 2026-10-20 (the sweeps are build step 7); Tier 5's T5.1, T5.2, T5.7, T5.8 were rendered on 2026-10-20 and await the user's judgement. Results in §4.
 
 ## 1. Conventions
 
@@ -203,7 +203,7 @@ N = 60, Δτ = 0.01, N_c = 10, τ_c = 0.05 (n_c = 5 steps), f = 6.4, Gaussian F 
 | T2.5 | one noise series across f: F stream independent of f, v(7.4)/v(5.4) = 7.4/5.4 | bitwise / 10⁻¹⁴ | bitwise / 10⁻¹⁴ | pass |
 | T2.5 | `run_seed(master, i)`: deterministic, 1000 distinct seeds, distinct across masters | — | as stated | pass |
 | T2.5 | `LinearRamp` evaluated at each redraw, constant within τ_c | exact | exact | pass |
-| T2.5 | record and stream modes agree; replaying a(τ) through the aggregators reproduces the online values | bitwise | — | deferred to build step 6 (`run.jl`) |
+| T2.5 | record and stream modes agree; replaying a(τ) through the aggregators reproduces the online values | bitwise | bitwise (2026-10-20, build step 6: 600 τ_d at seed 3 with 4 reversals; state, every standard aggregator, and the replay of the recorded a and D₁/ℱ streams through fresh detectors, histogram and binned means; a checkpointed run stopped at 450 τ_d and resumed from its 400 τ_d checkpoint is also bitwise identical, streams included) | pass |
 
 Observations.
 
@@ -244,4 +244,37 @@ Observations.
 - The exact escape integral (Eq. 57) exceeds the Gaussian-approximated Eq. 58 by 18% at (3, 0.2) and 12% at (6, 0.3), and by 8%, 14%, 17% and 2% for Table II runs 1–4 (run 5, with barely a well, gives 46% of Eq. 58). This quantifies the F.2 approximation and moves the theory toward the measured values of runs 2 and 3 (552 and 110 against the runs' 519 ± 53 and 107 ± 5); it is also the sense in which HSO (p. 151) call A.2 "only approximate". The dependence on a′ is weak, as HOS p. 289 states (1% between a′ = 0.8 and 1.2).
 - dv on the exact p(a) over a > 0 (HSO's definition) exceeds Eq. 56 for the first three Table II runs (0.046, 0.099, 0.196 against 0.042, 0.083, 0.175) and falls below it for run 4 (0.330 against 0.467) because it includes the reversal region near a = 0 and uses the full distribution rather than the parabola; it is not the between-reversal variance of §2. Both will be compared with the run statistics at Tier 4.
 - D14: the closed forms are type-stable and allocation-free. The quadratures allocate (QuadGK's segment heap) and are checked for inference only. The nested escape integral (Eq. 57, a `quadgk` inside a `quadgk`) was at first not JET-clean: Julia's inference recursion limit fires when QuadGK's adaptive routines are re-entered, whether the integrands are closures or callable structs and whether the inner interval is finite or not, and the inner call degraded to dynamic dispatch. Evaluating the inner integrand through QuadGK's `BatchIntegrand` sends it down a different method chain, so nothing is re-entered: fully inferred, identical result to the last bit, 0.3 ms instead of 1.8 ms per ⟨T_r⟩. The nesting itself is intrinsic (a two-dimensional integral over a triangle); no change of variables removes it.
+
+### Tier 4, standard run (2026-10-20): T4.1–T4.4 passed, 8/8 tests (`HOYNG_TIERS=4`)
+
+Three seeds × 5×10⁴ τ_d in stream mode (14 s each), aggregators pooled with `merge!`; the definitions of §2 (Schmitt trigger a_h = 0.5, a_e = 0.3; exclusion variance W = 5 τ_d; dv on |a| at 1 τ_d; D₁/ℱ bin averages of width 0.05 fitted unweighted for |a| ≤ 1.1 as the histogram of HOS Fig. 8). `test/tier4_stochastic.jl`, `src/run.jl` (`standard_observers`, `summarize`).
+
+| Gate | Check | Target | Measured (pooled; per seed) | Result |
+|---|---|---|---|---|
+| T4.1 | ⟨T_r⟩, Schmitt trigger | 107 ± 5 (468 reversals) | 104.7 ± 2.8 from 1433 reversals; 109.6 ± 5.1, 104.6 ± 4.8, 100.2 ± 4.5 | pass (2σ combined = 11.5) |
+| T4.1 | the papers' grouping rule (W = 5 τ_d) | — | 432, 456, 479 reversals against the trigger's 456, 478, 499; trigger: 253, 229, 235 aborted, 2295, 2176, 2197 excursions | recorded |
+| T4.2 | between-reversal relative variance | 0.16 ± 0.02 | 0.164 (0.151, 0.180, 0.160) | pass |
+| T4.2 | dv, HSO Eq. 12 on \|a\| | — | 0.160 | recorded |
+| T4.3 | D₁/ℱ = c₀ + c₂a², \|a\| ≤ 1.1, unweighted fit of the bin averages | 1.36 + 2.00a², 10% | 1.464 + 2.08a² (7.6%, 4%) | pass |
+| T4.3 | the same fit weighted by counts; mean of the bins \|a\| ≤ 0.2 | — | 1.584 + 1.91a²; 1.24 | recorded, see below |
+| T4.4 | (c², γ) from the fit with D0int = 3.532 (N = 60), ℱ = 3.217×10⁻², Λ = 0.5283 | (0.246, 2.96), 10% | (0.261, 2.93): 6%, 1% | pass |
+| T4.4 | Eqs. 56 and 58 at the measured (c², γ) | paper: 0.17, 94 at (0.246, 2.96) | 0.181, 83.9 (Eq. 57: 97.7) against the run's 0.164 and 104.7 | recorded |
+| T4.13 | parity 𝒫 every n_c steps over the whole run, events included | median < −0.9 outside event windows (D) | median −0.815; 31% of samples below −0.9 | recorded; the event-window exclusion is step 7 |
+
+Observations.
+
+- Reversal rate and variance: 104.7 ± 2.8 against 107 ± 5 and 0.164 against 0.16, so the standard run reproduces HOS Table II row 3 within the errors; the seed-to-seed scatter of ⟨T_r⟩ (100–110) is what the Poisson error (≈ 5) predicts. The grouping rule finds 4–5% fewer reversals than the trigger, because a pair of crossings within 5 τ_d counts as one aborted reversal.
+- (Logged in `DISCREPANCIES.md` DR-5.) The D₁ intercept depends on the weighting of the fit: the bin averages are only approximately quadratic (D₁ grows faster than a² beyond |a| ≈ 0.8, the "a⁴ term" HOS see beyond 1.1), so an unweighted fit through the bin means (the paper's curve through its histogram) gives 1.46, a count-weighted fit, which favours the populous bins near |a| ≈ 0.9, gives 1.58, and the direct mean of the bins |a| ≤ 0.2 gives 1.24 ± 0.1 (1300 samples of a heavy-tailed quantity). The paper's 1.36 lies between the direct estimate and the unweighted fit, and its histogram also "rises from ≈ 1.4 at a = 0". c₂ is insensitive (1.9–2.1). `summarize` reports all three; the gate uses the unweighted fit.
+- Theory at the measured (c², γ): Eq. 58 gives 84 against the measured 105 (the exact Eq. 57: 98); Eq. 56 gives 0.18 against 0.164. The same pattern as HOS's own comparison (94 against 107, 0.17 against 0.16), shifted by our slightly larger c².
+- Parity: between reversals 𝒫 sits at −0.8 to −1 with brief spikes toward 0, and reaches +1 at the reversals (Fig. 2); the whole-run median is −0.82. The gate's "outside event windows" median needs the event list applied to the parity stream (step 7).
+- Cost: 14 s per 5×10⁴ τ_d in stream mode (2.3 µs per step with all probes) and 14 s in record mode with every stream and the T, P snapshots (130 MB per run).
+
+### Tier 5, standard-run figures (2026-10-20): T5.1, T5.2, T5.7, T5.8 rendered, the user's judgement pending
+
+`scripts/run_standard.jl` (seed 1) and `viz/hos_fig01.py`, `hos_fig02.py`, `hos_fig08.py`, `hos_fig09.py` write `figures/hos_fig0*.png`. The summariser's reading against the features listed in §3:
+
+- T5.1 (HOS Fig. 1): vertical stripes of overtone fine structure in T(θ, τ); 27 reversal bars in 0–2000 τ_d (paper: of order 20 at a mean spacing of order 100); a around ±1 with excursions to |a| ≈ 1.8; aborted reversals and excursions visible as dips. The colour scale is ±1.7 in our field unit.
+- T5.2 (HOS Fig. 2): |a₁| spikes to 1.3–1.4 and |a₂| to 1.0 at the events (paper: ~1.2 and ~0.9), 0.1–0.5 between them; 𝒫 near −1 with spikes to +1 at the reversals and brief spikes toward 0 in between; the reversals of the window come in clusters (506; 538; 652 and 670). The overtone scale is in the unit-toroidal-energy convention of `eigenmodes` (`DECISIONS.md` D4); with it the spike heights match the paper's. The energy axis reaches 7 in our field unit while the paper's runs to 30, so their field unit is 2–3 times ours (the constant of HOS Eq. 18 is not given).
+- T5.7 (HOS Fig. 8): the scatter, the bin averages rising from ≈ 1.4 at a = 0 and the a⁴ departure beyond 1.1 all as in the paper; the fitted curve is 1.45 + 2.10a² for this seed against 1.36 + 2.00a².
+- T5.8 (HOS Fig. 9): the paper's discrepancy reappears exactly: histogram peak 1.42 at |a| = 0.84 (paper ≈ 1.35 at 0.85) against the Eq. 43 curve peak 1.12 at 0.8 (paper ≈ 1.1 at 0.8), the curve above the histogram for |a| < 0.5 and below it near the peak.
 

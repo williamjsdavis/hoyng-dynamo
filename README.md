@@ -2,13 +2,14 @@
 
 A fast, modern implementation of the bistable-oscillator geodynamo: the one-dimensional (colatitude) stochastic αΩ mean-field dynamo of Hoyng, Ossendrijver & Schmitt (2001), Schmitt, Ossendrijver & Hoyng (2001) and Hoyng, Schmitt & Ossendrijver (2002). Random fluctuations of the α-effect drive damped overtones whose back-reaction turns the dipole amplitude into an overdamped particle in a bistable potential; secular variation and reversals follow from one mechanism.
 
-**Status:** eigenproblem (Tier 0), deterministic time stepping (Tier 1), the stochastic α (Tier 2), the constant-memory running aggregators and the Fokker–Planck theory module (Tier 3) implemented and validated; 2.0 µs per step with noise. No run driver or HDF5 output yet. Progress is tracked in the gate table below and in `dev/`.
+**Status:** eigenproblem (Tier 0), deterministic time stepping (Tier 1), the stochastic α (Tier 2), the running aggregators, the Fokker–Planck theory module (Tier 3), the run driver with record and stream modes, HDF5 output and bitwise checkpoint/resume are implemented and validated. The standard run reproduces HOS Table II row 3 (⟨T_r⟩ 105 ± 3 against 107 ± 5, between-reversal variance 0.164 against 0.16; Tier 4 gates T4.1–T4.4) at 2.3 µs per step with all statistics running, and the first figures (HOS Figs. 1, 2, 8, 9) are rendered from `viz/`. Next: the forcing sweep and the other parameter sets. Progress is tracked in the gate table below and in `dev/`.
 
 ## What is here
 
 | Path | Contents |
 |---|---|
 | `src/`, `test/`, `bench/` | The Julia package `HoyngDynamo`, its tier-tagged tests and the hot-path benchmarks. |
+| `scripts/` | Run scripts (`run_standard.jl` writes the standard run to `results/`, git-ignored). |
 | `viz/` | Python plotting and visualisation (a uv project: matplotlib, numpy, h5py). Reads the package's HDF5 output. Not needed to simulate. |
 | `dev/` | Development notes: model summary (`DEVELOPMENT.md`), validation gates (`VALIDATION.md`), open questions (`QUESTIONS.md`), implementation decisions (`DECISIONS.md`), discrepancies between the papers and this implementation (`DISCREPANCIES.md`). |
 | `resources/` | Verified, agent-readable summaries of the three papers: every equation, parameter, table and result with page references. Start at `resources/README.md`. |
@@ -43,8 +44,8 @@ Gates are defined in `dev/VALIDATION.md`. A = automated, D = diagnostic, J = jud
 | 1 | deterministic dynamics, noise off (fixed point, growth rate Λ, saturation, 2μ relaxation) | passed 2026-10-18, 42 tests |
 | 2 | noise construction and reproducibility | passed 2026-10-19, 362 tests (record/stream equivalence tested at build step 6) |
 | 3 | closed-form Fokker–Planck theory (Table II theory columns) | passed 2026-10-20, 301 tests |
-| 4 | stochastic runs (⟨T_r⟩, variance, D₁ fit, sweeps, Poisson intervals) | not run |
-| 5 | figures of the three papers, judged by eye | not run |
+| 4 | stochastic runs (⟨T_r⟩, variance, D₁ fit, sweeps, Poisson intervals) | standard run T4.1–T4.4 passed 2026-10-20 (`HOYNG_TIERS=4`); sweeps pending |
+| 5 | figures of the three papers, judged by eye | HOS Figs. 1, 2, 8, 9 rendered 2026-10-20 (`viz/`), judgement pending |
 | 6 | Sint-800 comparison | deferred |
 
 ## The papers

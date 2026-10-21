@@ -14,3 +14,6 @@ results/
 .venv/
 __pycache__/
 .ipynb_checkpoints/
+
+# Figures rendered by viz/ are regenerated from results/ and never committed.
+figures/

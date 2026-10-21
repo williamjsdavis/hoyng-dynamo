@@ -84,6 +84,8 @@ Affects: Tier 1, T4.17, run cost. Status: adopted 2026-10-18 as recommended.
 
 Recommendation: as listed. Affects: Tier 0, T1.1. Status: adopted 2026-10-18 as recommended.
 
+Implementation note (2026-10-20): every mode, not only the fundamental, is scaled to unit toroidal energy ∫|T_k|² sin θ dθ = 1 (b̃_k inversely), so that the overtone amplitudes a_k = (b̃_k, b) are in units of the equilibrium dipole's toroidal r.m.s. field. HOS fix only (b̃_i, b_j) = δ_ij and leave the unit of B to the constant of their Eq. 18, so the amplitude scale of their Figs. 2 and 6 is a convention; in ours the spike heights of Fig. 2 match the paper's (T5.2) while the energy scale differs by their unknown field unit.
+
 ### D5. Random numbers
 
 - Generator: Xoshiro256** (Julia, Rust `rand_xoshiro`), PCG64 (NumPy) or Philox (JAX), following D1. All are fine; record the generator name and version with the output.
@@ -106,6 +108,8 @@ Implementation (2026-10-19, `src/noise.jl`): `Xoshiro(seed)` per noise object; `
 
 Recommendation: as listed. Affects: all runs. Status: adopted 2026-10-18 as recommended.
 
+Implementation (2026-10-20, `src/run.jl`, `src/io.jl`): `RunSpec` holds every parameter; `Simulation` bundles model, stepper, `BinnedNoise`, `State`, `Cache` and `Diagnostics` (the overtone projection vectors W b̃_k, the D₁ weights w P̃₀², T₀). All cadences are integer step counts (`Probe(f, agg, every)`, recorder `every`, `checkpoint_every`), checked against n_c where required. A checkpoint is one `Serialization` blob (n, a, b, the Xoshiro state, every probe's aggregator) in an extendible `UInt8` dataset, written on redraw steps only; `restore!` copies it field by field into a freshly built simulation and observer set (const arrays copied into, scalars assigned) and truncates the attached stream datasets to the checkpointed length, so a run stopped after its last checkpoint resumes bitwise (tested, `test/run_io.jl`).
+
 ### D7. Run modes, output format, cadence, precision
 
 **Run modes (user's decision).** Two modes, one stepping loop:
@@ -127,6 +131,8 @@ Contents per run: metadata (every parameter, seed, generator, N, Δτ, integrato
 Size: a every step in Float64 is 40 MB per 5×10⁴ τ_d, snapshots 46 MB; a 5×10⁵ τ_d run is ten times that. Proposal: Float32 for the per-step a stream (10⁻⁷ relative precision, far below anything measured from it; T1.1 is checked in memory), Float64 for everything else; a "light" mode without snapshots for long sweeps; `results/` git-ignored.
 
 Recommendation: HDF5 with the layout above (HDF5.jl); `viz/` reads the same files with h5py. Affects: Tier 4–5 analysis, disk. Status: accepted 2026-10-18, including the two modes.
+
+Implementation (2026-10-20): the mode is the observer NamedTuple handed to `run!`: `standard_observers(sim)` gives the probes (stream mode), `standard_observers(sim; file)` adds the `Recorder`s and `SnapshotRecorder`s (record mode); the loop, the stepper and the RNG are the same code. Streams are extendible chunked datasets (10⁴ scalars or 100 snapshots per chunk) with `every` and `dt` attributes; complex a₁, a₂ are HDF5 compound {r, i}, which h5py reads as complex. Results are one group per probe holding the `value` NamedTuple (event lists as parallel arrays), plus `results/summary` from `summarize`. One deviation from the proposal above: the per-step `a` stream defaults to Float64, not Float32, so that the replay invariant of T2.5 holds bitwise; `stream_eltype = Float32` is available for long sweeps. The standard run in record mode with snapshots is 130 MB per 5×10⁴ τ_d and costs 2.9 µs per step including all observers and the HDF5 writes (2.3 µs in stream mode, 2.0 µs for the step alone), 15 s per run; `scripts/run_standard.jl` writes it.
 
 ### D8. Running aggregators (constant-memory statistics)
 
@@ -212,10 +218,10 @@ Status: accepted 2026-10-18 as a requirement; the measures listed are the propos
 | D1 | Language and stack | Julia, as a Julia package | accepted 2026-10-18 |
 | D2 | Spatial discretisation | Conservative 2nd-order FD, poles as Dirichlet nodes, N parameter; spectral as Tier 0 cross-check | adopted 2026-10-18 |
 | D3 | Time integrator | Exponential integrator exp(ΔτG) with exact (nilpotent) update of quenching and noise; IMEX Euler as cross-check; O(1)-memory `step!` | adopted 2026-10-18 |
-| D4 | Eigenproblem and adjoints | LAPACK geev, weighted left eigenvectors, discrete C₀(N), s derived from C_m | adopted 2026-10-18 |
+| D4 | Eigenproblem and adjoints | LAPACK geev, weighted left eigenvectors, discrete C₀(N), s derived from C_m; all modes at unit toroidal energy | adopted 2026-10-18; overtone normalisation fixed 2026-10-20 |
 | D5 | RNG | Library generator per D1, hashed per-run seeds, Gaussian default with switch | adopted 2026-10-18; implemented 2026-10-19 |
-| D6 | State and bookkeeping | Single Float64 vector, precomputed projection weights, Int64 step schedules, checkpointable | adopted 2026-10-18 |
-| D7 | Run modes and output | Record mode (time series to HDF5) and stream mode (aggregators only), same results for the same seed; HDF5 per run with streamed extendible datasets and checkpoints | accepted 2026-10-18 |
+| D6 | State and bookkeeping | Single Float64 vector, precomputed projection weights, Int64 step schedules, checkpointable | adopted 2026-10-18; implemented 2026-10-20 |
+| D7 | Run modes and output | Record mode (time series to HDF5) and stream mode (aggregators only), same results for the same seed; HDF5 per run with streamed extendible datasets and checkpoints | accepted 2026-10-18; implemented 2026-10-20 (a stream Float64 by default) |
 | D8 | Running aggregators | Constant-memory online statistics behind a fit!/merge!/value interface; OnlineStats.jl optional, allocation-checked if used; offline = replay | accepted 2026-10-18; implemented bespoke 2026-10-19 |
 | D9 | Parallelism | Single-threaded runs, pool over runs | adopted 2026-10-18 |
 | D10 | Architecture | Module list above; package from the first commit; `runs/` committed, `results/` ignored; licence MIT | accepted 2026-10-18 |

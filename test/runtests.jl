@@ -18,5 +18,6 @@ relerr(x, ref) = abs(x - ref) / abs(ref)        # shared by the tier files
     tier(3) && include("tier3_theory.jl")
     tier(4) && include("tier4_stochastic.jl")
     include("aggregators.jl")
+    include("run_io.jl")
     include("quality.jl")
 end

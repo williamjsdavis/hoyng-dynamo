@@ -40,6 +40,12 @@ let aggs = (("Moments", Moments()), ("Histogram", Histogram(-3.0, 3.0, 600)), ("
     SUITE["aggregators"]["BinnedMean"] = @benchmarkable fit!($(BinnedMean(0.0, 1.5, 30)), (0.9, 2.5))
 end
 
+let sim = Simulation(RunSpec(; seed = 1)), obs = standard_observers(sim)
+    SUITE["run!"] = BenchmarkGroup()
+    SUITE["run!"]["stream mode, 100 steps, standard observers"] = @benchmarkable run!($sim, 100, $obs)
+    SUITE["run!"]["100 steps, no observers"] = @benchmarkable run!($sim, 100)
+end
+
 tune!(SUITE)                 # pick evals per sample; without it sub-µs entries read as 0 ns
 results = run(SUITE; verbose = true)
 show(stdout, MIME"text/plain"(), results)

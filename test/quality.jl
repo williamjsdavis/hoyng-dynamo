@@ -65,6 +65,15 @@ let th = BistableTheory(2.96, 0.246), thA = BistableTheory(4.8, 0.22; μ = 1.45 
     push!(HOT, (shape_parameters, (0.527, 0.178, 0.0438)))
 end
 
+# Run driver: the stepping loop with the standard observers in stream mode, and the extractors.
+let sim = Simulation(RunSpec(; seed = 1)), obs = standard_observers(sim)
+    push!(HOT, (run!, (sim, 10, obs)))
+    push!(HOT, (observe!, (obs, sim)))
+    for f in (amplitude, absamplitude, overtone1, overtone2, parity, toroidal_energy, d1_sample, d1_pair)
+        push!(HOT, (f, (sim,)))
+    end
+end
+
 # Specialised on f and the argument types so the call is inferred: a dynamically
 # dispatched call would box a scalar return value and count 16 bytes against the callee.
 function allocations(f::F, args::Vararg{Any,N}) where {F,N}

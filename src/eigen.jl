@@ -43,19 +43,29 @@ function eigenmodes(g::Grid{T}, kR, C) where {T}
         B̃[k, i] = conj(Y[i, k]) / g.W[k]
     end
     m = Modes{T}(T(kR), T(C), λ, V, B̃)
-    normalise_fundamental!(m, g)
+    normalise_modes!(m, g)
     return m
 end
 
-function normalise_fundamental!(m::Modes{T}, g::Grid{T}) where {T}
-    v = @view m.b[:, 1]
-    imag(m.λ[1]) == 0 || return m                 # not a steady mode: leave LAPACK's scaling
-    maximum(abs ∘ imag, v) ≤ 1e-12 * maximum(abs, v) || return m
+# Every mode is scaled to unit toroidal energy ∫|T_k|² sin θ dθ = 1 (b̃_k inversely), so that
+# the overtone amplitudes a_k = (b̃_k, b) are in units of the equilibrium dipole's toroidal
+# r.m.s. field, and the field unit is the one in which the nonlinear equilibrium b₀ has
+# unit toroidal energy. HOS fix only (b̃_i, b_j) = δ_ij and leave the unit of B to the
+# constant of Eq. 18, so their |a_k| and energy scales (Figs. 2, 6) are not ours. A real
+# steady fundamental mode is also made real with positive mean P ("normal" polarity).
+function normalise_modes!(m::Modes{T}, g::Grid{T}) where {T}
     M = g.M
-    energy = sum(g.w[j] * abs2(v[M+j]) for j in 1:M)
-    c = inv(sqrt(energy)) * sign(sum(g.w[j] * real(v[j]) for j in 1:M))
-    m.b[:, 1] .*= c
-    m.b̃[:, 1] ./= c
+    for i in axes(m.b, 2)
+        v = @view m.b[:, i]
+        energy = sum(g.w[j] * abs2(v[M+j]) for j in 1:M)
+        energy > 0 || continue
+        c = Complex{T}(inv(sqrt(energy)))
+        if i == 1 && imag(m.λ[1]) == 0 && maximum(abs ∘ imag, v) ≤ 1e-12 * maximum(abs, v)
+            c *= sign(sum(g.w[j] * real(v[j]) for j in 1:M))
+        end
+        m.b[:, i] .*= c
+        m.b̃[:, i] ./= c
+    end
     return m
 end
 
