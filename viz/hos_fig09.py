@@ -30,6 +30,9 @@ with RunFile(args.run) as run:
     meta = run.meta
 
 edges, counts = h["edges"], h["counts"]
+REBIN = 2                                   # the run file's bins are 0.005; draw 0.01 as the paper does
+edges = edges[::REBIN]
+counts = counts.reshape(-1, REBIN).sum(axis=1)
 centers = 0.5 * (edges[:-1] + edges[1:])
 width = edges[1] - edges[0]
 # fold onto |a|: bins are symmetric about zero

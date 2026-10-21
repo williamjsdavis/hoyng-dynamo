@@ -65,8 +65,9 @@ let th = BistableTheory(2.96, 0.246), thA = BistableTheory(4.8, 0.22; μ = 1.45 
     push!(HOT, (shape_parameters, (0.527, 0.178, 0.0438)))
 end
 
-# The KS test allocates its sorted copy and bootstrap buffer: inference only.
+# The KS test and the χ² density fit allocate their buffers: inference only.
 push!(INFERRED, (ks_exponential, ([5.0, 7.5, 12.0, 30.0, 61.0, 140.0],)))
+push!(INFERRED, (density_fit, (collect(0.0:0.1:2.0), [0, 5, 40, 120, 300, 500, 600, 400, 150, 40, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0], 0.527, 0.763)))
 
 # Run driver: the stepping loop with the standard observers in stream mode, and the extractors.
 let sim = Simulation(RunSpec(; seed = 1)), obs = standard_observers(sim)

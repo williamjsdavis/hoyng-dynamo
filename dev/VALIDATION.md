@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence) passed the same day; T4.8–T4.10, T4.13–T4.16 are the remaining pieces of build step 7. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.5, T5.6 await judgement. Results in §4.
+Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence) and the HSO runs T4.8, T4.9 passed the same day; T4.10, T4.13–T4.16 are the remaining pieces of build step 7. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.5, T5.6, T5.9, T5.10, T5.11, T5.13 are rendered and await judgement. Results in §4.
 
 ## 1. Conventions
 
@@ -300,6 +300,30 @@ Observations.
 - The KS test of T4.11 is a parametric bootstrap (the mean is fitted), `src/stats.jl`; the Kolmogorov distribution would give larger p-values.
 - Cost: 15 s per 5×10⁴ τ_d per seed, 54 s at 2×10⁵; the whole Tier 4 suite (standard run, sweep, invariance) runs in about 5 min on 4 threads.
 
+### Tier 4, the HSO runs (2026-10-20): T4.8, T4.9 passed; T5.13's decay rate recorded
+
+`test/tier4_stochastic.jl` (the f = 5.4 ensemble of the sweep is HSO's reference run, HOS run 2; the second run is a new ensemble), three seeds × 5×10⁴ τ_d each. The χ² fit of the stationary distribution to the |a| histogram follows HSO §4.3 (`density_fit`, `src/stats.jl`): about 100 equal-population bins of the 0.005-wide histogram at 1 τ_d, model counts integrated over each bin, normalisation fixed by the total, Nelder–Mead in (ln(γ − 1), ln c²), goodness of fit as σ = |χ² − ν|/√(2ν). Eq. 10 is HOS Eq. 43 (κ = 0); Eq. A.1 uses this model's κ = μ/Λ − 1.
+
+| Gate | Check | Target (HSO) | Measured (pooled; per seed) | Result |
+|---|---|---|---|---|
+| T4.8 | reference run ⟨T_r⟩ | 570 ± 61 (88 reversals) | 526 ± 31 from 285 (516, 610, 472) | pass (0.6σ combined); HOS's own 519 ± 53 for the same run is the other side of ours (T4.18) |
+| T4.8 | dv | 0.070 ± 0.005 | 0.0728 | pass |
+| T4.8 | (γ, c²), Eq. 10 fitted to the \|a\| histogram | (8, 0.50), 10% | (7.88, 0.509) at 342σ over 109 bins; per seed (7.64, 0.47), (7.94, 0.515), (8.0, 0.532) | pass (1.5%, 2%) |
+| T4.8 | (γ, c²), Eq. A.1 fitted to the histogram | HSO case 4 (4.8, 0.22) was fitted to Sint-800 and the run together | (4.81, 0.231) at 78σ | recorded: on top of case 4 |
+| T4.9 | second run kR 0.3, C_m 120, f 7: ⟨T_r⟩ | 113 ± 5 | 114.9 ± 3.2 from 1306 (119, 116, 110) | pass |
+| T4.9 | dv | 0.081 ± 0.005 | 0.079 | pass |
+| T4.9 | model constants | Λ = 0.815, μ/Λ = 1.82 | 0.8163, 1.818 | pass (T0.10) |
+| T4.9 | Eq. A.1 fit; A.2 at that fit | HSO case 5 (5, 0.50), fitted to both records; A.2 gives 138 | (5.77, 0.54) at 92σ; A.2 gives 201 against the measured 115 | recorded |
+| T4.11 | Poisson intervals of the second run | p > 0.05 | p = 0.81 (1264 intervals > 5 τ_d) | pass |
+| T5.13 | small-lag decay rate of the autocorrelation of \|a\|, f = 5.4, fitted over 0.1–0.6 τ_d | 2Λ = 1.057 (HSO Eq. 15) or 2μ = 1.526 (T1.4) | 0.87 per τ_d; acor(0.5 τ_d) = 0.64, acor(5 τ_d) = 0.04, no zero crossing within 5 τ_d | recorded: follows 2Λ rather than 2μ, 18% below 2Λ |
+
+Observations.
+
+- The histogram fits reproduce HSO's Table 1 to a few per cent wherever HSO fitted the simulation alone (case 2), and even where they fitted the simulation together with Sint-800 (cases 4 and 5) our simulation-only fits land within 0.2 in γ and 0.04 in c²: the shape of p(|a|) is reproduced in detail, including the preference for Eq. A.1 over Eq. 10 (78σ against 342σ, HSO's "many σ" of footnote 4; the σ values grow with the sample size, ours being three runs pooled).
+- The histogram fit and the D₁ fit give different (γ, c²) for the same run (7.9 against 5.4 at f = 5.4; HSO's 8 against HOS's 5.15), as the papers found; the theory of Eq. 43 is only approximate (HOS Fig. 9), so each fit absorbs the error differently. Both are reported by `summarize`.
+- Q5 of `QUESTIONS.md` is settled: the stochastic autocorrelation of |a| decays at 0.87 per τ_d at small lags, close to the 2Λ of HSO Eq. 15 and far from the deterministic 2μ, so HSO's method for τ_d, which measures Λ/τ_d, uses the right rate. The rate is 18% below 2Λ, so a τ_d inferred with exactly 2Λ would be biased low by that much; the paper's error bar on 11 ± 2 kyr covers it.
+- A.2 overshoots the measured ⟨T_r⟩ of the second run by 1.75 (201 against 115), more than HSO's 138/113, because the fit to the simulation alone gives a larger γ than their compromise fit; at the reference run the overshoot at our A.1 fit is the papers' factor of ~2 (`DISCREPANCIES.md` DR-4).
+
 ### Tier 4, convergence T4.17 and the DR-5 sensitivity (2026-10-20): passed
 
 `scripts/dr5_sensitivity.jl`; the two resolution variants are also a testset in `test/tier4_stochastic.jl`. Standard run, three seeds × 5×10⁴ τ_d each; the Δτ = 0.005 run sees the same noise realisation (the F stream is drawn per τ_c).
@@ -347,4 +371,13 @@ Three configurations at f²τ_c/N_c² = 2.05×10⁻², three seeds × 5×10⁴ �
 
 - T5.5 (HOS Fig. 5): with the same noise series as Fig. 1 (seed 1), 6 reversals in 0–2000 τ_d at f = 5.4, the paper's count exactly, including a short reversed interval near 1760–1840 (paper: 1760–1790); 58 at f = 7.4 (paper: several tens).
 - T5.6 (HOS Fig. 6): ℜa₁ against a over ±50 τ_d around the reversal at τ = 833 (the one nearest the paper's 680): two clouds centred at a ≈ ±0.9 with |ℜa₁| ≲ 0.5 and a single jump through a ≈ 0, as described.
+
+### Tier 5, HSO figures (2026-10-20): T5.9, T5.10, T5.11, T5.13 rendered, judgement pending
+
+`scripts/run_standard.jl 1 5e4 5.4` (the reference run, 129 MB) and `… 1 1e4 7 0.3 120` (the second run, 26 MB); `viz/hso_fig03.py`, `hso_fig06.py`, `hso_fig07.py`, `hso_fig08.py`.
+
+- T5.9 (HSO Fig. 3): 7 reversals in 0–3000 τ_d, the paper's count; the longest interval shown is ≈ 880 τ_d (paper ≈ 1100); seed 1 of the whole run gives ⟨T_r⟩ = 515 ± 52 from 97 reversals and dv = 0.072 (paper 570 ± 61 from 88, 0.070). The T(θ, τ) panel has the same vertical striping and polarity blocks as HOS Fig. 1.
+- T5.10 (HSO Fig. 6, bottom panels): the |a| histogram (5×10⁴ samples, peak 8.7×10⁴ counts per unit a at |a| ≈ 0.93; paper ≈ 9×10⁴ at ≈ 0.9) with the χ² fits. Eq. 10 gives (γ, c²) = (7.64, 0.470) at 104σ over 110 equal-population bins, and the curve is indistinguishable from HSO's case 2 (8, 0.50); Eq. A.1 gives (4.66, 0.204) at 21σ, on top of HSO's case 4 (4.8, 0.22), which they fitted to Sint-800 and the run together. A.1 is visibly the better description, as HSO say ("many σ" for either, their footnote 4).
+- T5.11 (HSO Fig. 8): the polarity bar code to 10⁴ τ_d and a(τ) to 3000 τ_d of the kR 0.3, C_m 120, f 7 run: 26 reversals in 3000 τ_d (paper: of order 20–25 read off the figure, 27 from the mean rate); seed 1 over 10⁴ τ_d gives ⟨T_r⟩ = 118 ± 13 and dv = 0.078 (paper 113 ± 5, 0.081).
+- T5.13 (HSO Fig. 7, model curves only; Sint-800 is not in the repository): HSO's recipe applied to the reference run (rectify, running average over τ_av, resample at 1 kyr, 799 points, lags to 50 kyr) for their six (τ_d, τ_av) settings. The behaviour they describe reappears: at τ_av = 5 kyr the curve decays faster with τ_d = 5.9 kyr than with 14.3; with τ_av = 0 the small-lag decay runs between exp(−2Λs) and exp(−2μs) before the smoothing flattens it; τ_av = 10 kyr over-smooths; the zero crossing with τ_d = 10 kyr is near 37 kyr against Sint-800's ≈ 27 kyr, and a different stretch of the run (panel f, from τ = 6000) shows the anticorrelation to −0.3 that HSO say the model "generally" reproduces. The quantitative decay rate is settled from the whole-run autocorrelation in the Tier 4 HSO section (QUESTIONS.md Q5).
 

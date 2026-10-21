@@ -70,10 +70,13 @@ const TABLE_II = Dict(4.4 => (c2 = 0.318, γ = 9.04, var = 0.03, Tr = 10700.0, e
         @test -1 ≤ median_P < 0
     end
 
+    sweep = Dict{Float64,Any}()                                     # the f = 5.4 ensemble is HSO's reference run
+
     @testset "T4.5–T4.7, T4.11, T4.18 forcing sweep (HOS Table II)" begin
         for f in (4.4, 5.4, 7.4, 8.4)
             τ = f == 4.4 ? 4 * T4_LENGTH : T4_LENGTH           # the paper had ~5 reversals at f = 4.4
             e = ensemble(RunSpec(; f), τ; seeds = T4_SEEDS)
+            sweep[f] = e
             s, pp = e.summary, TABLE_II[f]
             ks = report("T4.5–T4.7 f = $f ($(length(T4_SEEDS)) × $τ τ_d)", e; paper = pp)
             # T4.5: ⟨T_r⟩ within 2σ combined
@@ -106,6 +109,50 @@ const TABLE_II = Dict(4.4 => (c2 = 0.318, γ = 9.04, var = 0.03, Tr = 10700.0, e
                 @test minimum(Trs) - 60 < 519 && maximum(Trs) + 60 > 570
             end
         end
+    end
+
+    @testset "T4.8, T4.9 the HSO runs; T5.13 autocorrelation rate (diagnostic)" begin
+        # T4.8: HSO's reference run is HOS run 2 (f = 5.4): ⟨T_r⟩ 570 ± 61 from 88 reversals,
+        # dv 0.070, and (γ, c²) = (8, 0.50) from the χ² fit of Eq. 10 to the |a| histogram
+        # (HSO Table 1 case 2, §4.3); the A.1 fit is reported (HSO's case 4 fits both records)
+        e = sweep[5.4]
+        s = e.summary
+        hf = s.histogram_fit
+        @info "T4.8 HSO reference run (f = 5.4, pooled): ⟨T_r⟩ = $(round(s.mean_reversal_time, digits = 1)) ± $(round(s.mean_reversal_time_error, digits = 1)) (HSO 570 ± 61); dv $(round(s.dv, digits = 4)) (0.070); " *
+              "Eq. 10 fit (γ, c²) = ($(round(hf.eq10.γ, digits = 2)), $(round(hf.eq10.c2, digits = 3))) at $(round(hf.eq10.sigma, digits = 1))σ over $(hf.eq10.nbins) bins (HSO (8, 0.50)); " *
+              "Eq. A.1 fit ($(round(hf.a1.γ, digits = 2)), $(round(hf.a1.c2, digits = 3))) at $(round(hf.a1.sigma, digits = 1))σ (HSO case 4, fitted to both records: (4.8, 0.22)); " *
+              "per seed Eq. 10: $(join(["($(round(r.summary.histogram_fit.eq10.γ, digits = 2)), $(round(r.summary.histogram_fit.eq10.c2, digits = 3)))" for r in e.runs], ", "))"
+        @test abs(s.mean_reversal_time - 570) < 2 * sqrt(61^2 + s.mean_reversal_time_error^2)
+        @test abs(s.dv - 0.070) < 0.005
+        @test relerr(hf.eq10.γ, 8.0) < 0.1
+        @test relerr(hf.eq10.c2, 0.50) < 0.1
+        # T5.13 (diagnostic): the small-lag decay rate of the autocorrelation of |a| against
+        # 2Λ (HSO Eq. 15) and 2μ (the deterministic relaxation, T1.4), from the whole-run
+        # AutoCorrelation probe (lags of n_c steps to 5 τ_d), fitted over 0.1–0.6 τ_d
+        ac = value(e.pooled.autocorrelation)
+        c = e.runs[1].sim.model.constants
+        sel = (ac.lags .≥ 0.1) .& (ac.lags .≤ 0.6) .& (ac.acor .> 0)
+        rate = -(sum(ac.lags[sel] .* log.(ac.acor[sel])) - sum(ac.lags[sel]) * sum(log.(ac.acor[sel])) / count(sel)) /
+                (sum(ac.lags[sel] .^ 2) - sum(ac.lags[sel])^2 / count(sel))
+        first_neg = findfirst(<(0), ac.acor)
+        @info "T5.13 autocorrelation of |a| at f = 5.4: decay rate over 0.1–0.6 τ_d = $(round(rate, digits = 3)) per τ_d against 2Λ = $(round(2c.Λ, digits = 3)) and 2μ = $(round(2c.μ, digits = 3)); " *
+              "acor(0.5 τ_d) = $(round(ac.acor[findfirst(≥(0.5), ac.lags)], digits = 3)), acor(5 τ_d) = $(round(ac.acor[end], digits = 3))" *
+              (first_neg === nothing ? "; no zero crossing within 5 τ_d" : "; first negative lag $(ac.lags[first_neg]) τ_d")
+        @test rate > 0
+
+        # T4.9: HSO's second parameter set kR 0.3, C_m 120, f 7: ⟨T_r⟩ 113 ± 5, dv 0.081
+        e2 = ensemble(RunSpec(; kR = 0.3, Cm = 120.0, f = 7.0), T4_LENGTH; seeds = T4_SEEDS)
+        s2 = e2.summary
+        hf2 = s2.histogram_fit
+        ks2 = report("T4.9 HSO second run (kR 0.3, C_m 120, f 7)", e2)
+        c2 = e2.runs[1].sim.model.constants
+        @info "T4.9 model constants: Λ = $(round(c2.Λ, digits = 4)) (HSO 0.815), μ/Λ = $(round(c2.μ / c2.Λ, digits = 3)) (1.82); " *
+              "Eq. 10 fit (γ, c²) = ($(round(hf2.eq10.γ, digits = 2)), $(round(hf2.eq10.c2, digits = 3))) at $(round(hf2.eq10.sigma, digits = 1))σ; " *
+              "Eq. A.1 fit ($(round(hf2.a1.γ, digits = 2)), $(round(hf2.a1.c2, digits = 3))) at $(round(hf2.a1.sigma, digits = 1))σ (HSO case 5, fitted to both records: (5, 0.50)); " *
+              "A.2 at the A.1 fit: $(round(mean_reversal_time(BistableTheory(c2, hf2.a1.γ, hf2.a1.c2)), digits = 1)) (HSO 138 at case 5)"
+        @test abs(s2.mean_reversal_time - 113) < 2 * sqrt(5^2 + s2.mean_reversal_time_error^2)
+        @test abs(s2.dv - 0.081) < 0.005
+        @test ks2.p > 0.05                                           # T4.11 for this model too
     end
 
     @testset "T4.17 convergence of the standard run at Δτ = 0.005 and N = 120 (diagnostic)" begin

@@ -64,7 +64,7 @@ const RUN_STEPS = 60_000          # 600 τ_d at Δτ = 0.01: seed 3 has 4 revers
         tr = SchmittTrigger(; Δt = 0.01)
         ex = ExclusionVariance(; Δt = 0.01)
         cg = CrossingGroups(; Δt = 0.01)
-        h = Histogram(-2.5, 2.5, 500)
+        h = Histogram(-2.5, 2.5, 1000)
         for (i, x) in enumerate(a.values)
             fit!(tr, x); fit!(ex, x); fit!(cg, x)
             i % 100 == 0 && fit!(h, x)

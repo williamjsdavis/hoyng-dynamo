@@ -278,7 +278,7 @@ function standard_observers(sim::Simulation{T}; file = nothing, snapshots::Bool 
         exclusion = Probe(amplitude, ExclusionVariance(; Δt = Δτ)),
         moments = Probe(amplitude, Moments()),
         abs_moments = Probe(absamplitude, Moments(), nd),
-        histogram = Probe(amplitude, Histogram(T(-2.5), T(2.5), 500), nd),
+        histogram = Probe(amplitude, Histogram(T(-2.5), T(2.5), 1000), nd),     # 0.005 bins: ~100 equal-population bins for the χ² fit
         d1 = Probe(d1_pair, BinnedMean(zero(T), T(1.5), 30), nd),
         parity = Probe(parity, Histogram(-one(T), one(T), 200), nc),
         energy = Probe(toroidal_energy, Moments(), nd),
@@ -310,8 +310,10 @@ with its Poisson error (Schmitt trigger, and the papers' grouping rule), the exc
 variance of §2, dv (HSO Eq. 12), the D₁/ℱ quadratic fit of the bin averages for |a| ≤ 1.1
 (HOS Eq. 61, weighted by the bin counts as in the Fig. 8 caption; the unweighted fit and
 the mean over |a| ≤ 0.2 alongside) and the (c², γ) it implies with D₀ from Eq. 36
-(Eqs. 62–63; `c2_unweighted`, `γ_unweighted` from the unweighted fit), and the Eq. 56/58
-theory for the primary shape parameters. ℱ uses f at the last redraw (constant forcing: f).
+(Eqs. 62–63; `c2_unweighted`, `γ_unweighted` from the unweighted fit), the χ² fits of
+HSO Eq. 10 and Eq. A.1 to the |a| histogram (`histogram_fit.eq10`, `.a1`; HSO §4.3), and
+the Eq. 56/58 theory for the primary shape parameters. ℱ uses f at the last redraw
+(constant forcing: f).
 """
 function summarize(obs::NamedTuple, sim::Simulation{T}) where {T}
     tr, cg, ex, am, d1 = value(obs.trigger), value(obs.groups), value(obs.exclusion), value(obs.abs_moments), value(obs.d1)
@@ -330,6 +332,16 @@ function summarize(obs::NamedTuple, sim::Simulation{T}) where {T}
     sp = shape_parameters(c.Λ, Δ.Δ0, Δ.Δ1)
     Δu = diffusion_from_fit(u0, u2; D0int = c.D0int, prefactor = ℱ)
     spu = shape_parameters(c.Λ, Δu.Δ0, Δu.Δ1)
+    # HSO §4.3: χ² fits of Eq. 10 (κ = 0) and of Eq. A.1 (κ = μ/Λ − 1 of this model) to the
+    # histogram of |a| at 1 τ_d, about 100 equal-population bins
+    h = value(obs.histogram)
+    fe, fc = fold_histogram(h.edges, h.counts)
+    hfit = if sum(fc) ≥ 1000
+        (eq10 = density_fit(fe, fc, c.Λ), a1 = density_fit(fe, fc, c.Λ, c.μ))
+    else
+        none = (γ = T(NaN), c2 = T(NaN), chi2 = T(NaN), ν = 0, sigma = T(NaN), nbins = 0, n = sum(fc))
+        (eq10 = none, a1 = none)
+    end
     nan = T(NaN)
     theory = if isfinite(sp.γ) && sp.γ > 1 && sp.c2 > 0
         th = BistableTheory(sp.γ, sp.c2; Λ = c.Λ)
@@ -343,8 +355,8 @@ function summarize(obs::NamedTuple, sim::Simulation{T}) where {T}
             n_reversals_grouped = cg.n_reversals, n_aborted_grouped = cg.n_aborted, mean_reversal_time_grouped = cg.mean_interval,
             variance = ex.variance, variance_intervals = ex.intervals, dv = am.var / am.mean^2, mean_abs = am.mean,
             d1_fit = (c0 = c0, c2 = c2), d1_fit_unweighted = (c0 = u0, c2 = u2), d1_zero = d1_zero,
-            prefactor = ℱ, c2 = sp.c2, γ = sp.γ, Δ0 = Δ.Δ0, Δ1 = Δ.Δ1,
-            c2_unweighted = spu.c2, γ_unweighted = spu.γ, theory = theory)
+            prefactor = ℱ, Λ = c.Λ, μ = c.μ, D0int = c.D0int, c2 = sp.c2, γ = sp.γ, Δ0 = Δ.Δ0, Δ1 = Δ.Δ1,
+            c2_unweighted = spu.c2, γ_unweighted = spu.γ, histogram_fit = hfit, theory = theory)
 end
 
 # ---------------------------------------------------------------------------------------
