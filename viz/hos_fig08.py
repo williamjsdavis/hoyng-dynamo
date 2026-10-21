@@ -1,8 +1,9 @@
 """HOS Fig. 8 (p. 292): the measured D₁/ℱ against |a|.
 
 One dot per τ_d (the d1 stream and a at the same steps), the bin averages of the run's
-BinnedMean (histogram), the paper's fit 1.36 + 2.00 a² and this run's weighted even-quadratic
-fit for |a| ≤ 1.1 (results/summary/d1_fit). Gate T5.7.
+BinnedMean (histogram), the paper's fit 1.36 + 2.00 a² and this run's even-quadratic fits for
+|a| ≤ 1.1: weighted by the bin counts as in the paper (results/summary/d1_fit) and unweighted
+(results/summary/d1_fit_unweighted). Gate T5.7.
 """
 
 import numpy as np
@@ -19,7 +20,8 @@ with RunFile(args.run) as run:
     idx = (np.arange(1, len(d1) + 1) * every_d1) // every_a - 1   # the a sample at each d1 step
     aa = np.abs(a[idx])
     bins = run.result("d1")
-    fit = run.result("summary")["d1_fit"]
+    summary = run.result("summary")
+    fit, fitu = summary["d1_fit"], summary["d1_fit_unweighted"]
     meta = run.meta
 
 fig, ax = plt.subplots(figsize=(5.5, 4))
@@ -31,7 +33,9 @@ ax.bar(centers[ok], mean[ok], width=width, color="none", edgecolor="C0", lw=1.0,
 x = np.linspace(0, 1.1, 200)
 ax.plot(x, 1.36 + 2.00 * x**2, color="C3", lw=1.4, label="HOS Eq. 61: 1.36 + 2.00 a²")
 ax.plot(x, fit["c0"] + fit["c2"] * x**2, color="k", lw=1.2, ls="--",
-        label=f"this run: {fit['c0']:.2f} + {fit['c2']:.2f} a²")
+        label=f"this run, count-weighted: {fit['c0']:.2f} + {fit['c2']:.2f} a²")
+ax.plot(x, fitu["c0"] + fitu["c2"] * x**2, color="k", lw=0.9, ls=":",
+        label=f"this run, unweighted: {fitu['c0']:.2f} + {fitu['c2']:.2f} a²")
 ax.set_xlim(0, 1.5)
 ax.set_ylim(0, 15)
 ax.set_xlabel("|a|")

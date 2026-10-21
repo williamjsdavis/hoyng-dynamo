@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard-run gates T4.1–T4.4 passed on 2026-10-20 (the sweeps are build step 7); Tier 5's T5.1, T5.2, T5.7, T5.8 were rendered on 2026-10-20 and await the user's judgement. Results in §4.
+Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence) passed the same day; T4.8–T4.10, T4.13–T4.16 are the remaining pieces of build step 7. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.5, T5.6 await judgement. Results in §4.
 
 ## 1. Conventions
 
@@ -16,7 +16,7 @@ Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-1
 These close gaps G2–G5 and G9 of `DEVELOPMENT.md` §2. Every reported statistic quotes the definition it used.
 
 - **Reversal detection.** Schmitt trigger on a(τ): polarity is +1 until a < −a_h, then −1 until a > +a_h. Default a_h = 0.5. A polarity flip is a reversal; a zero crossing without a flip is an aborted reversal; a dip of |a| below a_e = 0.3 without a zero crossing is an excursion. Report sensitivity to a_h ∈ {0.3, 0.5, 0.7}. Also implement the papers' rule (group zero crossings within W = 5 τ_d; odd count = reversal, even = aborted) for comparison.
-- **Between-reversal variance (HOS/SOH style).** Within each polarity interval, drop W τ_d after the preceding reversal and before the next (default W = 5), compute ⟨(a−⟨a⟩)²⟩/⟨a⟩² over the remainder, pool across intervals time-weighted. Sensitivity W ∈ {2, 5, 10}.
+- **Between-reversal variance (HOS/SOH style).** Within each polarity interval, drop W τ_d after the preceding reversal and before the next (default W = 5), compute ⟨(a−⟨a⟩)²⟩/⟨a⟩² over the remainder, pool across intervals time-weighted. Sensitivity W ∈ {2, 5, 10}. *Note (step 7):* the pooling is of the moments (the variance about each interval's mean and |⟨a⟩| pooled by kept samples, then the ratio), not of the per-interval ratios, which a few near-zero-mean intervals dominate at high forcing; and the paper's "variance from run" column is reproduced at every forcing by dv below, not by this estimator at f ≥ 7.4 (`DISCREPANCIES.md` DR-6).
 - **dv (HSO style).** Eq. 12 on the rectified whole record |a|, no exclusion.
 - **⟨T_r⟩** = run length / number of reversals, error ⟨T_r⟩/√N (Poisson), as in the papers.
 - **Noise.** F ~ N(0, 1) by default. Bins: grid point j belongs to bin ⌊θ_j N_c/π⌋. Redraw at steps that are multiples of τ_c/Δτ = 5.
@@ -96,7 +96,7 @@ All runs: 60 points, Δτ = 0.01, 5×10⁴ τ_d unless stated; definitions of §
 | T4.13 | Parity 𝒫 ≃ −1 between reversals | — | median 𝒫 outside event windows < −0.9 | Eq. 28, p. 276 | D |
 | T4.14 | Reversal durations | ~3 τ_d typical, fast events ~0.5 τ_d (HOS); 0.5–2 τ_d (HSO, different definition); quadrupole period ≈ 1.1 τ_d visible | report distribution with the stated definition | HOS p. 277; HSO p. 151 | D |
 | T4.15 | SOH ramped run, f linear 4 → 6.5 over 5×10⁴ τ_d | rms variability 17% → 41%; chrons shorten drastically; first chron ≈ 1.9×10⁴ τ_d [approximate read-off] | 20% on the rms values; shape by user | SOH Fig. 3, p. 123 | A/J |
-| T4.16 | Robustness regression: alternative quenching (q from total toroidal energy; α/(1+q); local quenching) | dipole statistics "not materially changed" | ⟨T_r⟩, variance within ~20% | HOS pp. 277, 281 | D, stretch goal (after Tiers 0–5) |
+| T4.16 | Robustness regression: alternative quenching (q from total toroidal energy; α/(1+q); local quenching) | dipole statistics "not materially changed" | ⟨T_r⟩, variance within ~20% | HOS pp. 277, 281 | D, stretch goal (`STRETCH_GOALS.md` SG-2) |
 | T4.17 | Convergence of T4.1–T4.2 at 120 points and at Δτ = 0.005 | — | within statistical error | — | D |
 | T4.18 | HOS run 2 vs HSO reference run, nominally identical: 519 ± 53 vs 570 ± 61 | — | our seed-to-seed scatter at f = 5.4 should cover both | Table II; HSO p. 146 | D |
 
@@ -245,29 +245,91 @@ Observations.
 - dv on the exact p(a) over a > 0 (HSO's definition) exceeds Eq. 56 for the first three Table II runs (0.046, 0.099, 0.196 against 0.042, 0.083, 0.175) and falls below it for run 4 (0.330 against 0.467) because it includes the reversal region near a = 0 and uses the full distribution rather than the parabola; it is not the between-reversal variance of §2. Both will be compared with the run statistics at Tier 4.
 - D14: the closed forms are type-stable and allocation-free. The quadratures allocate (QuadGK's segment heap) and are checked for inference only. The nested escape integral (Eq. 57, a `quadgk` inside a `quadgk`) was at first not JET-clean: Julia's inference recursion limit fires when QuadGK's adaptive routines are re-entered, whether the integrands are closures or callable structs and whether the inner interval is finite or not, and the inner call degraded to dynamic dispatch. Evaluating the inner integrand through QuadGK's `BatchIntegrand` sends it down a different method chain, so nothing is re-entered: fully inferred, identical result to the last bit, 0.3 ms instead of 1.8 ms per ⟨T_r⟩. The nesting itself is intrinsic (a two-dimensional integral over a triangle); no change of variables removes it.
 
-### Tier 4, standard run (2026-10-20): T4.1–T4.4 passed, 8/8 tests (`HOYNG_TIERS=4`)
+### Tier 4, standard run (2026-10-20): T4.1, T4.2 passed; T4.3 and T4.4 pass on γ and c₂ but fail on the intercept and c² (`@test_broken`, DR-5)
 
-Three seeds × 5×10⁴ τ_d in stream mode (14 s each), aggregators pooled with `merge!`; the definitions of §2 (Schmitt trigger a_h = 0.5, a_e = 0.3; exclusion variance W = 5 τ_d; dv on |a| at 1 τ_d; D₁/ℱ bin averages of width 0.05 fitted unweighted for |a| ≤ 1.1 as the histogram of HOS Fig. 8). `test/tier4_stochastic.jl`, `src/run.jl` (`standard_observers`, `summarize`).
+Three seeds × 5×10⁴ τ_d in stream mode (14 s each), aggregators pooled with `merge!`; the definitions of §2 (Schmitt trigger a_h = 0.5, a_e = 0.3; exclusion variance W = 5 τ_d; dv on |a| at 1 τ_d; D₁/ℱ bin averages of width 0.05 fitted for |a| ≤ 1.1 weighted by the bin counts, HOS Fig. 8 caption). `test/tier4_stochastic.jl`, `src/run.jl` (`standard_observers`, `summarize`, `ensemble`). *Corrected at step 7:* the step-6 version of this section took the unweighted fit as the paper's procedure and reported T4.3–T4.4 as passed; the caption says the fit is count-weighted, and with it the intercept and c² miss the 10% gate (`DISCREPANCIES.md` DR-5).
 
 | Gate | Check | Target | Measured (pooled; per seed) | Result |
 |---|---|---|---|---|
 | T4.1 | ⟨T_r⟩, Schmitt trigger | 107 ± 5 (468 reversals) | 104.7 ± 2.8 from 1433 reversals; 109.6 ± 5.1, 104.6 ± 4.8, 100.2 ± 4.5 | pass (2σ combined = 11.5) |
 | T4.1 | the papers' grouping rule (W = 5 τ_d) | — | 432, 456, 479 reversals against the trigger's 456, 478, 499; trigger: 253, 229, 235 aborted, 2295, 2176, 2197 excursions | recorded |
-| T4.2 | between-reversal relative variance | 0.16 ± 0.02 | 0.164 (0.151, 0.180, 0.160) | pass |
-| T4.2 | dv, HSO Eq. 12 on \|a\| | — | 0.160 | recorded |
-| T4.3 | D₁/ℱ = c₀ + c₂a², \|a\| ≤ 1.1, unweighted fit of the bin averages | 1.36 + 2.00a², 10% | 1.464 + 2.08a² (7.6%, 4%) | pass |
-| T4.3 | the same fit weighted by counts; mean of the bins \|a\| ≤ 0.2 | — | 1.584 + 1.91a²; 1.24 | recorded, see below |
-| T4.4 | (c², γ) from the fit with D0int = 3.532 (N = 60), ℱ = 3.217×10⁻², Λ = 0.5283 | (0.246, 2.96), 10% | (0.261, 2.93): 6%, 1% | pass |
+| T4.2 | between-reversal relative variance, §2 estimator (pooled moments, DR-6) | 0.16 ± 0.02 | 0.142 (step 6 reported 0.164 from the pooled per-interval ratios) | pass |
+| T4.2 | dv, HSO Eq. 12 on \|a\| | 0.16 ± 0.02 | 0.160 | pass |
+| T4.3 | D₁/ℱ = c₀ + c₂a², \|a\| ≤ 1.1, fit of the bin averages weighted by the counts (the paper's procedure) | 1.36 + 2.00a², 10% | 1.584 + 1.91a² (16%, 4.5%) | c₀ **fails** (`@test_broken`), c₂ passes |
+| T4.3 | the same fit unweighted; mean of the bins \|a\| ≤ 0.2 | — | 1.464 + 2.08a² (7.6%, 4%); 1.24 | recorded, see below |
+| T4.4 | (c², γ) from the weighted fit with D0int = 3.532 (N = 60), ℱ = 3.217×10⁻², Λ = 0.5283 | (0.246, 2.96), 10% | (0.291, 3.02): 18%, 2% | c² **fails** (`@test_broken`), γ passes; unweighted (0.261, 2.93) |
 | T4.4 | Eqs. 56 and 58 at the measured (c², γ) | paper: 0.17, 94 at (0.246, 2.96) | 0.181, 83.9 (Eq. 57: 97.7) against the run's 0.164 and 104.7 | recorded |
 | T4.13 | parity 𝒫 every n_c steps over the whole run, events included | median < −0.9 outside event windows (D) | median −0.815; 31% of samples below −0.9 | recorded; the event-window exclusion is step 7 |
 
 Observations.
 
-- Reversal rate and variance: 104.7 ± 2.8 against 107 ± 5 and 0.164 against 0.16, so the standard run reproduces HOS Table II row 3 within the errors; the seed-to-seed scatter of ⟨T_r⟩ (100–110) is what the Poisson error (≈ 5) predicts. The grouping rule finds 4–5% fewer reversals than the trigger, because a pair of crossings within 5 τ_d counts as one aborted reversal.
-- (Logged in `DISCREPANCIES.md` DR-5.) The D₁ intercept depends on the weighting of the fit: the bin averages are only approximately quadratic (D₁ grows faster than a² beyond |a| ≈ 0.8, the "a⁴ term" HOS see beyond 1.1), so an unweighted fit through the bin means (the paper's curve through its histogram) gives 1.46, a count-weighted fit, which favours the populous bins near |a| ≈ 0.9, gives 1.58, and the direct mean of the bins |a| ≤ 0.2 gives 1.24 ± 0.1 (1300 samples of a heavy-tailed quantity). The paper's 1.36 lies between the direct estimate and the unweighted fit, and its histogram also "rises from ≈ 1.4 at a = 0". c₂ is insensitive (1.9–2.1). `summarize` reports all three; the gate uses the unweighted fit.
+- Reversal rate and variance: 104.7 ± 2.8 against 107 ± 5, and 0.142 (§2 estimator) or 0.160 (dv) against 0.16, so the standard run reproduces HOS Table II row 3 within the errors; the seed-to-seed scatter of ⟨T_r⟩ (100–110) is what the Poisson error (≈ 5) predicts. The grouping rule finds 4–5% fewer reversals than the trigger, because a pair of crossings within 5 τ_d counts as one aborted reversal.
+- (Logged in `DISCREPANCIES.md` DR-5.) The D₁ intercept depends on the weighting of the fit: the bin averages are only approximately quadratic (D₁ grows faster than a² beyond |a| ≈ 0.8, the "a⁴ term" HOS see beyond 1.1), so the paper's count-weighted fit, which favours the populous bins near |a| ≈ 0.9, gives 1.58, an unweighted fit through the bin means 1.46, and the direct mean of the bins |a| ≤ 0.2 gives 1.24 ± 0.1 (1300 samples of a heavy-tailed quantity). The paper's 1.36 lies between the direct estimate and the unweighted fit; its histogram "rises from ≈ 1.4 at a = 0". c₂ is insensitive (1.9–2.1). `summarize` reports all three; the gate uses the paper's weighted fit, and the 16% excess of its intercept, equivalently a 4–6% excess of D₁ where the samples are, is the open item of DR-5.
 - Theory at the measured (c², γ): Eq. 58 gives 84 against the measured 105 (the exact Eq. 57: 98); Eq. 56 gives 0.18 against 0.164. The same pattern as HOS's own comparison (94 against 107, 0.17 against 0.16), shifted by our slightly larger c².
 - Parity: between reversals 𝒫 sits at −0.8 to −1 with brief spikes toward 0, and reaches +1 at the reversals (Fig. 2); the whole-run median is −0.82. The gate's "outside event windows" median needs the event list applied to the parity stream (step 7).
 - Cost: 14 s per 5×10⁴ τ_d in stream mode (2.3 µs per step with all probes) and 14 s in record mode with every stream and the T, P snapshots (130 MB per run).
+
+### Tier 4, forcing sweep (2026-10-20): T4.5, T4.6, T4.11, T4.18 passed; T4.7 passes on γ everywhere and on c² at f ≥ 7.4 (`@test_broken` at f ≤ 6.4, DR-5); T4.12 recorded
+
+`ensemble` runs the seeds in parallel over the Julia threads and pools the aggregators (`src/run.jl`); `scripts/run_sweep.jl` writes `results/table2.md`; `test/tier4_stochastic.jl`. Three seeds per forcing, 5×10⁴ τ_d each as in the paper, 2×10⁵ τ_d each at f = 4.4 (the paper had ~5 reversals there). About 2.5 min on 4 threads. The D₁/ℱ fit is the paper's: bin averages for |a| ≤ 1.1 weighted by the bin counts; the paper's fit is the one its printed (c², γ) imply through Eqs. 62–63, which for f = 6.4 is the printed 1.36 + 2.00a².
+
+| f | reversals | ⟨T_r⟩ (paper) | §2 variance (paper) | dv | D₁/ℱ weighted fit (paper) | c² (paper) | γ (paper) | KS p (n) |
+|---|---|---|---|---|---|---|---|---|
+| 4.4 | 53 | 11321 ± 1555 (10700 ± 5300) | 0.030 (0.03) | 0.031 | 1.57 − 0.01a² (1.22 + 0.31a²) | 0.447 (0.318) | 9.86 (9.04) | 0.73 (50) |
+| 5.4 | 285 | 526 ± 31 (519 ± 53) | 0.068 (0.07) | 0.073 | 1.64 + 0.75a² (1.34 + 0.94a²) | 0.382 (0.299) | 5.39 (5.15) | 0.87 (282) |
+| 6.4 | 1433 | 104.7 ± 2.8 (107 ± 5) | 0.142 (0.16) | 0.160 | 1.58 + 1.91a² (1.36 + 2.00a²) | 0.291 (0.246) | 3.02 (2.96) | 0.77 (1398) |
+| 7.4 | 4051 | 37.0 ± 0.6 (37.6 ± 1) | 0.263 (0.30) | 0.301 | 1.62 + 3.37a² (1.62 + 3.20a²) | 0.234 (0.240) | 1.78 (1.82) | 0.37 (3707) |
+| 8.4 | 7789 | 19.3 ± 0.2 (18.7 ± 0.4) | 0.457 (0.50) | 0.496 | 1.92 + 5.25a² (1.99 + 5.20a²) | 0.218 (0.228) | 1.09 (1.09) | 0.11 (6185) |
+
+Unweighted fits: 1.41 + 0.27a², 1.39 + 1.10a², 1.46 + 2.08a², 1.58 + 3.41a², 2.04 + 4.99a², giving c² = 0.372, 0.300, 0.261, 0.228, 0.239 and γ = 9.14, 4.98, 2.93, 1.77, 1.12. Direct D₁(0) from the bins |a| ≤ 0.2: 1.04, 1.06, 1.24, 1.40, 1.50. Theory at our (c², γ): Eq. 56 0.042, 0.084, 0.178, 0.492, 10.9; Eq. 58 4909, 321, 78.6, 34.9, 35.4; Eq. 57 (exact escape integral) 5329, 369, 91.2, 35.3, 16.3.
+
+| Gate | Check | Result |
+|---|---|---|
+| T4.5 | ⟨T_r⟩ at the four other forcings, 2σ combined | pass at all four (0.1σ, 0.1σ, 0.5σ, 1.3σ); the rate reproduces over three decades |
+| T4.6 | variance, ±0.02 or 15% | pass: dv within 0.005 of the column everywhere; the §2 estimator within 0.02 at f ≤ 6.4 and 11–13% low at f ≥ 7.4 (DR-6) |
+| T4.7 | (c², γ) from the D₁ fit, 10% | γ passes everywhere (9%, 5%, 2%, 2%, 0%); c² passes at f = 7.4, 8.4 (2.5%, 4%) and **fails** at f = 4.4, 5.4, 6.4 (41%, 28%, 18%, `@test_broken`); the unweighted c² passes at 5.4–8.4 (0.3%, 6%, 5%, 5%) and fails at 4.4 (17%) |
+| T4.11 | polarity intervals above 5 τ_d exponential, KS with bootstrap p | pass at every forcing, p = 0.73, 0.87, 0.77, 0.37, 0.11 (the last at ⟨T_r⟩ = 19 τ_d, where T_r ≫ Λ⁻¹ ≈ 1.9 is weakest) |
+| T4.18 | seed scatter at f = 5.4 covers HOS's 519 ± 53 and HSO's 570 ± 61 | pass: 516, 610, 472 |
+
+Observations.
+
+- The reversal rate is the strongest result of the sweep: ⟨T_r⟩ reproduces from 19 to 11 000 τ_d, a factor 600, with the pooled values inside the paper's errors everywhere. The exact escape integral (Eq. 57) at our (c², γ) tracks the measured rate better than Eq. 58 at f = 8.4 (16.3 against 19.3, Eq. 58 35.4) and worse at f = 4.4 (5329 against 11 321), where our c² is off.
+- The D₁ fit (T4.7) is well conditioned only where the |a| distribution is broad. At f = 7.4 and 8.4 the weighted and unweighted fits agree with each other and with the paper's to 2–5%. At f ≤ 6.4 the samples concentrate near |a| ≈ 0.8–1.1 and the intercept is an extrapolation: at f = 4.4 fewer than 0.5% of the samples have |a| < 0.5, the bins below 0.5 hold 12–150 samples with means scattering from 0.05 to 3, and the weighted fit returns c₂ ≈ 0 (D₁ is flat near |a| = 1 there). The paper's fits at low forcing have the same conditioning problem, so its printed (c², γ) at f = 4.4 and 5.4 carry an uncertainty the 10% gate ignores; the excess of our weighted intercept at f = 5.4 and 6.4 (23%, 16%) over the paper's remains DR-5. γ, which Δ₀ = ℱ(c₂ + 3.529) dominates, is insensitive to all of this.
+- With the sweep, the fit that reproduces the paper's (c², γ) best is the unweighted one at f = 5.4–8.4 (c² within 6%), and the count-weighted one at f ≥ 7.4.
+- DR-6: the variance column of Table II is the whole-record relative variance of |a| (dv), which we reproduce to 0.005 at every forcing; the §2 exclusion estimator coincides with it at f ≤ 6.4 and falls 11–13% below it at f ≥ 7.4, where ⟨T_r⟩ is only 2–4 times the 2W = 10 τ_d exclusion. The estimator's first implementation pooled the per-interval ratios and was dominated by a few near-zero-mean intervals (0.54 and 4.3 at f = 7.4 and 8.4); it now pools the moments.
+- The KS test of T4.11 is a parametric bootstrap (the mean is fitted), `src/stats.jl`; the Kolmogorov distribution would give larger p-values.
+- Cost: 15 s per 5×10⁴ τ_d per seed, 54 s at 2×10⁵; the whole Tier 4 suite (standard run, sweep, invariance) runs in about 5 min on 4 threads.
+
+### Tier 4, convergence T4.17 and the DR-5 sensitivity (2026-10-20): passed
+
+`scripts/dr5_sensitivity.jl`; the two resolution variants are also a testset in `test/tier4_stochastic.jl`. Standard run, three seeds × 5×10⁴ τ_d each; the Δτ = 0.005 run sees the same noise realisation (the F stream is drawn per τ_c).
+
+| Variant | ⟨T_r⟩ | §2 variance | dv | weighted D₁ fit | D₁ bin 0.95–1.0 | (c², γ) |
+|---|---|---|---|---|---|---|
+| baseline (GaussianF, exponential, Δτ 0.01, N 60) | 104.7 ± 2.8 | 0.142 | 0.160 | 1.58 + 1.91a² | 3.33 | (0.291, 3.02) |
+| Δτ = 0.005 | 106.9 ± 2.9 | 0.142 | 0.160 | 1.57 + 1.89a² | 3.32 | (0.289, 3.03) |
+| N = 120 | 108.5 ± 2.9 | 0.139 | 0.156 | 1.58 + 1.89a² | 3.32 | (0.292, 3.03) |
+| UniformF | 106.5 ± 2.8 | 0.145 | 0.162 | 1.55 + 1.98a² | 3.37 | (0.281, 2.98) |
+| BinaryF | 111.9 ± 3.1 | 0.145 | 0.162 | 1.56 + 1.98a² | 3.39 | (0.283, 2.98) |
+| IMEX stepper, Δτ 0.01 | 98.3 ± 2.5 | 0.135 | 0.153 | 1.84 + 1.78a² | 3.43 | (0.345, 3.09) |
+
+- T4.17 passes: halving Δτ and doubling N move ⟨T_r⟩ by 2% and 4% (under 1σ), the variances by ≤ 0.004 and the D₁ fit by 0.01. The production integrator is converged at the papers' resolution.
+- The distribution of F does not matter (the three agree within errors), as HOS state for the "other details" of the cell model.
+- The time integrator does: a first-order IMEX scheme at the same Δτ raises the D₁ intercept by 0.26 and c² by 0.05 while changing ⟨T_r⟩ by 6% and dv by 0.007. This is the size of the DR-5 gap and the most probable explanation of it: the paper's unstated scheme carries an O(|λ₁|Δτ) bias on the overtone content that the extrapolated intercept amplifies, while ⟨T_r⟩ and the variance, which the gates reproduce, are an order of magnitude less sensitive. See `DISCREPANCIES.md` DR-5.
+
+### Tier 4, forcing-parameter invariance T4.12 (2026-10-20): recorded, the invariance is broken by the bin width
+
+Three configurations at f²τ_c/N_c² = 2.05×10⁻², three seeds × 5×10⁴ τ_d each (`test/tier4_stochastic.jl`). HOS p. 272 and Appendix E: all statistics depend on (f, τ_c, N_c) only through f²τ_c/N_c², in the δ-correlated, continuum-bin limit.
+
+| (f, τ_c, N_c) | ⟨T_r⟩ | ratio to standard | §2 variance | dv | D₁/ℱ weighted fit | (c², γ) | exact binned D₀ / Eq. 36 |
+|---|---|---|---|---|---|---|---|
+| (6.4, 0.05, 10), standard | 104.7 ± 2.8 (1433) | 1 | 0.142 | 0.160 | 1.58 + 1.91a² | (0.291, 3.02) | 0.9485 |
+| (4.525, 0.1, 10) | 114.8 ± 3.2 (1307) | 1.096 (2.4σ) | 0.134 | 0.153 | 1.59 + 1.72a² | (0.302, 3.13) | 0.9485 |
+| (12.8, 0.05, 20) | 75.9 ± 1.7 (1975) | 0.726 (−8.8σ) | 0.153 | 0.175 | 1.87 + 2.12a² | (0.330, 2.91) | 1.0008 |
+
+- Doubling τ_c at fixed f²τ_c/N_c² lengthens ⟨T_r⟩ by 10% (2.4σ) and lowers the variance and the D₁ slope slightly: a finite-correlation-time effect, the noise no longer being δ-correlated on the overtones' damping times (|ℜλ₁| ≈ 6, so τ_c = 0.1 is 0.6 of a damping time).
+- Doubling N_c at fixed f²τ_c/N_c² shortens ⟨T_r⟩ by 27% (8.8σ) and raises the D₁ intercept by 18% and dv by 9%. The mechanism is DR-3's: with N_c = 10 the piecewise-constant F delivers 5.2% less D₀ than Eq. 36 (Jensen's inequality over the bin), and with N_c = 20 the deficit is gone (ratio 1.0008, `binned_D0`); the overtones, which have finer latitudinal structure than the dipole, lose more at N_c = 10 and so gain more at N_c = 20, which is the 18% in D₁. The reversal rate's sensitivity to the forcing (d ln⟨T_r⟩/d ln f² ≈ −3.6 from Table II) turns the 5% in D₀ and the 18% in D₁ into the 27%.
+- So the invariance holds only in the limit the paper states it for; at the paper's own N_c = 10 the results are specific to that bin width, and comparisons with the paper must use N_c = 10, τ_c = 0.05, as every gate here does. `DISCREPANCIES.md` DR-3 carries the addendum.
 
 ### Tier 5, standard-run figures (2026-10-20): T5.1, T5.2, T5.7, T5.8 rendered, the user's judgement pending
 
@@ -277,4 +339,12 @@ Observations.
 - T5.2 (HOS Fig. 2): |a₁| spikes to 1.3–1.4 and |a₂| to 1.0 at the events (paper: ~1.2 and ~0.9), 0.1–0.5 between them; 𝒫 near −1 with spikes to +1 at the reversals and brief spikes toward 0 in between; the reversals of the window come in clusters (506; 538; 652 and 670). The overtone scale is in the unit-toroidal-energy convention of `eigenmodes` (`DECISIONS.md` D4); with it the spike heights match the paper's. The energy axis reaches 7 in our field unit while the paper's runs to 30, so their field unit is 2–3 times ours (the constant of HOS Eq. 18 is not given).
 - T5.7 (HOS Fig. 8): the scatter, the bin averages rising from ≈ 1.4 at a = 0 and the a⁴ departure beyond 1.1 all as in the paper; the fitted curve is 1.45 + 2.10a² for this seed against 1.36 + 2.00a².
 - T5.8 (HOS Fig. 9): the paper's discrepancy reappears exactly: histogram peak 1.42 at |a| = 0.84 (paper ≈ 1.35 at 0.85) against the Eq. 43 curve peak 1.12 at 0.8 (paper ≈ 1.1 at 0.8), the curve above the histogram for |a| < 0.5 and below it near the peak.
+- The user judged Figs. 1, 2, 8, 9 "very comparable" with the originals (2026-10-20). Fig. 8 now also draws the unweighted fit (DR-5).
+
+### Tier 5, sweep figures (2026-10-20): T5.5, T5.6 rendered, judgement pending
+
+`scripts/run_standard.jl 1 1e4 5.4` and `… 1 2000 7.4` write `results/standard_f5.4_seed1.h5` and `standard_f7.4_seed1.h5`; `viz/hos_fig05.py`, `hos_fig06.py`.
+
+- T5.5 (HOS Fig. 5): with the same noise series as Fig. 1 (seed 1), 6 reversals in 0–2000 τ_d at f = 5.4, the paper's count exactly, including a short reversed interval near 1760–1840 (paper: 1760–1790); 58 at f = 7.4 (paper: several tens).
+- T5.6 (HOS Fig. 6): ℜa₁ against a over ±50 τ_d around the reversal at τ = 833 (the one nearest the paper's 680): two clouds centred at a ≈ ±0.9 with |ℜa₁| ≲ 0.5 and a single jump through a ≈ 0, as described.
 

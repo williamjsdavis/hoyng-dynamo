@@ -18,6 +18,8 @@ to `../figures/` (git-ignored):
 |---|---|---|
 | `hos_fig01.py` | HOS Fig. 1: T(θ, τ) colour plot and a(τ), 0–2000 τ_d | the `T` snapshots and the `a` stream |
 | `hos_fig02.py` | HOS Fig. 2: \|a₁\|, \|a₂\|, parity, energy over τ = 500–700 | the `a1`, `a2`, `parity`, `energy` streams |
+| `hos_fig05.py` | HOS Fig. 5: a(τ), 0–2000 τ_d, at f = 5.4 and 7.4 with the same noise | the `a` stream of `standard_f5.4_seed1.h5` and `standard_f7.4_seed1.h5` (`run_standard.jl 1 1e4 5.4`, `… 1 2000 7.4`) |
+| `hos_fig06.py` | HOS Fig. 6: ℜa₁ against a through a reversal at f = 5.4 | the `a` and `a1` streams, `results/trigger` of `standard_f5.4_seed1.h5` |
 | `hos_fig08.py` | HOS Fig. 8: D₁/ℱ against \|a\| with the bin averages and fits | the `d1` and `a` streams, `results/d1`, `results/summary` |
 | `hos_fig09.py` | HOS Fig. 9: simulated p(\|a\|) against Eq. 43 | `results/histogram`, `results/summary` |
 

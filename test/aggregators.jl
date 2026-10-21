@@ -36,21 +36,23 @@ function ref_polarity(a, ah)
 end
 ref_flips(a, ah) = (p = ref_polarity(a, ah); [i for i in 2:length(a) if p[i] != p[i-1] && p[i-1] != 0])
 
-# between-reversal variance with the ±W exclusion, pooled by kept-sample count
+# between-reversal variance with the ±W exclusion: the variance about each interval's own
+# mean and |mean| pooled over the intervals by kept-sample count, then the ratio
 function ref_exclusion(a, ah, W, Δt)
     w = max(1, round(Int, W / Δt)); n = length(a)
     flips = ref_flips(a, ah)
     starts = vcat(1, flips .+ w)                       # first kept sample of each interval
     stops = vcat(flips .- 1 .- w, n - w)               # last kept sample
-    pooled = 0.0; pn = 0; k = 0
+    M2 = 0.0; absmean = 0.0; pn = 0; k = 0
     for (s, e) in zip(starts, stops)
         e - s + 1 ≥ 2 || continue
         seg = a[s:e]
-        pooled += length(seg) * ref_var(seg) / ref_mean(seg)^2
+        M2 += sum(abs2, seg .- ref_mean(seg)); absmean += length(seg) * abs(ref_mean(seg))
         pn += length(seg); k += 1
     end
-    return (variance = pooled / pn, n = pn, intervals = k)
+    return (variance = (M2 / (pn - k)) / (absmean / pn)^2, n = pn, intervals = k, M2 = M2, absmean = absmean)
 end
+ref_exclusion_pool(r1, r2) = ((r1.M2 + r2.M2) / (r1.n + r2.n - r1.intervals - r2.intervals)) / ((r1.absmean + r2.absmean) / (r1.n + r2.n))^2
 
 @testset "Aggregators (D8)" begin
     rng = Xoshiro(2026)
@@ -197,11 +199,17 @@ end
         ev2 = ExclusionVariance(; W, Δt); foreach(v -> fit!(ev2, v), b)
         @test value(ev2).n == 1_950
         @test value(ev2).variance ≈ ref_var(b[1:1950]) / ref_mean(b[1:1950])^2 rtol = 1e-10
-        # merge pools by kept-sample count
+        # merge pools the moments by kept-sample count (not the per-interval ratios)
         ev3 = ExclusionVariance(; W, Δt); foreach(v -> fit!(ev3, v), b)
         merge!(ev, ev3)
-        @test value(ev).variance ≈ (ref.variance * ref.n + value(ev2).variance * 1_950) / (ref.n + 1_950) rtol = 1e-10
+        @test value(ev).variance ≈ ref_exclusion_pool(ref, ref_exclusion(b, 0.5, W, Δt)) rtol = 1e-10
         @test value(ev).intervals == 6
+        # an interval hovering near zero does not dominate: pooled moments, not pooled ratios
+        w = round(Int, W / Δt)
+        c = copy(a); c[4_000+w+1:9_000-w-1] .= 0.02 .* randn(rng, 4_999 - 2w)
+        ev4 = ExclusionVariance(; W, Δt); foreach(v -> fit!(ev4, v), c)
+        @test value(ev4).variance ≈ ref_exclusion(c, 0.5, W, Δt).variance rtol = 1e-10
+        @test value(ev4).variance < 2 * ref.variance
     end
 
     @testset "BinnedMean and even_quadratic_fit" begin

@@ -9,7 +9,7 @@ Fixed: the model equation (HOS Eq. 26 form), the run table, the seven validation
 Three items were scope rather than implementation. The user closed them on 2026-10-18:
 
 - **S1. Sint-800 record.** Tier 6 is deferred and not planned for now. Obtaining the Guyodo & Valet (1999) VADM series becomes a task only if Tier 6 is reopened.
-- **S2. Alternative quenching laws** (T4.16: q from total toroidal energy, α/(1+q), local quenching) are a stretch goal. Keep a quenching-variant switch in the parameters object (D10) so they can be added without restructuring, and implement them only after Tiers 0–5 pass.
+- **S2. Alternative quenching laws** (T4.16: q from total toroidal energy, α/(1+q), local quenching) are a stretch goal. Keep a quenching-variant switch in the parameters object (D10) so they can be added without restructuring, and implement them only after Tiers 0–5 pass. *(2026-10-20: moved to `STRETCH_GOALS.md` SG-2, which also holds the integrator-sensitivity test SG-1.)*
 - **S3. Form of the deliverable.** A personal research project, built as a package that others can install and use later. Consequences: package structure from the first commit, a public API, docstrings and a README, and a licence (D10). S3 constrains the language only to "installable by others", which every option in D1 satisfies.
 
 ## 1. Decisions

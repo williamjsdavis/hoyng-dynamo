@@ -18,6 +18,7 @@ Package layout (`dev/DECISIONS.md` D10), in build order:
 - `stepper.jl`      constant-memory time steppers (exponential integrator, IMEX Euler)
 - `aggregators.jl`  running statistics behind `fit!`, `merge!`, `value`
 - `theory.jl`       the Fokker–Planck formula module (closed forms and quadratures)
+- `stats.jl`        statistical tests for the gates (KS test for exponential intervals)
 - `run.jl`          `RunSpec`, `Simulation`, observers and the `run!` loop (record or stream mode)
 - `io.jl`           HDF5 run files: streams, results, checkpoints
 
@@ -53,7 +54,8 @@ export BistableTheory, diffusion_constants, shape_parameters, diffusion_prefacto
     mean_reversal_time_quadrature
 export RunSpec, Diagnostics, Simulation, current_time, steps, amplitude, absamplitude, overtone, overtone1, overtone2,
     parity, toroidal, poloidal, toroidal_energy, d1_sample, d1_pair, Observer, Probe, observe!, flush!, run!,
-    standard_observers, summarize
+    standard_observers, summarize, pool!, ensemble
+export ks_exponential
 export RunFile, open_run, metadata, Recorder, SnapshotRecorder, read_stream, streams, write_results!, write_summary!,
     read_results, checkpoint!, restore!, checkpoint_step
 
@@ -63,6 +65,7 @@ include("stepper.jl")
 include("noise.jl")
 include("aggregators.jl")
 include("theory.jl")
+include("stats.jl")
 include("run.jl")
 include("io.jl")
 

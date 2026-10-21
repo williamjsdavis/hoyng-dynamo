@@ -449,10 +449,13 @@ value(c::CrossingGroups) = (n_reversals = c.nreversals, n_aborted = c.naborted, 
 
 Between-reversal relative variance of `VALIDATION.md` §2: within each polarity interval
 (Schmitt trigger with threshold `ah`), the samples closer than `W` to either reversal are
-dropped and ⟨(a − ⟨a⟩)²⟩/⟨a⟩² is computed over the rest; intervals are pooled weighted by
-their number of kept samples. A delay ring buffer of W/Δt samples holds the samples that
-may still be discarded, so memory is O(W/Δt). `value` gives `(variance, n, intervals)`,
-including the open interval.
+dropped; the variance about each interval's own mean and the magnitude of that mean are
+pooled over the intervals weighted by their kept samples, and `variance` is the ratio
+Σ M2ᵢ/Σ(nᵢ−1) ÷ (Σ nᵢ|⟨a⟩ᵢ|/Σ nᵢ)². (Pooling the per-interval ratios instead lets a few
+intervals whose kept part hovers near a = 0, long events the trigger does not resolve,
+dominate the result at high forcing; see `DISCREPANCIES.md` DR-6.) A delay ring buffer of
+W/Δt samples holds the samples that may still be discarded, so memory is O(W/Δt). `value`
+gives `(variance, n, intervals)`, including the open interval.
 """
 mutable struct ExclusionVariance{T<:AbstractFloat} <: Aggregator
     const ah::T
@@ -468,13 +471,14 @@ mutable struct ExclusionVariance{T<:AbstractFloat} <: Aggregator
     cn::Int                   # current interval: Welford state of the kept samples
     cmean::T
     cM2::T
-    pooled::T                 # Σ n_i r_i over closed intervals
+    pooled_M2::T              # Σ M2_i over closed intervals
+    pooled_absmean::T         # Σ n_i |mean_i|
     pooled_n::Int             # Σ n_i
     intervals::Int
 end
 function ExclusionVariance(; ah = 0.5, W = 5.0, Δt = 1.0, T::Type{<:AbstractFloat} = Float64)
     w = max(1, round(Int, W / Δt))
-    ExclusionVariance{T}(T(ah), T(W), T(Δt), w, zeros(T, w), 0, 0, 0, 0, 1, 0, zero(T), zero(T), zero(T), 0, 0)
+    ExclusionVariance{T}(T(ah), T(W), T(Δt), w, zeros(T, w), 0, 0, 0, 0, 1, 0, zero(T), zero(T), zero(T), zero(T), 0, 0)
 end
 
 @inline function keep!(ev::ExclusionVariance{T}, a::T) where {T}
@@ -487,8 +491,8 @@ end
 
 @inline function close_interval!(ev::ExclusionVariance{T}) where {T}
     if ev.cn ≥ 2
-        r = ev.cM2 / (ev.cn - 1) / ev.cmean^2
-        ev.pooled += ev.cn * r
+        ev.pooled_M2 += ev.cM2
+        ev.pooled_absmean += ev.cn * abs(ev.cmean)
         ev.pooled_n += ev.cn
         ev.intervals += 1
     end
@@ -528,11 +532,13 @@ end
 
 function Base.merge!(a::ExclusionVariance{T}, b::ExclusionVariance{T}) where {T}
     # pool b's closed and open intervals into a's closed ones
-    a.pooled += b.pooled
+    a.pooled_M2 += b.pooled_M2
+    a.pooled_absmean += b.pooled_absmean
     a.pooled_n += b.pooled_n
     a.intervals += b.intervals
     if b.cn ≥ 2
-        a.pooled += b.cn * (b.cM2 / (b.cn - 1) / b.cmean^2)
+        a.pooled_M2 += b.cM2
+        a.pooled_absmean += b.cn * abs(b.cmean)
         a.pooled_n += b.cn
         a.intervals += 1
     end
@@ -541,13 +547,15 @@ function Base.merge!(a::ExclusionVariance{T}, b::ExclusionVariance{T}) where {T}
 end
 
 function value(ev::ExclusionVariance{T}) where {T}
-    pooled, pooled_n, intervals = ev.pooled, ev.pooled_n, ev.intervals
+    M2, absmean, pooled_n, intervals = ev.pooled_M2, ev.pooled_absmean, ev.pooled_n, ev.intervals
     if ev.cn ≥ 2
-        pooled += ev.cn * (ev.cM2 / (ev.cn - 1) / ev.cmean^2)
+        M2 += ev.cM2
+        absmean += ev.cn * abs(ev.cmean)
         pooled_n += ev.cn
         intervals += 1
     end
-    return (variance = pooled_n > 0 ? pooled / pooled_n : T(NaN), n = pooled_n, intervals = intervals)
+    variance = pooled_n > 0 ? (M2 / (pooled_n - intervals)) / (absmean / pooled_n)^2 : T(NaN)
+    return (variance = variance, n = pooled_n, intervals = intervals)
 end
 
 # ---------------------------------------------------------------- BinnedMean (D₁ versus |a|)

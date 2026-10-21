@@ -1,0 +1,26 @@
+# Stretch goals
+
+Work deliberately outside the build order of `DEVELOPMENT.md` §4, to be taken up after build steps 0–7 are complete, if at all. Each entry says where it came from, what to do, how, and what would count as a result. Gate IDs refer to `VALIDATION.md`; discrepancy IDs to `DISCREPANCIES.md`. Notation is HOS's.
+
+## SG-1. Sensitivity of the D₁ fit and of the reversal statistics to the time integrator
+
+- **Origin.** The user, 2026-10-20, after the DR-5 sensitivity runs (`scripts/dr5_sensitivity.jl`, `VALIDATION.md` §4 T4.17).
+- **Hypothesis to test.** HOS's unstated time-integration scheme at Δτ = 0.01 biased the overtone content of their runs by a few per cent, and the count-weighted quadratic fit of D₁(a), anchored at |a| ≈ 0.7–1.1 and extrapolated to a = 0, turned that into the 16–23% excess of our intercept over theirs at f = 5.4–6.4 (DR-5). Our exponential stepper is exact for the linear part and converged in Δτ and N; a first-order IMEX scheme at the same Δτ already moves the intercept by +0.26 (under-damping the overtones) while moving ⟨T_r⟩ by 6%. We cannot know HOS's scheme, so the test is of sensitivity: how far, and in which direction, do plausible first-order schemes at their Δτ move the results?
+- **What.** One or two steppers "a step away" from ours, with the same `step!` interface and D14 discipline (allocation-free, JET-clean), selectable through `RunSpec(stepper = …)`:
+  1. backward Euler on the whole linear operator G(C₀) + s(1 − a²)E with the noise term explicit: per-step amplification of mode 1 is |1/(1 − λ₁Δτ)| = 0.9772 against the exact 0.9786 at C_m (λ₁ = −2.16 + 5.88i), i.e. over-damping by 0.14% per step, about 6% per damping time; expected to lower the intercept, the opposite side to the IMEX;
+  2. Crank–Nicolson (trapezoidal) on the same operator as a second-order control, expected to move little;
+  3. optionally the IMEX with the noise term also treated implicitly, or forward Euler on everything but diffusion with the shear implicit, to span what a 2000-era code might have done.
+- **How.** New `AbstractStepper` types in `src/stepper.jl` (the IMEX is the template; a factorised (I − ΔτG) or (I − ½ΔτG) can be precomputed since G is fixed and the quenching term is rank-limited, or the quenched operator refactorised only when a changes, which is every step, so a dense LU per step at 120×120 is affordable at ~10 µs); Tier 1 must pass with Δτ-sized errors as the IMEX does; then extend `scripts/dr5_sensitivity.jl` with the new schemes, three seeds × 5×10⁴ τ_d at f = 6.4 and 5.4, with f = 7.4 as a contrast where the fit is well conditioned and the gates already pass.
+- **Result to record** (in DR-5 and `VALIDATION.md` §4). For each scheme: the weighted and unweighted intercepts, D₁ in the bin |a| = 0.95–1.0, (c², γ), ⟨T_r⟩, the §2 variance and dv, and the shift from the exponential stepper; the per-step amplification of λ₁ against exp(λ₁Δτ) as the analytic expectation of the direction. The hypothesis is supported if some first-order scheme at Δτ = 0.01 reaches the paper's 1.36 ± 0.1 at f = 6.4 (and 1.34 at 5.4) while keeping ⟨T_r⟩ within 107 ± 5 and the variance within 0.16 ± 0.02; it is weakened if every scheme stays above about 1.5, which would send the search to the remaining candidates (the alignment of the noise bins with the grid, the finite-difference form of L and of the shear term).
+- **Cost.** About a day; the runs take a few minutes on 4 threads.
+
+## SG-2. Alternative quenching laws (gate T4.16)
+
+- **Origin.** `DECISIONS.md` S2 and `DEVELOPMENT.md` §4 item 7 (2026-10-18), moved here 2026-10-20.
+- **What.** HOS pp. 277 and 281 state that other nonlinearities leave the dipole statistics "not materially changed": q from the total toroidal energy instead of a²; α/(1 + q) instead of α(1 − q); local (θ-dependent) quenching. Gate T4.16 (kind D): ⟨T_r⟩ and the variance of the standard run within ~20% of the a²-quenched values.
+- **How.** A quenching-variant switch in `RunSpec` (D10) and the corresponding operators; the exponential stepper's midpoint predictor for the frozen quenching coefficient (D3) carries over to an energy-based q; local quenching makes the quenched operator θ-dependent per step, so it needs the IMEX-style factorisation or a per-step dense solve. Needs steps 0–7 complete so that the comparison baseline is final.
+- **Result to record.** ⟨T_r⟩, variance, dv and the D₁ fit for each law against the standard run, three seeds × 5×10⁴ τ_d, in `VALIDATION.md` §4 under T4.16.
+
+## Not stretch goals
+
+- Tier 6, the Sint-800 comparison, is deferred and not planned (`VALIDATION.md`, `DEVELOPMENT.md` §4 item 8): it needs the palaeomagnetic record, not the papers.

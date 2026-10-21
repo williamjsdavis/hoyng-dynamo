@@ -38,6 +38,19 @@ function RunSpec(; kR = 0.5, Cm = 100.0, N::Integer = 60, Δτ = 0.01, f = 6.4, 
                                                    UInt64(seed), stepper, T(a0))
 end
 
+"""
+    RunSpec(spec::RunSpec; kwargs...)
+
+A copy of `spec` with the given fields replaced: `seed`, `f` (a new `ConstantForcing`),
+`schedule`, `τc`, `Nc`, `N`, `Δτ`, `kR`, `Cm`, `distribution`, `stepper`, `a0`.
+"""
+function RunSpec(spec::RunSpec{T}; f = nothing, schedule = nothing, kR = spec.kR, Cm = spec.Cm, N = spec.N,
+                 Δτ = spec.Δτ, τc = spec.τc, Nc = spec.Nc, distribution = spec.distribution, seed = spec.seed,
+                 stepper = spec.stepper, a0 = spec.a0) where {T}
+    sched = schedule !== nothing ? schedule : (f !== nothing ? ConstantForcing(T(f)) : spec.schedule)
+    return RunSpec(; kR, Cm, N, Δτ, schedule = sched, τc, Nc, distribution, seed, stepper, a0, T)
+end
+
 Base.show(io::IO, s::RunSpec{T}) where {T} =
     print(io, "RunSpec{$T}(kR = $(s.kR), C_m = $(s.Cm), N = $(s.N), Δτ = $(s.Δτ), $(s.schedule), τ_c = $(s.τc), N_c = $(s.Nc), ",
           "$(nameof(typeof(s.distribution))), seed = $(s.seed), $(s.stepper), a0 = $(s.a0))")
@@ -295,25 +308,28 @@ end
 The headline statistics of a run with the standard observers: reversal counts and ⟨T_r⟩
 with its Poisson error (Schmitt trigger, and the papers' grouping rule), the exclusion
 variance of §2, dv (HSO Eq. 12), the D₁/ℱ quadratic fit of the bin averages for |a| ≤ 1.1
-(HOS Eq. 61; unweighted as in the paper, with the count-weighted fit and the mean over
-|a| ≤ 0.2 alongside) and the (c², γ) it implies with D₀ from Eq. 36 (Eqs. 62–63), and the
-Eq. 56/58 theory for those shape parameters. The D₁ fit uses f at the last redraw
-(constant forcing: f).
+(HOS Eq. 61, weighted by the bin counts as in the Fig. 8 caption; the unweighted fit and
+the mean over |a| ≤ 0.2 alongside) and the (c², γ) it implies with D₀ from Eq. 36
+(Eqs. 62–63; `c2_unweighted`, `γ_unweighted` from the unweighted fit), and the Eq. 56/58
+theory for the primary shape parameters. ℱ uses f at the last redraw (constant forcing: f).
 """
 function summarize(obs::NamedTuple, sim::Simulation{T}) where {T}
     tr, cg, ex, am, d1 = value(obs.trigger), value(obs.groups), value(obs.exclusion), value(obs.abs_moments), value(obs.d1)
     c = sim.model.constants
     ℱ = diffusion_prefactor(sim.noise.f, sim.noise.τc, sim.noise.Nc)
     sel = (d1.centers .<= 1.1) .& (d1.n .> 0)
-    # the papers fit the histogram of bin averages (HOS Fig. 8, p. 291): unweighted least squares
-    # on the bin means; the count-weighted fit and the direct small-|a| mean are kept alongside
-    # because D₁(a) is only approximately quadratic and the intercept depends on the weighting
-    c0, c2 = even_quadratic_fit(d1.centers[sel], d1.mean[sel], ones(T, count(sel)))
-    w0, w2 = even_quadratic_fit(d1.centers[sel], d1.mean[sel], float.(d1.n[sel]))
+    # HOS Fig. 8 caption: a least-squares quadratic through the histogram of bin averages,
+    # "weighted by the number of points in the bin", for |a| ≤ 1.1. The unweighted fit and the
+    # direct small-|a| mean are kept alongside because D₁(a) is only approximately quadratic
+    # and the intercept depends on the weighting (DISCREPANCIES.md DR-5)
+    c0, c2 = even_quadratic_fit(d1.centers[sel], d1.mean[sel], float.(d1.n[sel]))
+    u0, u2 = even_quadratic_fit(d1.centers[sel], d1.mean[sel], ones(T, count(sel)))
     near = (d1.centers .<= 0.2) .& (d1.n .> 0)
     d1_zero = sum(d1.n[near] .* d1.mean[near]) / max(sum(d1.n[near]), 1)
     Δ = diffusion_from_fit(c0, c2; D0int = c.D0int, prefactor = ℱ)
     sp = shape_parameters(c.Λ, Δ.Δ0, Δ.Δ1)
+    Δu = diffusion_from_fit(u0, u2; D0int = c.D0int, prefactor = ℱ)
+    spu = shape_parameters(c.Λ, Δu.Δ0, Δu.Δ1)
     nan = T(NaN)
     theory = if isfinite(sp.γ) && sp.γ > 1 && sp.c2 > 0
         th = BistableTheory(sp.γ, sp.c2; Λ = c.Λ)
@@ -326,6 +342,51 @@ function summarize(obs::NamedTuple, sim::Simulation{T}) where {T}
             mean_reversal_time = tr.mean_interval, mean_reversal_time_error = tr.mean_interval / sqrt(max(tr.n_reversals, 1)),
             n_reversals_grouped = cg.n_reversals, n_aborted_grouped = cg.n_aborted, mean_reversal_time_grouped = cg.mean_interval,
             variance = ex.variance, variance_intervals = ex.intervals, dv = am.var / am.mean^2, mean_abs = am.mean,
-            d1_fit = (c0 = c0, c2 = c2), d1_fit_weighted = (c0 = w0, c2 = w2), d1_zero = d1_zero,
-            prefactor = ℱ, c2 = sp.c2, γ = sp.γ, Δ0 = Δ.Δ0, Δ1 = Δ.Δ1, theory = theory)
+            d1_fit = (c0 = c0, c2 = c2), d1_fit_unweighted = (c0 = u0, c2 = u2), d1_zero = d1_zero,
+            prefactor = ℱ, c2 = sp.c2, γ = sp.γ, Δ0 = Δ.Δ0, Δ1 = Δ.Δ1,
+            c2_unweighted = spu.c2, γ_unweighted = spu.γ, theory = theory)
+end
+
+# ---------------------------------------------------------------------------------------
+# Ensembles of seeds
+# ---------------------------------------------------------------------------------------
+
+"""
+    pool!(target::NamedTuple, others) -> target
+
+Merge the aggregators of the observer sets in `others` into those of `target` (stream-mode
+sets of probes with the same keys, e.g. several seeds of `standard_observers`). The
+`intervals` of a pooled `SchmittTrigger` straddle the seams between runs; take them per run
+(`ensemble` does).
+"""
+function pool!(target::NamedTuple, others)
+    for obs in others, k in keys(target)
+        merge!(target[k].agg, obs[k].agg)
+    end
+    return target
+end
+
+"""
+    ensemble(spec::RunSpec, τ; seeds = 1:3) -> (runs, pooled, summary, intervals)
+
+`spec` with each of `seeds`, run for `τ` diffusion times in stream mode with the standard
+observers, in parallel over the available threads (the result does not depend on the thread
+count: every seed is its own simulation and the aggregators are pooled in seed order).
+`runs[i]` is `(seed, sim, observers, summary, seconds)`; `pooled` holds the pooled
+aggregators (a copy of the first set), `summary = summarize(pooled, sim)` and `intervals`
+the polarity intervals of all runs, each run's own.
+"""
+function ensemble(spec::RunSpec, τ::Real; seeds = 1:3)
+    seeds = collect(seeds)
+    sims = [Simulation(RunSpec(spec; seed)) for seed in seeds]
+    obs = [standard_observers(sim) for sim in sims]
+    seconds = zeros(length(sims))
+    Threads.@threads for i in eachindex(sims)
+        seconds[i] = @elapsed run!(sims[i], steps(sims[i], τ), obs[i])
+    end
+    runs = [(seed = seeds[i], sim = sims[i], observers = obs[i], summary = summarize(obs[i], sims[i]),
+             seconds = seconds[i]) for i in eachindex(sims)]
+    pooled = pool!(deepcopy(obs[1]), obs[2:end])
+    intervals = reduce(vcat, (value(r.observers.trigger).intervals for r in runs))
+    return (runs = runs, pooled = pooled, summary = summarize(pooled, sims[1]), intervals = intervals)
 end
