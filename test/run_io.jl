@@ -108,6 +108,22 @@ const RUN_STEPS = 60_000          # 600 τ_d at Δτ = 0.01: seed 3 has 4 revers
         rm(path)
     end
 
+    @testset "segmented runs: one trigger over the whole run, fresh observers per segment" begin
+        r = segmented(RunSpec(), 100.0, 3; seeds = 3:3)                  # `seeds` replaces the spec's seed
+        @test length(r.segments) == 3 && length(r.runs) == 1
+        @test current_time(r.runs[1].sim) ≈ 300.0
+        @test r.runs[1].whole.time ≈ 300.0
+        @test all(sg.time ≈ 100.0 for sg in r.runs[1].segments)
+        @test sum(sg.n_reversals for sg in r.runs[1].segments) ≤ r.runs[1].whole.n_reversals + 2   # segment triggers restart
+        @test isnan(r.first_reversal[1]) || r.first_reversal[1] > 0
+        @test sum(sg.time for sg in r.runs[1].segments) ≈ 300.0
+        # the segments see the same trajectory as one uninterrupted run
+        sim = Simulation(RunSpec(; seed = 3)); obs = standard_observers(sim); run!(sim, steps(sim, 300.0), obs)
+        @test value(obs.moments).n == 30_000
+        @test sim.state.a == r.runs[1].sim.state.a
+        @test sim.state.b == r.runs[1].sim.state.b
+    end
+
     @testset "checkpoint and resume are bitwise" begin
         # reference: one straight run in record mode
         sim_a = Simulation(spec)

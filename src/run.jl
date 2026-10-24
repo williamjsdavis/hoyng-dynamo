@@ -402,3 +402,37 @@ function ensemble(spec::RunSpec, τ::Real; seeds = 1:3)
     intervals = reduce(vcat, (value(r.observers.trigger).intervals for r in runs))
     return (runs = runs, pooled = pooled, summary = summarize(pooled, sims[1]), intervals = intervals)
 end
+
+"""
+    segmented(spec::RunSpec, τ_segment, nsegments; seeds = 1:1) -> (runs, segments, first_reversal)
+
+Run `spec` with each seed for `nsegments` consecutive segments of `τ_segment` diffusion
+times, a fresh set of standard observers per segment (windowed statistics, e.g. of a ramped
+forcing, SOH Fig. 3) and one Schmitt trigger over the whole run; seeds in parallel over the
+threads. `runs[k]` is `(seed, sim, whole, segments)` with `whole` the whole-run trigger value
+and `segments` that seed's per-segment summaries (ℱ at the segment's end); `segments[i]` is
+the summary of segment i pooled over the seeds (its ℱ, hence its D₁-derived shape parameters,
+use f at the end of the whole run); `first_reversal[k]` the time of seed k's first reversal
+(NaN if none).
+"""
+function segmented(spec::RunSpec, τ_segment::Real, nsegments::Integer; seeds = 1:1)
+    nsegments ≥ 1 || throw(ArgumentError("need at least one segment"))
+    seeds = collect(seeds)
+    sims = [Simulation(RunSpec(spec; seed)) for seed in seeds]
+    obs = [[standard_observers(sim) for _ in 1:nsegments] for sim in sims]
+    whole = [Probe(amplitude, SchmittTrigger(; Δt = timestep(sim))) for sim in sims]
+    summaries = [Vector{Any}(undef, nsegments) for _ in sims]
+    Threads.@threads for k in eachindex(sims)
+        n = steps(sims[k], τ_segment)
+        for i in 1:nsegments
+            run!(sims[k], n, (whole[k], obs[k][i]))
+            summaries[k][i] = summarize(obs[k][i], sims[k])
+        end
+    end
+    runs = [(seed = seeds[k], sim = sims[k], whole = value(whole[k]), segments = [summaries[k][i] for i in 1:nsegments])
+            for k in eachindex(sims)]
+    segments = [summarize(pool!(deepcopy(obs[1][i]), (obs[k][i] for k in 2:length(sims))), sims[1]) for i in 1:nsegments]
+    first_reversal = [isempty(r.whole.reversal_times) ? NaN : first(r.whole.reversal_times) for r in runs]
+    return (runs = runs, segments = segments, first_reversal = first_reversal)
+end
+

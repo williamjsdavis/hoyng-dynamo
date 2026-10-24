@@ -1,6 +1,6 @@
 # Tier 4: stochastic runs, quantitative (slow). Gates T4.1–T4.18 in dev/VALIDATION.md.
 # Build step 6 covers the standard run (T4.1–T4.4), build step 7 the forcing sweep (T4.5–T4.7,
-# T4.11, T4.12, T4.17, T4.18) and, in later pieces, the HSO and SOH runs. Definitions of
+# T4.11, T4.12, T4.17, T4.18), the HSO runs (T4.8, T4.9) and the SOH runs (T4.10, T4.15). Definitions of
 # VALIDATION.md §2: Schmitt trigger a_h = 0.5, a_e = 0.3; exclusion variance W = 5 τ_d; dv on
 # |a| at 1 τ_d; D₁/ℱ bin averages of width 0.05 fitted for |a| ≤ 1.1 weighted by the bin
 # counts (HOS Fig. 8 caption). Seeds run in parallel over the Julia threads
@@ -153,6 +153,36 @@ const TABLE_II = Dict(4.4 => (c2 = 0.318, γ = 9.04, var = 0.03, Tr = 10700.0, e
         @test abs(s2.mean_reversal_time - 113) < 2 * sqrt(5^2 + s2.mean_reversal_time_error^2)
         @test abs(s2.dv - 0.081) < 0.005
         @test ks2.p > 0.05                                           # T4.11 for this model too
+    end
+
+    @testset "T4.10, T4.15 the SOH variants and the ramped run" begin
+        # T4.10: SOH p. 121, f = 6 and 7 with the standard model: ⟨T_r⟩ ≈ 200 and ≈ 50, relative
+        # variance between reversals 0.11 and 0.24, 20%; both variance estimators are checked
+        for (f, Tr, var) in ((6.0, 200.0, 0.11), (7.0, 50.0, 0.24))
+            e = ensemble(RunSpec(; f), T4_LENGTH; seeds = T4_SEEDS)
+            s = e.summary
+            report("T4.10 SOH variant f = $f", e)
+            @test relerr(s.mean_reversal_time, Tr) < 0.2
+            @test relerr(s.dv, var) < 0.2
+            @test relerr(s.variance, var) < 0.2
+        end
+        # T4.15: SOH Fig. 3, f linear from 4 to 6.5 over 5×10⁴ τ_d: the rms variability rises
+        # from 17% to 41% (20% on the rms values), the chrons shorten drastically, the first
+        # chron ≈ 1.9×10⁴ τ_d in the paper's single realisation (kind J)
+        r = segmented(RunSpec(; schedule = LinearRamp(4.0, 6.5, 0.0, 5e4)), 5000.0, 10; seeds = T4_SEEDS)
+        rms_dv = [sqrt(sg.dv) for sg in r.segments]
+        rms_ex = [sqrt(sg.variance) for sg in r.segments]
+        nrev = [sg.n_reversals for sg in r.segments]
+        @info "T4.15 ramp 4 → 6.5 over 5×10⁴ τ_d, $(length(T4_SEEDS)) seeds, 10 segments: rms variability √dv = $(join(string.(round.(Int, 100 .* rms_dv)), ", "))%; " *
+              "√(§2 variance) = $(join(string.(round.(Int, 100 .* rms_ex)), ", "))% (SOH 17% → 41%); reversals per segment (pooled) $(join(string.(nrev), ", ")); " *
+              "first reversal per seed at τ = $(join(string.(round.(Int, r.first_reversal)), ", ")) (SOH's figure ≈ 19 000); reversals per seed $(join(string.(k.whole.n_reversals for k in r.runs), ", "))"
+        @test relerr(rms_dv[1], 0.17) < 0.2
+        @test relerr(rms_dv[end], 0.41) < 0.2
+        @test relerr(rms_ex[1], 0.17) < 0.2
+        @test relerr(rms_ex[end], 0.41) < 0.2
+        @test issorted(rms_dv)                                       # the rise is monotonic segment by segment
+        @test nrev[1] == 0 && nrev[end] > 100                        # chrons shorten drastically
+        @test all(5e3 .< r.first_reversal .< 3e4)                    # a long first chron, as in the paper
     end
 
     @testset "T4.17 convergence of the standard run at Δτ = 0.005 and N = 120 (diagnostic)" begin

@@ -54,7 +54,7 @@ export BistableTheory, diffusion_constants, shape_parameters, diffusion_prefacto
     mean_reversal_time_quadrature
 export RunSpec, Diagnostics, Simulation, current_time, steps, amplitude, absamplitude, overtone, overtone1, overtone2,
     parity, toroidal, poloidal, toroidal_energy, d1_sample, d1_pair, Observer, Probe, observe!, flush!, run!,
-    standard_observers, summarize, pool!, ensemble
+    standard_observers, summarize, pool!, ensemble, segmented
 export ks_exponential, nelder_mead, fold_histogram, equal_population_bins, density_fit
 export RunFile, open_run, metadata, Recorder, SnapshotRecorder, read_stream, streams, write_results!, write_summary!,
     read_results, checkpoint!, restore!, checkpoint_step

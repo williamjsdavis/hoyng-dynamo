@@ -24,6 +24,7 @@ to `../figures/` (git-ignored):
 | `hso_fig06.py` | HSO Fig. 6 bottom: the \|a\| histogram with the Eq. 10 and A.1 χ² fits | `results/histogram`, `results/summary/histogram_fit` of the reference run |
 | `hso_fig07.py` | HSO Fig. 7: model autocorrelation by HSO's recipe for six (τ_d, τ_av) settings | the `a` stream of the reference run |
 | `hso_fig08.py` | HSO Fig. 8: polarity bar code and a(τ) of the second run kR 0.3, C_m 120, f 7 | `run_kR0.3_Cm120_f7.0_seed1.h5` (`run_standard.jl 1 1e4 7 0.3 120`) |
+| `soh_fig03.py` | SOH Fig. 3: polarity bar code of the ramped run with the windowed rms variability and reversal counts | `ramp_f4.0-6.5_seed1.h5` (`run_ramp.jl`) |
 | `hos_fig08.py` | HOS Fig. 8: D₁/ℱ against \|a\| with the bin averages and fits | the `d1` and `a` streams, `results/d1`, `results/summary` |
 | `hos_fig09.py` | HOS Fig. 9: simulated p(\|a\|) against Eq. 43 | `results/histogram`, `results/summary` |
 
