@@ -87,6 +87,16 @@ const RUN_STEPS = 60_000          # 600 τ_d at Δτ = 0.01: seed 3 has 4 revers
         Tsnap = read_stream(file, "T")
         @test size(Tsnap.values) == (sim_s.model.grid.M, RUN_STEPS ÷ 100) && Tsnap.values[:, end] == toroidal(sim_s)
         @test Set(streams(file)) == Set(["a", "a1", "a2", "parity", "energy", "d1", "T", "P"])
+        # a full-resolution window re-run from the seed reproduces the recorded streams bitwise (HOS Figs. 3, 4)
+        w = window_run(spec, 100.0, 106.0)
+        @test length(w.time) == 600 && w.time[1] ≈ 100.01 && w.time[end] ≈ 106.0 && current_time(w.sim) ≈ 106.0
+        @test w.a == a.values[10_001:10_600]
+        @test w.T[:, 100] == Tsnap.values[:, 101] && w.T[:, 600] == Tsnap.values[:, 106]
+        @test w.a1[5:5:end] == a1.values[2001:2120] && w.parity[5:5:end] == p.values[2001:2120]
+        @test size(w.P) == (sim_s.model.grid.M, 600) && length(w.θ) == sim_s.model.grid.M
+        w2 = window_run(spec, 100.0, 106.0; every = 100)
+        @test w2.a == a.values[10_100:100:10_600] && w2.T == Tsnap.values[:, 101:106]
+        @test_throws ArgumentError window_run(spec, 10.0, 5.0)
         # results and summary are written and readable
         res = read_results(file)
         tv = value(obs_s.trigger)

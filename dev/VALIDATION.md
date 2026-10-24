@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence), the HSO runs T4.8, T4.9 and the SOH runs T4.10, T4.15 passed the same day; T4.13, T4.14 (event-level diagnostics) and the stretch goal T4.16 remain. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.5, T5.6, T5.9, T5.10, T5.11, T5.12, T5.13 are rendered and await judgement; T5.3, T5.4 (HOS Figs. 3, 4) are the last. Results in §4.
+Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence), the HSO runs T4.8, T4.9 and the SOH runs T4.10, T4.15 passed the same day; T4.14 passed and T4.13 was recorded on 2026-10-20 (the median parity outside events is −0.82, not below −0.9: `DISCREPANCIES.md` DR-7); only the stretch goal T4.16 remains. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.5, T5.6, T5.9, T5.10, T5.11, T5.12, T5.13 are rendered and await judgement; T5.3, T5.4 (HOS Figs. 3, 4) were rendered on 2026-10-20 and judged satisfactory by the user on 2026-10-24. Results in §4.
 
 ## 1. Conventions
 
@@ -259,14 +259,14 @@ Three seeds × 5×10⁴ τ_d in stream mode (14 s each), aggregators pooled with
 | T4.3 | the same fit unweighted; mean of the bins \|a\| ≤ 0.2 | — | 1.464 + 2.08a² (7.6%, 4%); 1.24 | recorded, see below |
 | T4.4 | (c², γ) from the weighted fit with D0int = 3.532 (N = 60), ℱ = 3.217×10⁻², Λ = 0.5283 | (0.246, 2.96), 10% | (0.291, 3.02): 18%, 2% | c² **fails** (`@test_broken`), γ passes; unweighted (0.261, 2.93) |
 | T4.4 | Eqs. 56 and 58 at the measured (c², γ) | paper: 0.17, 94 at (0.246, 2.96) | 0.181, 83.9 (Eq. 57: 97.7) against the run's 0.164 and 104.7 | recorded |
-| T4.13 | parity 𝒫 every n_c steps over the whole run, events included | median < −0.9 outside event windows (D) | median −0.815; 31% of samples below −0.9 | recorded; the event-window exclusion is step 7 |
+| T4.13 | parity 𝒫 every n_c steps over the whole run, events included | median < −0.9 outside event windows (D) | median −0.815; 31% of samples below −0.9 | recorded; outside the event windows −0.821, see the event-level section (DR-7) |
 
 Observations.
 
 - Reversal rate and variance: 104.7 ± 2.8 against 107 ± 5, and 0.142 (§2 estimator) or 0.160 (dv) against 0.16, so the standard run reproduces HOS Table II row 3 within the errors; the seed-to-seed scatter of ⟨T_r⟩ (100–110) is what the Poisson error (≈ 5) predicts. The grouping rule finds 4–5% fewer reversals than the trigger, because a pair of crossings within 5 τ_d counts as one aborted reversal.
 - (Logged in `DISCREPANCIES.md` DR-5.) The D₁ intercept depends on the weighting of the fit: the bin averages are only approximately quadratic (D₁ grows faster than a² beyond |a| ≈ 0.8, the "a⁴ term" HOS see beyond 1.1), so the paper's count-weighted fit, which favours the populous bins near |a| ≈ 0.9, gives 1.58, an unweighted fit through the bin means 1.46, and the direct mean of the bins |a| ≤ 0.2 gives 1.24 ± 0.1 (1300 samples of a heavy-tailed quantity). The paper's 1.36 lies between the direct estimate and the unweighted fit; its histogram "rises from ≈ 1.4 at a = 0". c₂ is insensitive (1.9–2.1). `summarize` reports all three; the gate uses the paper's weighted fit, and the 16% excess of its intercept, equivalently a 4–6% excess of D₁ where the samples are, is the open item of DR-5.
 - Theory at the measured (c², γ): Eq. 58 gives 84 against the measured 105 (the exact Eq. 57: 98); Eq. 56 gives 0.18 against 0.164. The same pattern as HOS's own comparison (94 against 107, 0.17 against 0.16), shifted by our slightly larger c².
-- Parity: between reversals 𝒫 sits at −0.8 to −1 with brief spikes toward 0, and reaches +1 at the reversals (Fig. 2); the whole-run median is −0.82. The gate's "outside event windows" median needs the event list applied to the parity stream (step 7).
+- Parity: between reversals 𝒫 sits at −0.8 to −1 with brief spikes toward 0, and reaches +1 at the reversals (Fig. 2); the whole-run median is −0.82, and masking the event windows leaves it at −0.821 (the event-level section below, DR-7).
 - Cost: 14 s per 5×10⁴ τ_d in stream mode (2.3 µs per step with all probes) and 14 s in record mode with every stream and the T, P snapshots (130 MB per run).
 
 ### Tier 4, forcing sweep (2026-10-20): T4.5, T4.6, T4.11, T4.18 passed; T4.7 passes on γ everywhere and on c² at f ≥ 7.4 (`@test_broken` at f ≤ 6.4, DR-5); T4.12 recorded
@@ -343,6 +343,32 @@ Observations.
 - The SOH variants are the HOS model at two more forcings and sit on the same curve as the Table II sweep: ⟨T_r⟩ falls from 185 to 53 between f = 6 and 7 while the variance doubles, and both lie within 20% of the paper's round numbers. The two variance estimators bracket the paper's value at f = 7 (0.209 and 0.239 against 0.24), the §2 estimator being the lower one for the reason of DR-6.
 - The ramp reproduces SOH's picture quantitatively: the rms variability rises from 16% to 39% (17% → 41%), roughly linearly with f, and the reversal count per 5000 τ_d climbs from none to ~150, i.e. ⟨T_r⟩ from > 10⁴ to ≈ 34 τ_d. The forcing parameter f²τ_c/N_c² rises by (6.5/4)² = 2.64 over the run, SOH's "factor ~2.5".
 
+### Tier 4, event-level diagnostics (2026-10-20): T4.14 passed; T4.13 recorded, the −0.9 criterion not met (DR-7); Q9 answered
+
+Per seed, the §2 Schmitt trigger, a second trigger with a_h = 0.3 (a_e = 0.15) and the parity series at the n_c cadence (`Series` and `outside_events` in `src/aggregators.jl`), three seeds × 5×10⁴ τ_d on the trajectories of the standard ensemble (the §2 trigger reproduces its 1433 reversals exactly); `test/tier4_stochastic.jl`. An event window is the stretch with |a| < a_h plus the sample that ends it; every reversal, aborted reversal and excursion is masked.
+
+| Gate | Check | Target | Measured (three seeds pooled) | Result |
+|---|---|---|---|---|
+| T4.13 | median 𝒫 outside the event windows (14% of the run masked) | < −0.9 (D) | −0.821; quartiles −0.924, −0.617; 10th percentile −0.967; 32% of the samples below −0.9. Windows padded by 1 τ_d (24% masked): −0.823. Whole run: −0.811 | **not met** (`@test_broken`); recorded, DR-7 |
+| T4.14 | reversal duration, the \|a\| < a_h = 0.5 stretch (§2) | ~3 τ_d typical, fast events ~0.5 τ_d (HOS p. 277) | 1433 reversals: median 2.62 τ_d, quartiles 0.75–4.93, mean 3.44; 19% shorter than 0.5 τ_d, 43% shorter than 2 τ_d, 24% longer than 5 τ_d | pass (reported) |
+| T4.14 | the same with a_h = 0.3 | 0.5–2 τ_d (HSO p. 151, definition unstated) | 1505 reversals: median 0.80 τ_d, quartiles 0.20–3.27; 42% below 0.5 τ_d, 65% below 2 τ_d | pass (reported) |
+
+Observations.
+
+- Parity: the exclusion of the events barely moves the median (−0.811 → −0.821) because the events occupy 14% of the run; between them the symmetric part of the toroidal field carries a steady E_S/E_A = (1 + 𝒫)/(1 − 𝒫) ≈ 0.10 of the energy, which is what the inter-event overtone level implies (median |a₁| = 0.21 outside events in seed 1, |a₂| = 0.14; with the unit-energy modes of `DECISIONS.md` D4, a₁ alone gives 𝒫 ≈ (2|a₁|² − 1)/(2|a₁|² + 1) ≈ −0.83). HOS Fig. 2 shows the same |a₁| ≈ 0.1–0.3 between events, so the paper's "𝒫 ≃ −1" is a loose reading of its −1…1 axis, and the −0.9 criterion was our own operationalisation. The field is within 5% of pure dipole energy (𝒫 < −0.9) a third of the time and within 2% (𝒫 < −0.967) a tenth. `DISCREPANCIES.md` DR-7.
+- Durations: HOS's "~3 τ_d typical" is the median and mean of the §2 definition, and their "fast events ~0.5 τ_d" are the shortest fifth (19% below 0.5 τ_d; the fastest, τ = 9304.63–9304.69 in seed 1, takes a from −a_h to +a_h in six steps). HSO's "(0.5–2) τ_d" is what the narrower band gives (median 0.8 τ_d). The two quoted ranges differ by definition, not by model. The distribution is broad, a factor 6.5 between the quartiles, because 31% of the reversals have three or more zero crossings and the longest last 10–18 τ_d (seed 1: 316 single-crossing reversals, 96 with three, 29 with five, 15 with seven or more).
+- Q9 (`QUESTIONS.md`), the duration across the forcing sweep with the §2 definition, three seeds each: the median falls from 4.1 τ_d at f = 4.4 to 0.76 τ_d at f = 8.4 while the mean stays at 3–4 τ_d, because fast single-crossing reversals become the majority as the forcing rises while the long multi-crossing ones persist.
+
+| f | reversals | median (τ_d) | quartiles | mean | fraction < 0.5 τ_d | fraction ≥ 5 τ_d |
+|---|---|---|---|---|---|---|
+| 4.4 | 53 | 4.14 | 2.28–5.73 | 4.16 | 0% | 36% |
+| 5.4 | 285 | 3.44 | 1.60–5.81 | 4.00 | 10% | 32% |
+| 6.4 | 1433 | 2.62 | 0.75–4.93 | 3.44 | 19% | 24% |
+| 7.4 | 4051 | 1.71 | 0.37–4.50 | 3.16 | 30% | 22% |
+| 8.4 | 7789 | 0.76 | 0.19–3.73 | 2.84 | 42% | 18% |
+
+- Cost: 15 s per seed in parallel; the stored parity series is 8 MB per seed.
+
 ### Tier 4, convergence T4.17 and the DR-5 sensitivity (2026-10-20): passed
 
 `scripts/dr5_sensitivity.jl`; the two resolution variants are also a testset in `test/tier4_stochastic.jl`. Standard run, three seeds × 5×10⁴ τ_d each; the Δτ = 0.005 run sees the same noise realisation (the F stream is drawn per τ_c).
@@ -383,6 +409,14 @@ Three configurations at f²τ_c/N_c² = 2.05×10⁻², three seeds × 5×10⁴ �
 - T5.7 (HOS Fig. 8): the scatter, the bin averages rising from ≈ 1.4 at a = 0 and the a⁴ departure beyond 1.1 all as in the paper; the fitted curve is 1.45 + 2.10a² for this seed against 1.36 + 2.00a².
 - T5.8 (HOS Fig. 9): the paper's discrepancy reappears exactly: histogram peak 1.42 at |a| = 0.84 (paper ≈ 1.35 at 0.85) against the Eq. 43 curve peak 1.12 at 0.8 (paper ≈ 1.1 at 0.8), the curve above the histogram for |a| < 0.5 and below it near the peak.
 - The user judged Figs. 1, 2, 8, 9 "very comparable" with the originals (2026-10-20). Fig. 8 now also draws the unweighted fit (DR-5).
+
+### Tier 5, event figures (2026-10-20): T5.3, T5.4 passed, judged satisfactory by the user 2026-10-24
+
+`scripts/run_events.jl` selects four events from the event list of `results/standard_f6.4_seed1.h5` by documented rules (the single-crossing reversal with the shortest |a| < a_h stretch and no other event in its window; among reversals with ≥ 1 τ_d below |a| = 0.3, the one with the largest mean |a₁| over that stretch; the two-crossing aborted reversal reaching farthest into the opposite polarity; the excursion with the smallest min |a|), re-runs the simulation from the seed to each 6 τ_d window with `window_run` (`src/run.jl`) at full resolution, checks the window's a against the recorded stream bitwise, and writes `results/events_f6.4_seed1.h5`; `viz/hos_fig03.py` and `hos_fig04.py` draw T(θ, τ) with the zero contour and, below it, a, |a₁| and 𝒫. The paper's windows (τ = 219–225, 1133–1139, 823–829, 1280–1286) belong to its own realisation; ours are chosen by the rules above.
+
+- T5.3 (HOS Fig. 3): top, the reversal at τ = 9304.63–9304.69: a goes from −1.3 to +1.5 in about 0.3 τ_d while |a₁| peaks at 1.3 and 𝒫 reaches +0.8, the zero contour of T sweeping across the whole colatitude range in a fraction of a diffusion time, the paper's "very fast event". Bottom, the reversal at τ = 38258.23–38260.63 (5 crossings): after the first crossing the field is small for 2 τ_d (|a| ≲ 0.3, |a₁| falling from 1.1 to 0.2) with 𝒫 swinging between +1 and −1 and the zero contour of T bulging at intervals of about 1 τ_d, the quadrupole's period 2π/5.88 = 1.07 τ_d; a then recovers along the dotted exp(Λτ) guide over the last 2 τ_d, the roughly exponential recovery of the caption.
+- T5.4 (HOS Fig. 4): the aborted reversal at τ = 276.5–280.21 (a to −0.44 and back, 2 crossings) and the excursion at τ = 13711.72–13714.21 (min |a| = 0.0006, no crossing) look alike, as the paper says: a sudden rise of |a₁| to 0.5–1, 𝒫 to +1, the toroidal field weak and symmetric for 1–3 τ_d, then the dipole regrows, with or without a sign change.
+- The user judged Figs. 3 and 4 satisfactory (2026-10-24): T5.3 and T5.4 pass.
 
 ### Tier 5, sweep figures (2026-10-20): T5.5, T5.6 rendered, judgement pending
 

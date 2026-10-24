@@ -36,9 +36,9 @@ def default_run() -> Path:
     return RESULTS / "standard_f6.4_seed1.h5"
 
 
-def parse_args(description: str, default_name: str) -> argparse.Namespace:
+def parse_args(description: str, default_name: str, default_input=None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=description)
-    p.add_argument("run", nargs="?", default=str(default_run()), help="HDF5 run file (default: the standard run)")
+    p.add_argument("run", nargs="?", default=str(default_input or default_run()), help="HDF5 input file (default: the standard run)")
     p.add_argument("-o", "--out", default=str(FIGURES / default_name), help="output image path")
     return p.parse_args()
 

@@ -1,6 +1,7 @@
 # Tier 4: stochastic runs, quantitative (slow). Gates T4.1–T4.18 in dev/VALIDATION.md.
 # Build step 6 covers the standard run (T4.1–T4.4), build step 7 the forcing sweep (T4.5–T4.7,
-# T4.11, T4.12, T4.17, T4.18), the HSO runs (T4.8, T4.9) and the SOH runs (T4.10, T4.15). Definitions of
+# T4.11, T4.12, T4.17, T4.18), the HSO runs (T4.8, T4.9), the SOH runs (T4.10, T4.15) and the
+# event-level diagnostics (T4.13, T4.14). Definitions of
 # VALIDATION.md §2: Schmitt trigger a_h = 0.5, a_e = 0.3; exclusion variance W = 5 τ_d; dv on
 # |a| at 1 τ_d; D₁/ℱ bin averages of width 0.05 fitted for |a| ≤ 1.1 weighted by the bin
 # counts (HOS Fig. 8 caption). Seeds run in parallel over the Julia threads
@@ -183,6 +184,62 @@ const TABLE_II = Dict(4.4 => (c2 = 0.318, γ = 9.04, var = 0.03, Tr = 10700.0, e
         @test issorted(rms_dv)                                       # the rise is monotonic segment by segment
         @test nrev[1] == 0 && nrev[end] > 100                        # chrons shorten drastically
         @test all(5e3 .< r.first_reversal .< 3e4)                    # a long first chron, as in the paper
+    end
+
+    @testset "T4.13, T4.14 event-level diagnostics (standard run, $(length(T4_SEEDS)) seeds); Q9 across the sweep" begin
+        # The parity series at the n_c cadence and two Schmitt triggers per seed: the §2 band
+        # a_h = 0.5 and a narrower a_h = 0.3 (a_e scaled with it). The trajectories are those of
+        # `standard` (same seeds), so the §2 trigger reproduces its event list exactly.
+        sims = [Simulation(RunSpec(; seed)) for seed in T4_SEEDS]
+        obs = map(sims) do sim
+            Δτ, nc = timestep(sim), redraw_interval(sim.noise)
+            (trigger = Probe(amplitude, SchmittTrigger(; Δt = Δτ)),
+             narrow = Probe(amplitude, SchmittTrigger(; ah = 0.3, ae = 0.15, Δt = Δτ)),
+             parity = Probe(parity, Series(; sizehint = steps(sim, T4_LENGTH) ÷ nc), nc))
+        end
+        Threads.@threads for k in eachindex(sims)
+            run!(sims[k], steps(sims[k], T4_LENGTH), obs[k])
+        end
+        quantile(x, p) = (y = sort(x); y[clamp(round(Int, p * (length(y) - 1)) + 1, 1, length(y))])
+        median(x) = quantile(x, 0.5)
+        frac(x, c) = count(<(c), x) / length(x)
+        r2(x) = round(x, digits = 2)
+        r3(x) = round(x, digits = 3)
+        # T4.13: the parity outside the event windows of every reversal, aborted reversal and excursion
+        Pall, P0, P1 = Float64[], Float64[], Float64[]
+        for (sim, o) in zip(sims, obs)
+            ev, P = value(o.trigger).events, value(o.parity).values
+            nc, Δτ = redraw_interval(sim.noise), timestep(sim)
+            t = [(nc * i) * Δτ for i in 1:length(P)]            # step index × Δτ, as the trigger times its events
+            append!(Pall, P)
+            append!(P0, P[outside_events(t, ev)])
+            append!(P1, P[outside_events(t, ev; pad = 1.0)])
+        end
+        @info "T4.13 parity outside event windows ($(length(T4_SEEDS)) seeds × $T4_LENGTH τ_d, every n_c steps): median 𝒫 = $(r3(median(P0))) over $(r3(length(P0) / length(Pall))) of the samples " *
+              "(quartiles $(r3(quantile(P0, 0.25))), $(r3(quantile(P0, 0.75))); 10th percentile $(r3(quantile(P0, 0.1))); fraction below −0.9: $(r3(frac(P0, -0.9)))); " *
+              "with 1 τ_d padding: $(r3(median(P1))) over $(r3(length(P1) / length(Pall))); whole run: $(r3(median(Pall)))"
+        @test_broken median(P0) < -0.9                 # HOS's "𝒫 ≃ −1" taken as a median below −0.9: not met, DISCREPANCIES.md DR-7
+        @test -1 < median(P0) < -0.7                   # dipole-dominated between events: E_S/E_A < 0.18
+        @test abs(median(P0) - median(Pall)) < 0.05    # the events occupy too little time to move the median
+        @test quantile(P0, 0.25) < -0.9                # a quarter of the time the symmetric part holds < 5% of the energy
+        # T4.14: reversal durations with the §2 definition (the |a| < a_h stretch) and the narrower band
+        d5 = reduce(vcat, [value(o.trigger).durations for o in obs])
+        d3 = reduce(vcat, [value(o.narrow).durations for o in obs])
+        @info "T4.14 reversal durations: a_h = 0.5 ($(length(d5)) reversals): median $(r2(median(d5))) τ_d, quartiles $(r2(quantile(d5, 0.25)))–$(r2(quantile(d5, 0.75))), mean $(r2(sum(d5) / length(d5))), " *
+              "fraction < 0.5 τ_d $(r3(frac(d5, 0.5))), < 2 τ_d $(r3(frac(d5, 2.0))), ≥ 5 τ_d $(r3(1 - frac(d5, 5.0))) (HOS: ~3 τ_d typical, fast events ~0.5 τ_d); " *
+              "a_h = 0.3 ($(length(d3)) reversals): median $(r2(median(d3))), quartiles $(r2(quantile(d3, 0.25)))–$(r2(quantile(d3, 0.75))), fraction < 0.5 τ_d $(r3(frac(d3, 0.5))), < 2 τ_d $(r3(frac(d3, 2.0))) (HSO: 0.5–2 τ_d)"
+        @test length(d5) == standard.summary.n_reversals          # the same trajectories as `standard`
+        @test 1.5 < median(d5) < 4.5
+        @test 0.1 < frac(d5, 0.5) < 0.35
+        @test 0.5 ≤ median(d3) ≤ 2.0
+        # Q9: the duration distribution across the forcing sweep with the §2 definition
+        for f in (4.4, 5.4, 6.4, 7.4, 8.4)
+            d = f == 6.4 ? d5 : value(sweep[f].pooled.trigger).durations
+            isempty(d) && continue
+            @info "Q9 f = $f: $(length(d)) reversals, duration median $(r2(median(d))) τ_d, quartiles $(r2(quantile(d, 0.25)))–$(r2(quantile(d, 0.75))), " *
+                  "mean $(r2(sum(d) / length(d))), fraction < 0.5 τ_d $(r3(frac(d, 0.5))), ≥ 5 τ_d $(r3(1 - frac(d, 5.0)))"
+            @test 0.3 < median(d) < 10
+        end
     end
 
     @testset "T4.17 convergence of the standard run at Δτ = 0.005 and N = 120 (diagnostic)" begin

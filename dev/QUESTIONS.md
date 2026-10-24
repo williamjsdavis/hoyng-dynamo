@@ -14,8 +14,7 @@ When a question is settled, write the answer under it with the runs that settled
 - **Q6. The Fig. 9 discrepancy** (T5.8) and whether Eq. A.1 removes it (T5.10).
 - **Q7. Dependence on the distribution of F** (Gaussian vs uniform vs ±1) at fixed variance. The Fokker–Planck theory only sees the second moment; rare-event tails might not.
 - **Q8. Seed-to-seed scatter** at fixed parameters (T4.18), to calibrate how much of the 519 vs 570 difference is realisation noise.
-- **Q9. Reversal duration** with a fixed, documented definition across the forcing sweep, since HOS (~3 τ_d) and HSO (0.5–2 τ_d) differ.
 
 ## Settled
 
-None yet.
+- **Q9. Reversal duration** with a fixed, documented definition across the forcing sweep, since HOS (~3 τ_d) and HSO (0.5–2 τ_d) differ. **Answer (2026-10-20, T4.14, `VALIDATION.md` §4):** with the §2 definition (the stretch with |a| < a_h = 0.5 around an odd number of zero crossings) the standard run gives a median of 2.6 τ_d and a mean of 3.4 τ_d, HOS's "~3 τ_d typical", with 19% of the reversals shorter than 0.5 τ_d, their "fast events"; with a_h = 0.3 the median is 0.8 τ_d and the quartiles 0.2–3.3 τ_d, HSO's "(0.5–2) τ_d". The two papers quote different definitions of the same distribution. Across the sweep (three seeds each) the median falls from 4.1 τ_d at f = 4.4 through 3.4, 2.6 and 1.7 to 0.76 τ_d at f = 8.4 while the mean stays at 3–4 τ_d: fast single-crossing reversals become the majority as the forcing rises (0 → 42% below 0.5 τ_d) while the long multi-crossing ones persist (36 → 18% above 5 τ_d).

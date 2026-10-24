@@ -161,7 +161,7 @@ Parity diagnostic (Brandenburg et al. 1989), p. 276:
 
 $$\mathcal P=\frac{\mathcal E_S-\mathcal E_A}{\mathcal E_S+\mathcal E_A} \qquad \text{(Eq. 28)}$$
 
-with ℰ_{S,A} = ∫_0^π (ℜT_{S,A})² sin θ dθ, T_S(θ) = T(θ) + T(π−θ), T_A(θ) = T(θ) − T(π−θ). Except during (aborted) reversals and excursions 𝒫 ≃ −1 (antisymmetric, dipolar).
+with ℰ_{S,A} = ∫_0^π (ℜT_{S,A})² sin θ dθ, T_S(θ) = T(θ) + T(π−θ), T_A(θ) = T(θ) − T(π−θ). Except during (aborted) reversals and excursions 𝒫 ≃ −1 (antisymmetric, dipolar). **Note:** in our reproduction of the standard run the median 𝒫 outside the (aborted) reversals and excursions is −0.82, with 𝒫 < −0.9 a third of the time; the symmetric part then carries about 10% of the toroidal energy, which is what the |a₁| ≈ 0.1–0.3 between events in Fig. 2 implies, so "≃ −1" is a loose description of the figure rather than a value. See `dev/DISCREPANCIES.md` DR-7.
 
 The coupled mode equations (29)–(31), Fokker–Planck equation (32)–(41) and reversal statistics (42)–(60) are derived results and are given in Section 6.
 

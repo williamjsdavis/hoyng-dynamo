@@ -436,3 +436,34 @@ function segmented(spec::RunSpec, τ_segment::Real, nsegments::Integer; seeds = 
     return (runs = runs, segments = segments, first_reversal = first_reversal)
 end
 
+
+"""
+    window_run(spec, τ0, τ1; every = 1) -> NamedTuple
+
+Re-run `spec` from τ = 0 and record the window τ0 < τ ≤ τ1 at full resolution (every
+`every` steps): the toroidal field `T` and the poloidal potential `P` at the nodes (M × n),
+the dipole amplitude `a`, the overtones `a1`, `a2`, the `parity`, the toroidal `energy` and
+the sample `time`s, with the grid's `θ` and the finished `sim`. The seed fixes the
+trajectory, so a window chosen from the event list of a run file reproduces that run's
+streams bitwise (HOS Figs. 3 and 4 are 6 τ_d windows at full resolution; `scripts/run_events.jl`).
+"""
+function window_run(spec::RunSpec{T}, τ0::Real, τ1::Real; every::Integer = 1) where {T}
+    every ≥ 1 || throw(ArgumentError("need every ≥ 1, got $every"))
+    sim = Simulation(spec)
+    n0, n1 = steps(sim, τ0), steps(sim, τ1)
+    0 ≤ n0 < n1 || throw(ArgumentError("need 0 ≤ τ0 < τ1, got $τ0, $τ1"))
+    run!(sim, n0)
+    nsamp = (n1 - n0) ÷ every
+    M = sim.model.grid.M
+    Tf, Pf = Matrix{T}(undef, M, nsamp), Matrix{T}(undef, M, nsamp)
+    a, 𝒫, energy, time = (Vector{T}(undef, nsamp) for _ in 1:4)
+    a1, a2 = Vector{Complex{T}}(undef, nsamp), Vector{Complex{T}}(undef, nsamp)
+    for j in 1:nsamp
+        run!(sim, every)
+        Tf[:, j] .= toroidal(sim)
+        Pf[:, j] .= poloidal(sim)
+        a[j], a1[j], a2[j] = amplitude(sim), overtone1(sim), overtone2(sim)
+        𝒫[j], energy[j], time[j] = parity(sim), toroidal_energy(sim), current_time(sim)
+    end
+    return (time = time, θ = sim.model.grid.θ, T = Tf, P = Pf, a = a, a1 = a1, a2 = a2, parity = 𝒫, energy = energy, sim = sim)
+end

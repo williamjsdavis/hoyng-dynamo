@@ -44,7 +44,7 @@ export NoNoise, update_noise!, AbstractFDistribution, GaussianF, UniformF, Binar
 export Model, State, Cache, AbstractStepper, ExponentialStepper, IMEXStepper, step!, timestep,
     dipole_amplitude, overtone_residual
 export Aggregator, fit!, value, Moments, Histogram, AutoCorrelation, Sampled, MovingAverage, smooth!,
-    Event, SchmittTrigger, CrossingGroups, ExclusionVariance, BinnedMean, even_quadratic_fit
+    Series, Event, SchmittTrigger, outside_events, CrossingGroups, ExclusionVariance, BinnedMean, even_quadratic_fit
 export BistableTheory, diffusion_constants, shape_parameters, diffusion_prefactor, diffusion_from_fit,
     drift, diffusion, potential, psi, dpsi, d2psi, phi, phi0_curvature, bistable, peak_amplitude,
     peak_log_density, peak_curvature, mean_amplitude, relative_variance, log_mean_reversal_time,
@@ -54,7 +54,7 @@ export BistableTheory, diffusion_constants, shape_parameters, diffusion_prefacto
     mean_reversal_time_quadrature
 export RunSpec, Diagnostics, Simulation, current_time, steps, amplitude, absamplitude, overtone, overtone1, overtone2,
     parity, toroidal, poloidal, toroidal_energy, d1_sample, d1_pair, Observer, Probe, observe!, flush!, run!,
-    standard_observers, summarize, pool!, ensemble, segmented
+    standard_observers, summarize, pool!, ensemble, segmented, window_run
 export ks_exponential, nelder_mead, fold_histogram, equal_population_bins, density_fit
 export RunFile, open_run, metadata, Recorder, SnapshotRecorder, read_stream, streams, write_results!, write_summary!,
     read_results, checkpoint!, restore!, checkpoint_step

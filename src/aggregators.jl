@@ -375,6 +375,51 @@ function value(d::SchmittTrigger{T}) where {T}
             durations = [e.stop - e.start for e in d.events if e.kind == :reversal], events = copy(d.events))
 end
 
+# ---------------------------------------------------------------- Series (stored samples)
+
+"""
+    Series(; T = Float64, sizehint = 0)
+
+Stores every sample fed to it, for diagnostics that need the whole series after the fact,
+such as the parity outside the event windows of a `SchmittTrigger` (gate T4.13). Memory
+grows with the run, so it serves finite diagnostics, not the open-ended statistics of a long
+run; `fit!` allocates only when the vector grows past its capacity (reserve it with
+`sizehint`). `merge!` appends; `value` gives `(n, values)`.
+"""
+struct Series{T} <: Aggregator
+    values::Vector{T}
+end
+function Series(; T::Type = Float64, sizehint::Integer = 0)
+    v = T[]
+    sizehint!(v, sizehint)
+    return Series{T}(v)
+end
+@inline fit!(s::Series{T}, x) where {T} = (push!(s.values, convert(T, x)); s)
+Base.merge!(a::Series{T}, b::Series{T}) where {T} = (append!(a.values, b.values); a)
+value(s::Series) = (n = length(s.values), values = copy(s.values))
+
+# ---------------------------------------------------------------- event windows
+
+"""
+    outside_events(times, events; pad = 0) -> BitVector
+
+`true` at every sample time that lies outside every window `[start − pad, stop + pad]` of
+`events` (the event list of a `SchmittTrigger`'s value, all kinds; the window is the stretch
+with |a| < a_h plus the sample that ended it). `times` must be increasing. HOS p. 276:
+"except during (aborted) reversals and excursions 𝒫 ≃ −1" (gate T4.13).
+"""
+function outside_events(times::AbstractVector{<:Real}, events::AbstractVector{<:Event}; pad::Real = 0)
+    pad ≥ 0 || throw(ArgumentError("pad must be ≥ 0, got $pad"))
+    issorted(times) || throw(ArgumentError("the sample times must be increasing"))
+    mask = trues(length(times))
+    for e in events
+        i1 = searchsortedfirst(times, e.start - pad)
+        i2 = searchsortedlast(times, e.stop + pad)
+        i1 ≤ i2 && (mask[i1:i2] .= false)
+    end
+    return mask
+end
+
 # ---------------------------------------------------------------- CrossingGroups (the papers' rule)
 
 """

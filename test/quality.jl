@@ -25,7 +25,7 @@ let model = Model(; kR = 0.5, Cm = 100.0, N = 60), cache = Cache(model)
     push!(HOT, (noise_projection, (model, zeros(model.grid.M))))
 end
 
-let aggs = (Moments(), Histogram(-3.0, 3.0, 600), AutoCorrelation(500; Δt = 0.01), Sampled(Moments(), 100),
+let aggs = (Moments(), Histogram(-3.0, 3.0, 600), AutoCorrelation(500; Δt = 0.01), Sampled(Moments(), 100), Series(; sizehint = 1000),
             SchmittTrigger(; Δt = 0.01), CrossingGroups(; Δt = 0.01), ExclusionVariance(; Δt = 0.01))
     for agg in aggs
         push!(HOT, (fit!, (agg, 0.9)))
@@ -68,6 +68,7 @@ end
 # The KS test and the χ² density fit allocate their buffers: inference only.
 push!(INFERRED, (ks_exponential, ([5.0, 7.5, 12.0, 30.0, 61.0, 140.0],)))
 push!(INFERRED, (density_fit, (collect(0.0:0.1:2.0), [0, 5, 40, 120, 300, 500, 600, 400, 150, 40, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0], 0.527, 0.763)))
+push!(INFERRED, (outside_events, ((1:5) .* 0.1, [Event{Float64}(:reversal, 0.2, 0.3, 0.0, 1, 0.25)])))
 
 # Run driver: the stepping loop with the standard observers in stream mode, and the extractors.
 let sim = Simulation(RunSpec(; seed = 1)), obs = standard_observers(sim)

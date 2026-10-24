@@ -165,6 +165,42 @@ ref_exclusion_pool(r1, r2) = ((r1.M2 + r2.M2) / (r1.n + r2.n - r1.intervals - r2
         @test_throws ArgumentError SchmittTrigger(; ah = 0.3, ae = 0.5)
     end
 
+    @testset "Series and outside_events" begin
+        s = Series(; sizehint = 10)
+        foreach(v -> fit!(s, v), 1:5)
+        @test value(s).n == 5 && value(s).values == 1.0:5.0 && eltype(value(s).values) == Float64
+        s2 = Series(; T = ComplexF64); fit!(s2, 1 + 2im)
+        @test value(s2).values == [1.0 + 2.0im]
+        t = Series(); foreach(v -> fit!(t, v), 6:7)
+        @test value(merge!(s, t)).values == 1.0:7.0
+        # the hand-built series of the SchmittTrigger test (Δt = 0.1): events at samples 3–5, 7–9,
+        # 11–13 and 14–17 (the sample that ends an event is inside its window); the dip at 18 is not an event
+        a = [1, 1, 0.2, -0.2, -1, -1, -0.1, 0.4, 1, 1, 0.1, 0.2, 1, 0.3, -0.3, 0.3, 1, 0.4, 1]
+        d = SchmittTrigger(; Δt = 0.1); foreach(v -> fit!(d, v), a)
+        ev = value(d).events
+        tt = [i * 0.1 for i in 1:19]                       # as the trigger computes its times (a range would round differently)
+        @test findall(outside_events(tt, ev)) == [1, 2, 6, 10, 18, 19]
+        @test findall(outside_events(tt, ev; pad = 0.15)) == [1, 19]
+        @test all(outside_events(tt, Event{Float64}[]))
+        @test outside_events([5.0, 6.0], ev) == [true, true]
+        @test_throws ArgumentError outside_events([2.0, 1.0], ev)
+        @test_throws ArgumentError outside_events(tt, ev; pad = -1)
+        # an AR(1) series with many events: between the first polarity and the last event, every
+        # sample outside the event windows has |x| ≥ a_e (a closer approach to zero is an event),
+        # and every sample inside one is in the band, the exit sample, or a jump across the band
+        x = zeros(20_000)
+        for i in 2:length(x)
+            x[i] = 0.9 * x[i-1] + 0.5 * randn(rng)
+        end
+        d3 = SchmittTrigger(; Δt = 1.0); foreach(v -> fit!(d3, v), x)
+        ev3 = value(d3).events
+        m3 = outside_events(1.0:20_000.0, ev3)
+        i0, i1 = findfirst(v -> abs(v) ≥ 0.5, x), round(Int, maximum(e.stop for e in ev3))
+        @test length(ev3) > 100
+        @test all(abs(x[i]) ≥ 0.3 for i in i0:i1 if m3[i])
+        @test all(abs(x[i]) < 0.5 || abs(x[i-1]) < 0.5 || sign(x[i]) != sign(x[i-1]) for i in findall(.!m3))
+    end
+
     @testset "CrossingGroups" begin
         # Δt = 0.1, W = 0.5: one crossing (reversal), two within W (aborted), three (reversal)
         s = ones(80)
