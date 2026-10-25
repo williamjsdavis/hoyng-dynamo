@@ -32,10 +32,9 @@ to `../figures/` (git-ignored):
 | `hso_fig01.py` | HSO Fig. 1: the Sint-800 VADM record with its errors, sign flipped beyond 780 ka | `sint800.h5` (`sint800_comparison.jl`; falls back to `data/sint800.tsv`) |
 | `sint800_fits.py` | HSO Fig. 6 top panels, HOS Fig. 10 and SOH Fig. 4: the VADM histograms with the χ² fits of Eq. 10, A.1 and 43 | `sint800.h5` |
 | `sint800_tau_d.py` | the systematic τ_d scan behind HSO §5.1: misfit against τ_d, best τ_d per window, the data curve against the model curves | `sint800.h5` |
-| `km_drift_diffusion.py` | drift and diffusion of a by online kernel-based regression against HOS's S(a) and D(a), and their lag dependence | `km_f<f>.h5` (`km_streaming.jl`) |
-| `km_moments.py` | the conditional moments M⁽¹⁾/τ and M⁽²⁾/τ of a against the lag, one curve per a over both signs of a (the bistable fold of the family), on linear and log lag axes, and against a at fixed lags with S(a) and D(a) (is the lag set well chosen?) | `km_f<f>.h5` |
 
 `hso_fig07.py` overlays the Sint-800 autocorrelation with its Monte-Carlo error bars when `sint800.h5` exists.
+The figures of the drift-and-diffusion investigation live with it, in the sibling repository `hoyng-dynamo-sde/viz/`.
 
 Shared modules: `runfile.py` (reader for the HDF5 layout of `dev/DECISIONS.md` D7),
 `eventwindows.py` (reader and the two-window figure for the files of `scripts/run_events.jl`) and

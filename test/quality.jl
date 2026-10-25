@@ -9,7 +9,6 @@
 using JET
 
 const HOT = Vector{Tuple{Any,Tuple}}()
-const INFERRED_LATER = Vector{Tuple{Any,Tuple}}()      # appended to INFERRED once it is defined below
 
 let model = Model(; kR = 0.5, Cm = 100.0, N = 60), cache = Cache(model)
     noise = BinnedNoise(model, 0.01; f = 6.4, seed = 1)
@@ -45,15 +44,8 @@ let aggs = (Moments(), Histogram(-3.0, 3.0, 600), AutoCorrelation(500; Δt = 0.0
     push!(HOT, (smooth!, (MovingAverage(50), 0.9)))
     # merge! of the O(1)/fixed-size aggregators; the event detectors append their event lists
     for make in (Moments, () -> Histogram(-3.0, 3.0, 600), () -> AutoCorrelation(500), () -> Sampled(Moments(), 100),
-                 ExclusionVariance, () -> BinnedMean(0.0, 1.5, 30), () -> ConditionalMoments(range(-1.5, 1.5; length = 61); h = 0.1, lags = 40))
+                 ExclusionVariance, () -> BinnedMean(0.0, 1.5, 30))
         push!(HOT, (merge!, (make(), make())))
-    end
-    # the online kernel-based regression, with its ring buffer full so that every lag is updated
-    for K in (Epanechnikov(), Boxcar(), Triangular()), lags in (40, log_lags(200))
-        cm = ConditionalMoments(range(-1.5, 1.5; length = 61); h = 0.1, lags, Δt = 0.05, kernel = K)
-        foreach(v -> fit!(cm, v), 0.9 .+ 0.1 .* sin.(1:250))
-        push!(HOT, (fit!, (cm, 0.9)))
-        push!(INFERRED_LATER, (kramers_moyal, (cm,)))
     end
 end
 
@@ -62,7 +54,6 @@ end
 # escape integral, whose inner quadgk goes through a BatchIntegrand precisely so that JET
 # stays clean (see the comment in theory.jl).
 const INFERRED = Vector{Tuple{Any,Tuple}}()
-append!(INFERRED, INFERRED_LATER)
 let th = BistableTheory(2.96, 0.246), thA = BistableTheory(4.8, 0.22; μ = 1.45 * 0.527)
     for t in (th, thA)
         for f in (diffusion_constants, peak_amplitude, peak_log_density, peak_curvature, relative_variance,
@@ -99,11 +90,6 @@ let sim = Simulation(RunSpec(; seed = 1)), obs = standard_observers(sim)
               noise_diffusion_sample, continuum_diffusion_sample, noise_diffusion_pair, continuum_diffusion_pair)
         push!(HOT, (f, (sim,)))
     end
-    # the drift/diffusion probes beside the standard set (stream mode)
-    both = merge(standard_observers(sim), drift_diffusion_observers(sim))
-    run!(sim, 60, both)                                 # fill the ring buffer so that every lag is updated
-    push!(HOT, (run!, (sim, 10, both)))
-    push!(HOT, (observe!, (both, sim)))
 end
 
 # Specialised on f and the argument types so the call is inferred: a dynamically

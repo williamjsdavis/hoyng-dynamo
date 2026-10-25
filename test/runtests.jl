@@ -21,7 +21,6 @@ relerr(x, ref) = abs(x - ref) / abs(ref)        # shared by the tier files
     include("stepper.jl")
     include("quenching.jl")
     include("aggregators.jl")
-    include("conditional_moments.jl")
     include("stats.jl")
     include("run_io.jl")
     include("quality.jl")

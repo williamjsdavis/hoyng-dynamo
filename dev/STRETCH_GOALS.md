@@ -26,4 +26,4 @@ Work deliberately outside the build order of `DEVELOPMENT.md` §4, to be taken u
 ## Not stretch goals
 
 - Tier 6, the Sint-800 comparison, was deferred (`VALIDATION.md`, `DEVELOPMENT.md` §4 item 8) because it needs the palaeomagnetic record, not the papers. Reopened by the user and done on 2026-10-24 once the record was found in the supplementary information of Guyodo & Valet (1999): `data/`, `src/sint800.jl`, `VALIDATION.md` §4.
-- The streamed drift/diffusion estimator (`ConditionalMoments`, 2026-10-24) is a research tool for the user's parameter sweeps and phase diagrams (`QUESTIONS.md` Q10, `DEVELOPMENT.md` §4 item 9), not a validation item.
+- The streamed drift/diffusion estimator (`ConditionalMoments`, 2026-10-24) is a research tool for the user's parameter sweeps and phase diagrams, not a validation item; it was moved on 2026-10-25 to the sibling repository `hoyng-dynamo-sde` together with its notes (`QUESTIONS.md` Q10 keeps a pointer).
