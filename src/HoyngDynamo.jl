@@ -15,7 +15,7 @@ Package layout (`dev/DECISIONS.md` D10), in build order:
 - `grid.jl`         colatitude nodes, quadrature weights, the operators L and shear
 - `eigen.jl`        G(C), eigenmodes and weighted adjoints, the critical dynamo number C₀
 - `noise.jl`        the stochastic α: binned, piecewise-constant F(θ, τ), forcing schedules
-- `stepper.jl`      constant-memory time steppers (exponential integrator, IMEX Euler, θ-method)
+- `stepper.jl`      constant-memory time steppers (exponential integrator, IMEX Euler, θ-method) and the quenching laws
 - `aggregators.jl`  running statistics behind `fit!`, `merge!`, `value`
 - `theory.jl`       the Fokker–Planck formula module (closed forms and quadratures)
 - `stats.jl`        statistics for the gates: KS test for exponential intervals, χ² fit of p(a) to a histogram
@@ -42,7 +42,8 @@ export NoNoise, update_noise!, AbstractFDistribution, GaussianF, UniformF, Binar
     AbstractForcing, ConstantForcing, LinearRamp, forcing, run_seed, BinnedNoise, redraw!,
     redraw_interval, noise_projection, binned_D0
 export Model, State, Cache, AbstractStepper, ExponentialStepper, IMEXStepper, ThetaStepper, BackwardEulerStepper,
-    CrankNicolsonStepper, step!, timestep, dipole_amplitude, overtone_residual, amplification_matrix, mode_factor
+    CrankNicolsonStepper, step!, timestep, dipole_amplitude, overtone_residual, amplification_matrix, mode_factor,
+    AbstractQuenching, AmplitudeQuenching, EnergyQuenching, InverseQuenching, LocalQuenching, quenching!, quenching, calibrate, floored
 export Aggregator, fit!, value, Moments, Histogram, AutoCorrelation, Sampled, MovingAverage, smooth!,
     Series, Event, SchmittTrigger, outside_events, CrossingGroups, ExclusionVariance, BinnedMean, even_quadratic_fit
 export BistableTheory, diffusion_constants, shape_parameters, diffusion_prefactor, diffusion_from_fit,

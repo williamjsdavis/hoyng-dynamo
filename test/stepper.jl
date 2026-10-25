@@ -21,7 +21,7 @@ using LinearAlgebra, Random
         st = State(model, b)
         cache = Cache(model)
         cache.v .= v                                     # NoNoise leaves cache.v as set
-        c = HoyngDynamo.quenching_coefficient(sp, b, v, st.a)
+        c = quenching!(cache, quenching(sp), sp, b, st.a)[1]     # the amplitude law fills a constant
         V = zeros(2M, 2M)
         V[1:M, M+1:2M] .= Diagonal(v)
         A = G .+ c .* E

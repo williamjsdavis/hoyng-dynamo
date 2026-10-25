@@ -17,6 +17,13 @@ let model = Model(; kR = 0.5, Cm = 100.0, N = 60), cache = Cache(model)
                CrankNicolsonStepper(model, 0.01; implicit_noise = true)), nz in (NoNoise(), noise)
         push!(HOT, (step!, (State(model, 0.1 .* model.b0), sp, nz, cache)))
     end
+    # the alternative quenching laws (SG-2) through the production stepper and the θ-method
+    for law in (EnergyQuenching(), InverseQuenching(), LocalQuenching(0.55), EnergyQuenching(; floored = true), LocalQuenching(0.55; floored = true))
+        push!(HOT, (step!, (State(model, 0.1 .* model.b0), ExponentialStepper(model, 0.01; quenching = law), noise, cache)))
+        push!(HOT, (quenching!, (cache, law, ExponentialStepper(model, 0.01; quenching = law), 0.1 .* model.b0, 0.1)))
+    end
+    push!(HOT, (step!, (State(model, 0.1 .* model.b0), BackwardEulerStepper(model, 0.01; quenching = LocalQuenching(0.55)), noise, cache)))
+    push!(HOT, (step!, (State(model, 0.1 .* model.b0), IMEXStepper(model, 0.01; quenching = EnergyQuenching()), NoNoise(), cache)))
     for nz in (noise, ramped), n in (0, 1)          # redraw step and quiet step
         push!(HOT, (update_noise!, (zeros(model.grid.M), nz, n)))
     end

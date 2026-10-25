@@ -58,7 +58,7 @@ function write_metadata!(file::RunFile, spec::RunSpec{T}) where {T}
     a["float_type"] = string(T)
     a["kR"] = spec.kR; a["Cm"] = spec.Cm; a["N"] = spec.N; a["dtau"] = spec.Δτ
     a["tau_c"] = spec.τc; a["Nc"] = spec.Nc; a["seed"] = spec.seed
-    a["stepper"] = String(spec.stepper); a["a0"] = spec.a0
+    a["stepper"] = String(spec.stepper); a["quenching"] = String(spec.quenching); a["a0"] = spec.a0
     a["distribution"] = string(nameof(typeof(spec.distribution)))
     a["schedule"] = string(nameof(typeof(spec.schedule)))
     for name in fieldnames(typeof(spec.schedule))
@@ -90,7 +90,8 @@ function RunSpec(file::RunFile)
         error("unknown forcing schedule $(m["schedule"])")
     end
     RunSpec(; kR = m["kR"], Cm = m["Cm"], N = m["N"], Δτ = m["dtau"], schedule = sched, τc = m["tau_c"], Nc = m["Nc"],
-            distribution = DISTRIBUTIONS[m["distribution"]], seed = m["seed"], stepper = Symbol(m["stepper"]), a0 = m["a0"], T)
+            distribution = DISTRIBUTIONS[m["distribution"]], seed = m["seed"], stepper = Symbol(m["stepper"]),
+            quenching = Symbol(get(m, "quenching", "amplitude")), a0 = m["a0"], T)
 end
 
 # ---------------------------------------------------------------------------------------

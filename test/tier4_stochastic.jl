@@ -1,6 +1,6 @@
 # Tier 4: stochastic runs, quantitative (slow). Gates T4.1–T4.18 in dev/VALIDATION.md.
 # Build step 6 covers the standard run (T4.1–T4.4), build step 7 the forcing sweep (T4.5–T4.7,
-# T4.11, T4.12, T4.17, T4.18), the HSO runs (T4.8, T4.9), the SOH runs (T4.10, T4.15) and the
+# T4.11, T4.12, T4.16, T4.17, T4.18), the HSO runs (T4.8, T4.9), the SOH runs (T4.10, T4.15) and the
 # event-level diagnostics (T4.13, T4.14). Definitions of
 # VALIDATION.md §2: Schmitt trigger a_h = 0.5, a_e = 0.3; exclusion variance W = 5 τ_d; dv on
 # |a| at 1 τ_d; D₁/ℱ bin averages of width 0.05 fitted for |a| ≤ 1.1 weighted by the bin
@@ -260,6 +260,44 @@ const TABLE_II = Dict(4.4 => (c2 = 0.318, γ = 9.04, var = 0.03, Tr = 10700.0, e
             @test abs(s.variance - ref.variance) < 0.02
             @test abs(s.dv - ref.dv) < 0.02
             @test relerr(s.d1_fit.c0, ref.d1_fit.c0) < 0.05
+        end
+    end
+
+    @testset "T4.16 alternative quenching laws (SG-2): dipole statistics \"not materially changed\"" begin
+        # HOS p. 277: q from the toroidal energy, α/(1 + q), local quenching. With h = 1 − q the
+        # energy and local laws reverse the sign of α under an overtone burst and run away
+        # (test/quenching.jl, DISCREPANCIES.md DR-8), so the comparison uses their floored
+        # variants (α suppressed, never reversed) and the inverse law, which needs no floor.
+        # Result 2026-10-24 (VALIDATION.md §4): the gate's "⟨T_r⟩, variance within ~20%" holds for
+        # the floored papers' law (the floor is immaterial for it), for the ⟨T_r⟩ of the inverse law
+        # only (its variability is 40–50% higher: the well is shallower, the barrier the same), and
+        # for neither statistic of the floored energy and local laws, which reverse 2–7 times more
+        # often. The 20% criteria stay as @test_broken where they fail.
+        ref = standard.summary
+        for (label, q, rate_holds) in (("papers' law, floored", :amplitude_floored, true), ("α/(1 + q)", :inverse, true),
+                                       ("q from the toroidal energy, floored", :energy_floored, false), ("local quenching, floored", :local_floored, false))
+            e = ensemble(RunSpec(; quenching = q), T4_LENGTH; seeds = T4_SEEDS)
+            s = e.summary
+            report("T4.16 $label", e)
+            @info "T4.16 $label against the papers' law: ⟨T_r⟩ ratio $(round(s.mean_reversal_time / ref.mean_reversal_time, digits = 3)); " *
+                  "§2 variance $(round(s.variance, digits = 3)) vs $(round(ref.variance, digits = 3)); dv $(round(s.dv, digits = 3)) vs $(round(ref.dv, digits = 3)); " *
+                  "D₁ fit $(round(s.d1_fit.c0, digits = 2)) + $(round(s.d1_fit.c2, digits = 2)) a² vs $(round(ref.d1_fit.c0, digits = 2)) + $(round(ref.d1_fit.c2, digits = 2)) a²"
+            @test s.n_reversals > 100
+            if q === :amplitude_floored
+                @test relerr(s.mean_reversal_time, ref.mean_reversal_time) < 0.05
+                @test relerr(s.dv, ref.dv) < 0.05
+                @test relerr(s.variance, ref.variance) < 0.05
+                continue
+            end
+            if rate_holds
+                @test relerr(s.mean_reversal_time, ref.mean_reversal_time) < 0.2
+            else
+                @test_broken relerr(s.mean_reversal_time, ref.mean_reversal_time) < 0.2
+                @test 0.1 < s.mean_reversal_time / ref.mean_reversal_time < 0.6     # two to seven times the reversal rate, stably
+            end
+            @test_broken relerr(s.dv, ref.dv) < 0.2
+            @test_broken relerr(s.variance, ref.variance) < 0.2
+            @test s.dv > 1.2 * ref.dv                                                # every alternative raises the variability
         end
     end
 

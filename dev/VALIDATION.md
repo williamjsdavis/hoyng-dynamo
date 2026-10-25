@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence), the HSO runs T4.8, T4.9 and the SOH runs T4.10, T4.15 passed the same day; T4.14 passed and T4.13 was recorded on 2026-10-20 (the median parity outside events is −0.82, not below −0.9: `DISCREPANCIES.md` DR-7); only the stretch goal T4.16 remains; the integrator-sensitivity stretch goal SG-1 was done on 2026-10-24 and excludes the time integrator as the cause of DR-5. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.3, T5.4 (HOS Figs. 3, 4) were rendered on 2026-10-20 and judged satisfactory by the user on 2026-10-24, as were T5.5, T5.6, T5.9, T5.10, T5.11, T5.12, T5.13 (HOS Figs. 5, 6; HSO Figs. 3, 6, 7, 8; SOH Fig. 3) the same day: Tier 5 complete. Results in §4.
+Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence), the HSO runs T4.8, T4.9 and the SOH runs T4.10, T4.15 passed the same day; T4.14 passed and T4.13 was recorded on 2026-10-20 (the median parity outside events is −0.82, not below −0.9: `DISCREPANCIES.md` DR-7); the stretch goals were done on 2026-10-24: SG-1 excludes the time integrator as the cause of DR-5, and SG-2 recorded T4.16 as not met (the alternative quenching laws change the statistics or run away, `DISCREPANCIES.md` DR-8). Every gate of Tiers 0–5 is now passed or recorded. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.3, T5.4 (HOS Figs. 3, 4) were rendered on 2026-10-20 and judged satisfactory by the user on 2026-10-24, as were T5.5, T5.6, T5.9, T5.10, T5.11, T5.12, T5.13 (HOS Figs. 5, 6; HSO Figs. 3, 6, 7, 8; SOH Fig. 3) the same day: Tier 5 complete. Results in §4.
 
 ## 1. Conventions
 
@@ -96,7 +96,7 @@ All runs: 60 points, Δτ = 0.01, 5×10⁴ τ_d unless stated; definitions of §
 | T4.13 | Parity 𝒫 ≃ −1 between reversals | — | median 𝒫 outside event windows < −0.9 | Eq. 28, p. 276 | D |
 | T4.14 | Reversal durations | ~3 τ_d typical, fast events ~0.5 τ_d (HOS); 0.5–2 τ_d (HSO, different definition); quadrupole period ≈ 1.1 τ_d visible | report distribution with the stated definition | HOS p. 277; HSO p. 151 | D |
 | T4.15 | SOH ramped run, f linear 4 → 6.5 over 5×10⁴ τ_d | rms variability 17% → 41%; chrons shorten drastically; first chron ≈ 1.9×10⁴ τ_d [approximate read-off] | 20% on the rms values; shape by user | SOH Fig. 3, p. 123 | A/J |
-| T4.16 | Robustness regression: alternative quenching (q from total toroidal energy; α/(1+q); local quenching) | dipole statistics "not materially changed" | ⟨T_r⟩, variance within ~20% | HOS pp. 277, 281 | D, stretch goal (`STRETCH_GOALS.md` SG-2) |
+| T4.16 | Robustness regression: alternative quenching (q from total toroidal energy; α/(1+q); local quenching) | dipole statistics "not materially changed" | ⟨T_r⟩, variance within ~20% | HOS pp. 277, 281 | D, stretch goal (`STRETCH_GOALS.md` SG-2); recorded 2026-10-24, not met (§4) |
 | T4.17 | Convergence of T4.1–T4.2 at 120 points and at Δτ = 0.005 | — | within statistical error | — | D |
 | T4.18 | HOS run 2 vs HSO reference run, nominally identical: 519 ± 53 vs 570 ± 61 | — | our seed-to-seed scatter at f = 5.4 should cover both | Table II; HSO p. 146 | D |
 
@@ -438,6 +438,43 @@ The IMEX under-damps the first overtone by 12% and backward Euler over-damps it 
 - The hypothesis fails its own test: no scheme reaches the paper's 1.36 ± 0.1 at f = 6.4 (1.34 at 5.4) while keeping ⟨T_r⟩ within 107 ± 5 (519 ± 53). The nearest, fully implicit backward Euler, gives 1.45 and 1.54 at ⟨T_r⟩ = 129.5 ± 3.8 and 704 ± 48, 3.6σ and 2.6σ from the paper's values; at f = 7.4, where the exponential stepper already matches the paper's intercept (1.62), the same scheme would spoil both numbers (1.38; 45.0 against 37.6 ± 1). The variances are insensitive to the scheme (dv within 0.01, §2 variance within 0.02), as DR-5 already noted of the IMEX.
 - The shape of D₁(a) is also not an integrator effect: c₂/c₀ of the weighted fit is 1.15–1.25 for every scheme but the IMEX (0.97) at f = 6.4, against the paper's 1.47. The unweighted fit through the bin means is within 0.05–0.10 of the paper's intercept at all three forcings (1.39, 1.46, 1.58 against 1.34, 1.36, 1.62), the weighted one only at f = 7.4.
 - Conclusion for DR-5: the papers' unstated time-integration scheme does not explain the intercept gap, within the family of implicit schemes a 2000-era code at Δτ = 0.01 could have used (the diffusion stiffness rules out explicit ones). The remaining candidates are the fit procedure (weighting, the range |a| ≤ 1.1, the paper's histogram binning), the alignment of the noise bins with the grid, and the finite-difference forms of L and of the shear term; DR-5 stays open as a reproduction gap.
+
+### Stretch goal SG-2, alternative quenching laws, gate T4.16 (2026-10-24): recorded, not met; the alternatives are not immaterial
+
+`scripts/sg2_quenching.jl` (`-t 4`, 8 min; the tables are also in `results/sg2_quenching.md`). The nonlinearity is now a pluggable law (`AbstractQuenching` in `src/stepper.jl`, `DECISIONS.md` D3 note, selected by `RunSpec(quenching = …)`): the papers' `AmplitudeQuenching` (c = s(1 − a²); bitwise the previous code, `test/quenching.jl`) and HOS's three alternatives of p. 277, `EnergyQuenching` (q from the toroidal energy Σ w T² instead of a² alone, c = s(1 − E_T)), `InverseQuenching` (α/(1 + q), c = s(1 − a²)/(1 + s a²)) and `LocalQuenching` (α(θ)(1 − κ T(θ)²), c_j = s − (1 + s) κ T_j², with κ = 0.551 calibrated so that the equilibrium has a = 1; the sin θ-mean of q over b₀ would need 2q₀ = 0.842). `floored = true` clamps c ≥ −1: the α-effect is suppressed to zero, never reversed. Standard run at f = 6.4, 5.4 and 7.4, three seeds × 5×10⁴ τ_d pooled. The deterministic equilibria first:
+
+| law | coefficient c | relaxation rate about a = 1 | equilibrium ‖b − a b₀‖ | equilibrium toroidal energy | parity |
+|---|---|---|---|---|---|
+| amplitude (papers) | s(1 − a²) | 1.526 (= 2μ) | 10⁻¹² | 1 | −1 |
+| energy | s(1 − Σ w T²) | 1.077 | 10⁻¹² | 1 | −1 |
+| inverse | s(1 − a²)/(1 + s a²) | 0.883 (= 2μ/(1 + s)) | 10⁻¹² | 1 | −1 |
+| local | s − (1 + s) κ T(θ)² | 2.403 | 0.68 | 1.21 | −1 |
+
+| f = 6.4 | ⟨T_r⟩ | reversals | §2 var | dv | weighted D₁ fit | D₁(0) direct | D₁ bin 0.95–1.0 | (c², γ) |
+|---|---|---|---|---|---|---|---|---|
+| amplitude | 104.7 ± 2.8 | 1433 | 0.142 | 0.160 | 1.58 + 1.91a² | 1.24 | 3.33 | (0.291, 3.02) |
+| amplitude, floored | 104.7 ± 2.8 | 1432 | 0.144 | 0.161 | 1.59 + 1.90a² | 1.23 | 3.35 | (0.292, 3.02) |
+| inverse | 98.2 ± 2.5 | 1528 | 0.202 | 0.223 | 1.31 + 2.36a² | 1.13 | 3.61 | (0.223, 2.79) |
+| energy | diverged at τ = 475, ≈ 143, 192 (seeds 1–3) | | | | | | | |
+| energy, floored | 36.6 ± 0.6 | 4102 | 0.204 | 0.233 | 2.41 + 0.48a² | 2.52 | 2.95 | (0.600, 4.10) |
+| local | diverged at τ = 402, 116 (seeds 1, 2) | | | | | | | |
+| local, floored | 32.5 ± 0.5 | 4618 | 0.252 | 0.283 | 2.36 + 1.35a² | 2.25 | 3.65 | (0.483, 3.37) |
+| paper | 107 ± 5 | | | 0.16 | 1.36 + 2.00a² | | | (0.246, 2.96) |
+
+| f = 5.4 | ⟨T_r⟩ | §2 var | dv | weighted D₁ fit | (c², γ) | | f = 7.4 | ⟨T_r⟩ | §2 var | dv | weighted D₁ fit | (c², γ) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| amplitude | 526 ± 31 | 0.068 | 0.073 | 1.64 + 0.75a² | (0.382, 5.39) | | amplitude | 37.0 ± 0.6 | 0.263 | 0.301 | 1.62 + 3.37a² | (0.234, 1.78) |
+| amplitude, floored | 526 ± 31 | 0.068 | 0.073 | 1.63 + 0.76a² | (0.381, 5.38) | | amplitude, floored | 37.4 ± 0.6 | 0.274 | 0.311 | 1.65 + 3.33a² | (0.240, 1.79) |
+| inverse | 497 ± 29 | 0.103 | 0.108 | 1.23 + 1.29a² | (0.255, 4.79) | | inverse | 35.9 ± 0.6 | 0.365 | 0.419 | 1.47 + 3.87a² | (0.198, 1.66) |
+| energy | diverged (τ = 1556, seed 1) | | | | | | energy | diverged | | | | |
+| energy, floored | 104.8 ± 2.8 | 0.110 | 0.123 | 2.30 − 0.35a² | (0.723, 7.25) | | energy, floored | 18.4 ± 0.2 | 0.355 | 0.387 | 2.54 + 2.04a² | (0.456, 2.20) |
+| local | diverged (τ = 558, seed 1) | | | | | | local | diverged | | | | |
+| local, floored | 75.5 ± 1.7 | 0.150 | 0.170 | 2.32 + 0.38a² | (0.593, 5.90) | | local, floored | 18.3 ± 0.2 | 0.417 | 0.450 | 2.39 + 3.13a² | (0.359, 1.84) |
+
+- The energy and local laws with h = 1 − q run away at every forcing: an overtone burst lifts their quenching measure past the point where the α-effect reverses sign (E_T > 1 + 1/s = 2.37, or κ T² > 1 locally), and the α-reversed αΩ dynamo is as supercritical as the normal one (the operator is mirror-symmetric under C → −C: Λ = 0.528 at C = −100), so the growing field drives the reversal further and the run overflows within a diffusion time (`DISCREPANCIES.md` DR-8). The papers' law escapes because q depends on a alone: its brief reversed-α episodes (|a| up to 2.5, E_T up to 17 in the standard run) are immaterial, the floored version agreeing with it to 0.1% in ⟨T_r⟩ and 1–4% in the variances.
+- The inverse law keeps the reversal rate but not the variability: ⟨T_r⟩ −6%, −6%, −3% at f = 6.4, 5.4, 7.4 (within the gate), the §2 variance and dv +40–50% (0.202 and 0.223 against 0.142 and 0.160 at f = 6.4). The restoring rate about a = ±1 is 2μ/(1 + s) = 0.88 instead of 1.53, so the well is shallower, while the barrier near a = 0, where c → s under either law, is the same. Its D₁ fit at f = 6.4, 1.31 + 2.36a² with (c², γ) = (0.223, 2.79), happens to lie near the paper's 1.36 + 2.00a², (0.246, 2.96), but its variance does not match the paper's 0.16, which the papers' law reproduces.
+- The floored energy and local laws change the statistics materially: ⟨T_r⟩ falls to 36.6 and 32.5 τ_d at f = 6.4 (−65%, −69%), 105 and 76 at f = 5.4 (−80%, −86%) and 18.4 and 18.3 at f = 7.4 (−50%, −51%); the variances rise by 35–135%; D₁(0) doubles (2.5 against 1.2) while D₁ at |a| ≈ 1 changes little, so the quadratic fits flatten. A quenching that counts the overtone energy, or the local field, switches the α-effect off exactly during the bursts that drive reversals, removing the dipole's supercritical restoring force when it is needed, so the dipole reverses two to seven times more often.
+- Gate T4.16 (kind D): recorded, not met. The inverse law meets the ⟨T_r⟩ half of "⟨T_r⟩, variance within ~20%" and fails the variance half; the energy and local laws fail both, or diverge. HOS's "no material change in the dipole statistics" (p. 277) is reproduced only for the reversal rate under law (2); the paper does not say how its alternatives were bounded, which modes entered q, or how long they ran (DR-8; the resource file carries a Note). The testset keeps the 20% criteria as `@test_broken` beside assertions on what holds: the inverse law's ⟨T_r⟩ within 20%, the floored laws stable with two to seven times the reversal rate, every alternative raising dv, and the floored papers' law within 5% of the unfloored.
 
 ### Tier 4, forcing-parameter invariance T4.12 (2026-10-20): recorded, the invariance is broken by the bin width
 

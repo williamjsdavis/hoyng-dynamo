@@ -7,17 +7,22 @@
 "The steppers `RunSpec` accepts; `make_stepper` builds them."
 const STEPPERS = (:exponential, :imex, :backward_euler, :crank_nicolson, :backward_euler_implicit_noise,
                   :crank_nicolson_implicit_noise)
+"The quenching laws `RunSpec` accepts (`AbstractQuenching`); `make_quenching` builds them."
+const QUENCHINGS = (:amplitude, :energy, :inverse, :local, :amplitude_floored, :energy_floored, :local_floored)
 
 """
     RunSpec(; kR = 0.5, Cm = 100.0, N = 60, Δτ = 0.01, f = 6.4, schedule = ConstantForcing(f),
             τc = 0.05, Nc = 10, distribution = GaussianF(), seed = 1, stepper = :exponential,
-            a0 = 1.0, T = Float64)
+            quenching = :amplitude, a0 = 1.0, T = Float64)
 
 Every parameter of a run. `schedule` is the forcing f(τ) (`ConstantForcing`, `LinearRamp`);
 `stepper` is one of `STEPPERS`: `:exponential` (production), `:imex`, and the SG-1 sensitivity
 steppers `:backward_euler`, `:crank_nicolson`, `:backward_euler_implicit_noise`,
-`:crank_nicolson_implicit_noise` (`ThetaStepper`); the initial state is `a0 · b₀`, the
-fundamental mode at amplitude `a0` (a = ±1 is the nonlinear equilibrium). The defaults are HOS's standard
+`:crank_nicolson_implicit_noise` (`ThetaStepper`); `quenching` is one of `QUENCHINGS`: `:amplitude`
+(the papers' law, q = q₀a²), the SG-2 alternatives `:energy`, `:inverse`, `:local`, or the
+`_floored` variants with the α-effect suppressed but never reversed (`AbstractQuenching`; the
+local law's constant is calibrated by `Simulation`); the initial
+state is `a0 · b₀`, the fundamental mode at amplitude `a0` (a = ±1 is the nonlinear equilibrium). The defaults are HOS's standard
 run (footnote 1, p. 273).
 """
 struct RunSpec{T<:AbstractFloat,D<:AbstractFDistribution,S<:AbstractForcing{T}}
@@ -31,35 +36,37 @@ struct RunSpec{T<:AbstractFloat,D<:AbstractFDistribution,S<:AbstractForcing{T}}
     schedule::S
     seed::UInt64
     stepper::Symbol
+    quenching::Symbol
     a0::T
 end
 
 function RunSpec(; kR = 0.5, Cm = 100.0, N::Integer = 60, Δτ = 0.01, f = 6.4, schedule = nothing, τc = 0.05,
                  Nc::Integer = 10, distribution::AbstractFDistribution = GaussianF(), seed::Integer = 1,
-                 stepper::Symbol = :exponential, a0 = 1.0, T::Type{<:AbstractFloat} = Float64)
+                 stepper::Symbol = :exponential, quenching::Symbol = :amplitude, a0 = 1.0, T::Type{<:AbstractFloat} = Float64)
     stepper in STEPPERS || throw(ArgumentError("stepper must be one of $STEPPERS, got $stepper"))
+    quenching in QUENCHINGS || throw(ArgumentError("quenching must be one of $QUENCHINGS, got $quenching"))
     sched = schedule === nothing ? ConstantForcing(T(f)) : schedule
     sched isa AbstractForcing{T} || throw(ArgumentError("the forcing schedule must have element type $T"))
     RunSpec{T,typeof(distribution),typeof(sched)}(T(kR), T(Cm), Int(N), T(Δτ), T(τc), Int(Nc), distribution, sched,
-                                                   UInt64(seed), stepper, T(a0))
+                                                   UInt64(seed), stepper, quenching, T(a0))
 end
 
 """
     RunSpec(spec::RunSpec; kwargs...)
 
 A copy of `spec` with the given fields replaced: `seed`, `f` (a new `ConstantForcing`),
-`schedule`, `τc`, `Nc`, `N`, `Δτ`, `kR`, `Cm`, `distribution`, `stepper`, `a0`.
+`schedule`, `τc`, `Nc`, `N`, `Δτ`, `kR`, `Cm`, `distribution`, `stepper`, `quenching`, `a0`.
 """
 function RunSpec(spec::RunSpec{T}; f = nothing, schedule = nothing, kR = spec.kR, Cm = spec.Cm, N = spec.N,
                  Δτ = spec.Δτ, τc = spec.τc, Nc = spec.Nc, distribution = spec.distribution, seed = spec.seed,
-                 stepper = spec.stepper, a0 = spec.a0) where {T}
+                 stepper = spec.stepper, quenching = spec.quenching, a0 = spec.a0) where {T}
     sched = schedule !== nothing ? schedule : (f !== nothing ? ConstantForcing(T(f)) : spec.schedule)
-    return RunSpec(; kR, Cm, N, Δτ, schedule = sched, τc, Nc, distribution, seed, stepper, a0, T)
+    return RunSpec(; kR, Cm, N, Δτ, schedule = sched, τc, Nc, distribution, seed, stepper, quenching, a0, T)
 end
 
 Base.show(io::IO, s::RunSpec{T}) where {T} =
     print(io, "RunSpec{$T}(kR = $(s.kR), C_m = $(s.Cm), N = $(s.N), Δτ = $(s.Δτ), $(s.schedule), τ_c = $(s.τc), N_c = $(s.Nc), ",
-          "$(nameof(typeof(s.distribution))), seed = $(s.seed), $(s.stepper), a0 = $(s.a0))")
+          "$(nameof(typeof(s.distribution))), seed = $(s.seed), $(s.stepper), $(s.quenching), a0 = $(s.a0))")
 
 """
     Diagnostics(model; K = 2)
@@ -112,15 +119,29 @@ function Simulation(spec::RunSpec{T}) where {T}
     return Simulation(spec, model, make_stepper(spec, model), noise, state, Cache(model), Diagnostics(model))
 end
 
-"The stepper `spec.stepper` names, built for `model` (see `STEPPERS`)."
+"The quenching law `spec.quenching` names (see `QUENCHINGS`); the local law is calibrated for `model` at `spec.Δτ`."
+function make_quenching(spec::RunSpec{T}, model::Model{T}) where {T}
+    q = spec.quenching
+    q === :amplitude && return AmplitudeQuenching()
+    q === :energy && return EnergyQuenching()
+    q === :inverse && return InverseQuenching()
+    q === :local && return calibrate(LocalQuenching, model, spec.Δτ)
+    q === :amplitude_floored && return AmplitudeQuenching(; floored = true)
+    q === :energy_floored && return EnergyQuenching(; floored = true)
+    q === :local_floored && return calibrate(LocalQuenching, model, spec.Δτ; floored = true)
+    throw(ArgumentError("unknown quenching law $q"))
+end
+
+"The stepper `spec.stepper` names, built for `model` with the law `spec.quenching` (see `STEPPERS`)."
 function make_stepper(spec::RunSpec{T}, model::Model{T}) where {T}
     s, Δτ = spec.stepper, spec.Δτ
-    s === :exponential && return ExponentialStepper(model, Δτ)
-    s === :imex && return IMEXStepper(model, Δτ)
-    s === :backward_euler && return ThetaStepper(model, Δτ; θ = 1)
-    s === :crank_nicolson && return ThetaStepper(model, Δτ; θ = 1 // 2)
-    s === :backward_euler_implicit_noise && return ThetaStepper(model, Δτ; θ = 1, implicit_noise = true)
-    s === :crank_nicolson_implicit_noise && return ThetaStepper(model, Δτ; θ = 1 // 2, implicit_noise = true)
+    quenching = make_quenching(spec, model)
+    s === :exponential && return ExponentialStepper(model, Δτ; quenching)
+    s === :imex && return IMEXStepper(model, Δτ; quenching)
+    s === :backward_euler && return ThetaStepper(model, Δτ; θ = 1, quenching)
+    s === :crank_nicolson && return ThetaStepper(model, Δτ; θ = 1 // 2, quenching)
+    s === :backward_euler_implicit_noise && return ThetaStepper(model, Δτ; θ = 1, implicit_noise = true, quenching)
+    s === :crank_nicolson_implicit_noise && return ThetaStepper(model, Δτ; θ = 1 // 2, implicit_noise = true, quenching)
     throw(ArgumentError("unknown stepper $s"))
 end
 
