@@ -34,9 +34,9 @@ Streamed drift and diffusion of any scalar series (the online kernel-based regre
 ```julia
 using HoyngDynamo
 spec = RunSpec(; f = 6.4)
-obs = sim -> merge(standard_observers(sim), drift_diffusion_observers(sim))   # a every n_c steps, lags to 2 τ_d
+obs = sim -> merge(standard_observers(sim), drift_diffusion_observers(sim))   # a every step, 22 log-spaced lags 0.01–2 τ_d
 e = ensemble(spec, 5e4; seeds = 1:3, observers = obs)                        # the moments are pooled over the seeds
-d = kramers_moyal(e.pooled.km; lags = 5:20)                                   # D⁽¹⁾(a), D⁽²⁾(a) with error bars over lags 0.25–1 τ_d
+d = kramers_moyal(e.pooled.km; window = (0.25, 1.0))                          # D⁽¹⁾(a), D⁽²⁾(a) with error bars over lags 0.25–1 τ_d
 ```
 
 Plotting:

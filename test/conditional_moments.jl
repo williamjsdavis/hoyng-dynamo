@@ -50,7 +50,7 @@ end
             v = value(cm)
             r = ref_moments(X, x, 0.5, 4, K)
             sel = r.W .> 0
-            @test v.n == 4000 && v.lags == (1:4) .* 0.1 && size(v.M1) == (4, 25) && v.h == 0.5
+            @test v.n == 4000 && v.lags ≈ (1:4) .* 0.1 && size(v.M1) == (4, 25) && v.h == 0.5
             @test count(sel) > 50 && count(.!sel) > 0
             @test v.W[sel] ≈ r.W[sel] rtol = 1e-12
             @test maxrel(v.M1[sel], r.M1[sel]) < 1e-10
@@ -62,6 +62,32 @@ end
             # the effective sample size lies between 1 and the number of samples in the support
             @test all(1 .≤ v.neff[sel] .≤ 4000)
         end
+    end
+
+    @testset "sparse lag sets" begin
+        X = ar1(rng, 3000)
+        dense = ConditionalMoments(x; h = 0.5, lags = 40, Δt = 0.1)
+        sparse = ConditionalMoments(x; h = 0.5, lags = [1, 3, 8, 21, 40], Δt = 0.1)
+        foreach(v -> (fit!(dense, v); fit!(sparse, v)), X)
+        vd, vs = value(dense), value(sparse)
+        @test vs.lags ≈ [1, 3, 8, 21, 40] .* 0.1 && size(vs.M1) == (5, 25)
+        # each row of the sparse set is bitwise the corresponding row of the dense one (same updates, same order)
+        for (k, ℓ) in enumerate([1, 3, 8, 21, 40])
+            @test vs.W[k, :] == vd.W[ℓ, :] && isequal(vs.M1[k, :], vd.M1[ℓ, :]) && isequal(vs.M2star[k, :], vd.M2star[ℓ, :])
+        end
+        @test log_lags(200) == [1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 18, 22, 27, 34, 43, 53, 66, 83, 103, 129, 160, 200]
+        @test log_lags(1) == [1] && log_lags(10; per_decade = 3) == [1, 2, 5, 10]
+        @test_throws ArgumentError ConditionalMoments(x; h = 0.5, lags = [3, 1])
+        @test_throws ArgumentError ConditionalMoments(x; h = 0.5, lags = [1, 1, 2])
+        @test_throws ArgumentError ConditionalMoments(x; h = 0.5, lags = [0, 1])
+        @test_throws ArgumentError ConditionalMoments(x; h = 0.5, lags = Int[])
+        @test_throws ArgumentError merge!(sparse, dense)
+        # selection by time window
+        d = kramers_moyal(vs; window = (0.25, 2.5))
+        @test d.lags ≈ [0.3, 0.8, 2.1]
+        @test_throws ArgumentError kramers_moyal(vs; window = (5.0, 6.0))
+        @test_throws ArgumentError kramers_moyal(vs; window = (2.0, 1.0))
+        @test_throws ArgumentError kramers_moyal(vs; lags = 1:2, window = (0.0, 1.0))
     end
 
     @testset "merge! pools independent streams" begin

@@ -36,16 +36,34 @@ struct Triangular <: AbstractKernel end
 @inline (::Triangular)(u::T) where {T<:AbstractFloat} = abs(u) < 1 ? 1 - abs(u) : zero(T)
 
 """
+    log_lags(nmax; per_decade = 10) -> Vector{Int}
+
+Distinct sample lags from 1 to `nmax`, about `per_decade` per decade of lag: dense where the
+correlation structure of a series lives (the noise correlation time, the relaxation times)
+and sparse where the moments have saturated. `log_lags(200)` is 22 lags, 1 … 200.
+"""
+function log_lags(nmax::Integer; per_decade::Integer = 10)
+    nmax ≥ 1 || throw(ArgumentError("need nmax ≥ 1"))
+    per_decade ≥ 1 || throw(ArgumentError("need per_decade ≥ 1"))
+    n = ceil(Int, log10(nmax) * per_decade) + 1
+    return unique!(max.(1, round.(Int, exp10.(range(0, log10(nmax); length = n)))))
+end
+
+"""
     ConditionalMoments(x::AbstractRange; h, lags = 1, Δt = 1.0, kernel = Epanechnikov())
 
 Online kernel-based regression (Davis 2023): the conditional moments M⁽¹⁾, M⁽²⁾ and the
 conditional variance M⁽²*⁾ of the increments of a streamed series at the equally spaced
-evaluation points `x`, for the lags `1:lags` samples (`Δt` per sample), with the kernel
-`K_h(u) = K(u/h)/h` of bandwidth `h`. `fit!(cm, X)` feeds one sample; `merge!` pools
+evaluation points `x`, at the sample lags `lags` (an integer n for the lags 1 … n, or an
+increasing vector of distinct lags in samples, e.g. `log_lags(200)`; `Δt` per sample), with
+the kernel `K_h(u) = K(u/h)/h` of bandwidth `h`. The lags must straddle the correlation
+times of the series: too sparse and the correlation structure is missed, too fine and the
+moments do not change over the set. `fit!(cm, X)` feeds one sample; `merge!` pools
 independent streams; `value` gives `(x, lags, W, W2, M1, M2, M2star, neff, n, h)` with the
-matrices N_τ × N_x as in the paper (`W` the cumulative kernel weights, `W2` the sum of their
-squares, `neff = W²/W2` the effective number of samples; NaN where a point has no weight).
-Memory O(N_τ N_x), cost per sample O(N_τ h/Δx).
+lags in time units and the matrices N_τ × N_x as in the paper (`W` the cumulative kernel
+weights, `W2` the sum of their squares, `neff = W²/W2` the effective number of samples; NaN
+where a point has no weight). Memory O(N_τ N_x) plus a ring buffer of the longest lag; cost
+per sample O(N_τ h/Δx).
 """
 mutable struct ConditionalMoments{T<:AbstractFloat,K<:AbstractKernel} <: Aggregator
     const x::Vector{T}
@@ -54,9 +72,10 @@ mutable struct ConditionalMoments{T<:AbstractFloat,K<:AbstractKernel} <: Aggrega
     const h::T
     const invh::T
     const kernel::K
-    const nlags::Int
+    const lags::Vector{Int}     # the sample lags, increasing
+    const L::Int                # the longest lag: length of the ring buffer
     const Δt::T
-    const buf::Vector{T}        # ring of the last N_τ samples
+    const buf::Vector{T}        # ring of the last L samples
     const W::Matrix{T}          # N_x × N_τ internally (contiguous over x for a given lag)
     const W2::Matrix{T}
     const M1::Matrix{T}
@@ -66,18 +85,20 @@ mutable struct ConditionalMoments{T<:AbstractFloat,K<:AbstractKernel} <: Aggrega
     pos::Int                    # ring index where the next sample is stored
 end
 
-function ConditionalMoments(x::AbstractRange; h::Real, lags::Integer = 1, Δt::Real = 1.0, kernel::AbstractKernel = Epanechnikov(),
+function ConditionalMoments(x::AbstractRange; h::Real, lags = 1, Δt::Real = 1.0, kernel::AbstractKernel = Epanechnikov(),
                             T::Type{<:AbstractFloat} = float(promote_type(eltype(x), typeof(h), typeof(Δt))))
     length(x) ≥ 2 || throw(ArgumentError("need at least two evaluation points"))
     dx = step(x)
     dx > 0 || throw(ArgumentError("the evaluation points must increase"))
     h > 0 || throw(ArgumentError("need a positive bandwidth h"))
-    lags ≥ 1 || throw(ArgumentError("need lags ≥ 1"))
     Δt > 0 || throw(ArgumentError("need Δt > 0"))
-    nx = length(x)
-    z() = zeros(T, nx, lags)
-    ConditionalMoments{T,typeof(kernel)}(collect(T, x), T(first(x)), 1 / T(dx), T(h), 1 / T(h), kernel, Int(lags), T(Δt),
-                                         zeros(T, lags), z(), z(), z(), z(), z(), 0, 1)
+    lagidx = lags isa Integer ? collect(1:Int(lags)) : collect(Int, lags)
+    (!isempty(lagidx) && lagidx[1] ≥ 1 && issorted(lagidx) && allunique(lagidx)) ||
+        throw(ArgumentError("lags must be a positive integer n (the lags 1:n) or an increasing vector of distinct positive sample lags"))
+    nx, nl, L = length(x), length(lagidx), lagidx[end]
+    z() = zeros(T, nx, nl)
+    ConditionalMoments{T,typeof(kernel)}(collect(T, x), T(first(x)), 1 / T(dx), T(h), 1 / T(h), kernel, lagidx, L, T(Δt),
+                                         zeros(T, L), z(), z(), z(), z(), z(), 0, 1)
 end
 
 # One increment Δ = X_N − X_{N−i} of lag i, conditioned on its starting point Xi = X_{N−i}:
@@ -106,21 +127,22 @@ end
 @inline function fit!(cm::ConditionalMoments{T}, xnew::Real) where {T}
     X = T(xnew)
     cm.n += 1
-    L, buf = cm.nlags, cm.buf
-    j = cm.pos
-    @inbounds for i in 1:min(L, cm.n - 1)
-        j -= 1
-        j == 0 && (j = L)
-        Xi = buf[j]                      # X_{N−i}
-        update_row!(cm, i, Xi, X - Xi)
+    L, buf, lags, pos = cm.L, cm.buf, cm.lags, cm.pos
+    @inbounds for k in eachindex(lags)
+        ℓ = lags[k]
+        ℓ ≤ cm.n - 1 || break            # increasing lags: the later ones have no sample yet either
+        j = pos - ℓ
+        j ≤ 0 && (j += L)
+        Xi = buf[j]                      # X_{N−ℓ}
+        update_row!(cm, k, Xi, X - Xi)
     end
-    @inbounds buf[cm.pos] = X
-    cm.pos = cm.pos == L ? 1 : cm.pos + 1
+    @inbounds buf[pos] = X
+    cm.pos = pos == L ? 1 : pos + 1
     return cm
 end
 
 function Base.merge!(a::ConditionalMoments{T}, b::ConditionalMoments{T}) where {T}
-    (a.x == b.x && a.h == b.h && a.nlags == b.nlags && a.Δt == b.Δt && a.kernel == b.kernel) ||
+    (a.x == b.x && a.h == b.h && a.lags == b.lags && a.Δt == b.Δt && a.kernel == b.kernel) ||
         throw(ArgumentError("conditional moments have different evaluation points, bandwidth, lags, Δt or kernel"))
     W, W2, M1, M2, S = a.W, a.W2, a.M1, a.M2, a.S
     @inbounds for idx in eachindex(W)
@@ -148,17 +170,18 @@ function value(cm::ConditionalMoments{T}) where {T}
     neff = ifelse.(has, W .* W ./ W2, nan)
     M1 = ifelse.(has, permutedims(cm.M1), nan)
     M2 = ifelse.(has, permutedims(cm.M2), nan)
-    return (x = copy(cm.x), lags = (1:cm.nlags) .* cm.Δt, W = W, W2 = W2, M1 = M1, M2 = M2, M2star = M2star, neff = neff,
+    return (x = copy(cm.x), lags = cm.lags .* cm.Δt, W = W, W2 = W2, M1 = M1, M2 = M2, M2star = M2star, neff = neff,
             n = cm.n, h = cm.h)
 end
 
 """
-    kramers_moyal(cm; lags = :, method = :regression, variance = false) -> NamedTuple
+    kramers_moyal(cm; lags = :, window = nothing, method = :regression, variance = false) -> NamedTuple
 
 The drift D⁽¹⁾ and diffusion D⁽²⁾ at the evaluation points from the conditional moments of a
-`ConditionalMoments` (or its `value`), Davis 2023 §3. `method = :direct` is Eq. 16 at the
-first selected lag, D⁽ᵏ⁾ = M⁽ᵏ⁾/(k! τ); `:regression` is the least-squares fit of
-M⁽ᵏ⁾(τ) ≃ k! τ D⁽ᵏ⁾ through the origin over the selected lags (Eq. 17). `variance = true`
+`ConditionalMoments` (or its `value`), Davis 2023 §3, over the lags selected by index
+(`lags`, into the lag set) or by time (`window = (τ_lo, τ_hi)`, the lags with τ_lo ≤ τ ≤ τ_hi).
+`method = :direct` is Eq. 16 at the first selected lag, D⁽ᵏ⁾ = M⁽ᵏ⁾/(k! τ); `:regression` is
+the least-squares fit of M⁽ᵏ⁾(τ) ≃ k! τ D⁽ᵏ⁾ through the origin over the selected lags (Eq. 17). `variance = true`
 builds D⁽²⁾ from the conditional variance M⁽²*⁾ instead of M⁽²⁾, which removes the (τD⁽¹⁾)²
 term of the finite-τ second moment. Returns `(x, lags, D1, D2, D1_err, D2_err, n)` with the
 standard errors from the conditional variance and the effective sample size at each lag
@@ -170,9 +193,16 @@ S = D⁽¹⁾ and the diffusion is D = 2D⁽²⁾.
 """
 kramers_moyal(cm::ConditionalMoments; kwargs...) = kramers_moyal(value(cm); kwargs...)
 
-function kramers_moyal(v::NamedTuple; lags = Colon(), method::Symbol = :regression, variance::Bool = false)
+function kramers_moyal(v::NamedTuple; lags = Colon(), window = nothing, method::Symbol = :regression, variance::Bool = false)
     method in (:direct, :regression) || throw(ArgumentError("method must be :direct or :regression, got $method"))
-    idx = lags isa Colon ? collect(eachindex(v.lags)) : collect(lags)
+    idx = if window !== nothing
+        lags isa Colon || throw(ArgumentError("select the lags by index (lags) or by time (window), not both"))
+        lo, hi = window
+        lo ≤ hi || throw(ArgumentError("need window = (τ_lo, τ_hi) with τ_lo ≤ τ_hi"))
+        findall(τ -> lo ≤ τ ≤ hi, v.lags)
+    else
+        lags isa Colon ? collect(eachindex(v.lags)) : collect(lags)
+    end
     isempty(idx) && throw(ArgumentError("no lags selected"))
     all(1 .≤ idx .≤ length(v.lags)) || throw(ArgumentError("lags out of range 1:$(length(v.lags))"))
     method === :direct && (idx = idx[1:1])

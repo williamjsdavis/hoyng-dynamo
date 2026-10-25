@@ -48,7 +48,7 @@ export Model, State, Cache, AbstractStepper, ExponentialStepper, IMEXStepper, Th
     AbstractQuenching, AmplitudeQuenching, EnergyQuenching, InverseQuenching, LocalQuenching, quenching!, quenching, calibrate, floored
 export Aggregator, fit!, value, Moments, Histogram, AutoCorrelation, Sampled, MovingAverage, smooth!,
     Series, Event, SchmittTrigger, outside_events, CrossingGroups, ExclusionVariance, BinnedMean, even_quadratic_fit
-export AbstractKernel, Epanechnikov, Boxcar, Triangular, ConditionalMoments, kramers_moyal
+export AbstractKernel, Epanechnikov, Boxcar, Triangular, ConditionalMoments, log_lags, kramers_moyal
 export BistableTheory, diffusion_constants, shape_parameters, diffusion_prefactor, diffusion_from_fit,
     drift, diffusion, potential, psi, dpsi, d2psi, phi, phi0_curvature, bistable, peak_amplitude,
     peak_log_density, peak_curvature, mean_amplitude, relative_variance, log_mean_reversal_time,

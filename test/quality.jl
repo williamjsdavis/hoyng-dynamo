@@ -49,9 +49,9 @@ let aggs = (Moments(), Histogram(-3.0, 3.0, 600), AutoCorrelation(500; Δt = 0.0
         push!(HOT, (merge!, (make(), make())))
     end
     # the online kernel-based regression, with its ring buffer full so that every lag is updated
-    for K in (Epanechnikov(), Boxcar(), Triangular())
-        cm = ConditionalMoments(range(-1.5, 1.5; length = 61); h = 0.1, lags = 40, Δt = 0.05, kernel = K)
-        foreach(v -> fit!(cm, v), 0.9 .+ 0.1 .* sin.(1:50))
+    for K in (Epanechnikov(), Boxcar(), Triangular()), lags in (40, log_lags(200))
+        cm = ConditionalMoments(range(-1.5, 1.5; length = 61); h = 0.1, lags, Δt = 0.05, kernel = K)
+        foreach(v -> fit!(cm, v), 0.9 .+ 0.1 .* sin.(1:250))
         push!(HOT, (fit!, (cm, 0.9)))
         push!(INFERRED_LATER, (kramers_moyal, (cm,)))
     end

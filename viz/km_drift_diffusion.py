@@ -7,7 +7,8 @@ with κ = 0 (HOS Eq. 33). Top right: 2D⁽²⁾(a) from the conditional variance
 windows, D(a) = Δ₀a² + Δ₁ from the run's D₁ fit (HOS Eqs. 61–63), and the noise diffusion of
 a evaluated on the run's fields: exact for the binned noise (D_b) and in HOS's δ-correlated
 limit (D_c, Eqs. 36–37). Bottom: the lag dependence of M⁽¹⁾/τ and M⁽²*⁾/τ at a = 0, 0.5, 1.0
-from the fine (every step) and coarse (every n_c steps) probes; the dotted line marks τ_c.
+over the lag set (log axis); the dotted line marks τ_c. viz/km_moments.py shows the moments
+of every a in the style of a conditional-moments figure.
 """
 
 import argparse
@@ -29,8 +30,7 @@ with h5py.File(args.curves, "r") as h:
     γ, c2, Δ0, Δ1, τc = (float(at[k]) for k in ("gamma_run", "c2_run", "Delta0_run", "Delta1_run", "tau_c"))
     reg = {k: {n: h["regression"][k][n][...] for n in ("x", "D1", "D2", "D1_err", "D2_err")} for k in h["regression"]}
     # HDF5.jl writes the N_τ × N_x matrices column-major; h5py reads them transposed
-    probes = {k: {n: (h[k][n][...].T if h[k][n].ndim == 2 else h[k][n][...]) for n in ("x", "lags", "M1", "M2star", "W", "neff")}
-              for k in ("coarse", "fine")}
+    km = {n: (h["km"][n][...].T if h["km"][n].ndim == 2 else h["km"][n][...]) for n in ("x", "lags", "M1", "M2star", "W", "neff")}
     db = {n: h["d_binned"][n][...] for n in ("centers", "n", "mean")}
     dc = {n: h["d_continuum"][n][...] for n in ("centers", "n", "mean")}
 out = args.out or str(FIGURES / f"km_drift_diffusion_f{f:g}.png")
@@ -69,12 +69,8 @@ ax.set_title("diffusion", fontsize=9)
 
 for ax, (name, ylabel) in zip(axes[1], (("M1", "M⁽¹⁾/τ"), ("M2star", "M⁽²*⁾/τ"))):
     for a0, color in ((0.0, "C0"), (0.5, "C2"), (1.0, "C3")):
-        for probe, marker in (("fine", "."), ("coarse", "o")):
-            pr = probes[probe]
-            j = int(np.argmin(np.abs(pr["x"] - a0)))
-            y = pr[name][:, j] / pr["lags"]
-            ax.plot(pr["lags"], y, marker, ms=3 if marker == "o" else 4, color=color, lw=0.6, ls="-" if probe == "coarse" else "none",
-                    label=f"a = {a0:g}" if probe == "coarse" else None)
+        j = int(np.argmin(np.abs(km["x"] - a0)))
+        ax.plot(km["lags"], km[name][:, j] / km["lags"], "o-", ms=3, color=color, lw=0.6, label=f"a = {a0:g}")
         if name == "M1":
             ax.axhline(S(a0, κ), color=color, lw=0.6, ls="--")
         else:

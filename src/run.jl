@@ -385,23 +385,25 @@ function standard_observers(sim::Simulation{T}; file = nothing, snapshots::Bool 
 end
 
 """
-    drift_diffusion_observers(sim; x = range(-1.5, 1.5; length = 61), h = 0.1, every = n_c, lags = 40,
-                              kernel = Epanechnikov())
+    drift_diffusion_observers(sim; x = range(-1.5, 1.5; length = 61), h = 0.1, every = 1,
+                              lags = log_lags(2 τ_d in steps), kernel = Epanechnikov())
 
 The conditional moments of the dipole amplitude a by online kernel-based regression
 (`ConditionalMoments`, Davis 2023), as a NamedTuple of probes to `merge` with
-`standard_observers`: in `km`, a is fed every `every` steps and its increments over `1:lags`
-samples are conditioned on a at the evaluation points `x` with bandwidth `h`. The defaults
-sample at the redraw interval n_c (Δt = τ_c) with lags to 2 τ_d, so that `kramers_moyal` can
-follow D⁽¹⁾(a; τ) and D⁽²⁾(a; τ) from the correlated-noise regime τ ≈ τ_c through the overtone
-relaxation time to the drift time 1/Λ, for comparison with the drift S(a) and the diffusion
+`standard_observers`: in `km`, a is fed every `every` steps and its increments over the
+sample lags `lags` are conditioned on a at the evaluation points `x` with bandwidth `h`. The
+default lag set is log-spaced over 0.01–2 τ_d (`log_lags`, 22 lags at Δτ = 0.01), so that
+the correlation structure of a is resolved on every scale that matters, the noise
+correlation time τ_c = 0.05, the overtone relaxation time ≈ 0.5 and the drift time
+1/2μ ≈ 0.7 τ_d, while the moments still change across the set; `kramers_moyal` then follows
+D⁽¹⁾(a; τ) and D⁽²⁾(a; τ) across it, for comparison with the drift S(a) and the diffusion
 D(a) = 2D⁽²⁾(a) of the Fokker–Planck reduction (HOS Eqs. 33 and 39, `BistableTheory`).
 Beside it, `d_binned` and `d_continuum` bin the exact noise diffusion of a for the current
 field (`noise_diffusion_sample`) and its δ-correlated-limit value (`continuum_diffusion_sample`,
 HOS Eqs. 36–37) against |a| once per τ_d, like the D₁ measurement of the standard observers.
 """
 function drift_diffusion_observers(sim::Simulation{T}; x::AbstractRange = range(T(-1.5), T(1.5); length = 61), h::Real = 0.1,
-                                   every::Integer = redraw_interval(sim.noise), lags::Integer = 40,
+                                   every::Integer = 1, lags = log_lags(round(Int, 2 / (every * timestep(sim)))),
                                    kernel::AbstractKernel = Epanechnikov()) where {T}
     Δτ = timestep(sim)
     nd = round(Int, 1 / Δτ)

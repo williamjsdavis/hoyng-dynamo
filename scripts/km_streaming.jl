@@ -7,9 +7,11 @@
 #     julia --project -t 4 scripts/km_streaming.jl [f = 6.4] [τ per seed = 5e4] [seeds = 3]
 #
 # Appends to results/km_streaming.md (env KM_OUT) and writes the conditional moments and the
-# estimates to results/km_f<f>.h5 (env KM_H5) for viz/km_drift_diffusion.py. Two probes: a
-# every n_c steps (Δt = τ_c) with lags to 2 τ_d, and a every step with lags to 10 steps for the
-# sub-τ_c regime; 61 points on [−1.5, 1.5], bandwidth 0.1, Epanechnikov kernel.
+# estimates to results/km_f<f>.h5 (env KM_H5) for viz/km_moments.py and viz/km_drift_diffusion.py.
+# One probe: a at every step with 26 lags from 0.01 to 2 τ_d, log-spaced (`log_lags`) plus the
+# round values 0.05, 0.1, 0.25, 0.5, 1, 2 τ_d, so that the noise correlation time τ_c = 0.05,
+# the overtone relaxation time ≈ 0.5 and the drift time ≈ 0.7 τ_d are all resolved while the
+# moments still change across the set; 61 points on [−1.5, 1.5], bandwidth 0.1, Epanechnikov.
 
 using HoyngDynamo, HDF5, LinearAlgebra
 BLAS.set_num_threads(1)
@@ -23,13 +25,15 @@ mkpath(dirname(out))
 
 spec = RunSpec(; f)
 x = range(-1.5, 1.5; length = 61)
-observers(sim) = merge(standard_observers(sim), drift_diffusion_observers(sim; x, h = 0.1, lags = 40),
-                       (km_fine = Probe(amplitude, ConditionalMoments(x; h = 0.1, lags = 10, Δt = timestep(sim)), 1),))
+lagset = sort(union(log_lags(200), [5, 10, 25, 50, 100, 200]))
+observers(sim) = merge(standard_observers(sim), drift_diffusion_observers(sim; x, h = 0.1, every = 1, lags = lagset))
 t = @elapsed e = ensemble(spec, τ; seeds = 1:nseeds, observers)
 s = e.summary
 c = e.runs[1].sim.model.constants
 Λ, μ = c.Λ, c.μ
-km, kmf = value(e.pooled.km), value(e.pooled.km_fine)
+km = value(e.pooled.km)
+nearest(xs, p) = argmin(abs.(xs .- p))
+lag_at(τl) = nearest(km.lags, τl)                   # index of the lag nearest to τl
 
 # the reduced description with the run's own (c², γ) (weighted D₁ fit) and with HOS's printed values
 th_run = BistableTheory(c, s.γ, s.c2)
@@ -45,13 +49,12 @@ emit("")
 emit("## Drift and diffusion by online kernel-based regression: f = $f, $nseeds seeds × $τ τ_d ($(round(t, digits = 0)) s on $(Threads.nthreads()) threads)")
 emit("")
 emit("Run: ⟨T_r⟩ = $(fmt(s.mean_reversal_time; d = 1)) ± $(fmt(s.mean_reversal_time_error; d = 1)), dv = $(fmt(s.dv)); D₁/ℱ fit $(fmt(s.d1_fit.c0)) + $(fmt(s.d1_fit.c2)) a² → (c², γ) = ($(fmt(s.c2)), $(fmt(s.γ; d = 2))), Δ₀ = $(fmt(s.Δ0; d = 4)), Δ₁ = $(fmt(s.Δ1; d = 4)); Λ = $(fmt(Λ)), μ/Λ = $(fmt(μ / Λ; d = 2)).")
-emit("Conditional moments of a: $(length(x)) points on [−1.5, 1.5], h = 0.1, Epanechnikov; coarse probe every n_c steps (Δt = $(km.lags[1])) with $(length(km.lags)) lags, fine probe every step with $(length(kmf.lags)) lags; $(km.n) and $(kmf.n) samples pooled.")
+emit("Conditional moments of a: $(length(x)) points on [−1.5, 1.5], h = 0.1, Epanechnikov; a at every step, $(length(km.lags)) lags from $(km.lags[1]) to $(km.lags[end]) τ_d (steps $(join(lagset, ", "))); $(km.n) samples pooled.")
 emit("")
 
 pts = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25]
-nearest(xs, p) = argmin(abs.(xs .- p))
 jdx = [nearest(km.x, p) for p in pts]
-lagsel = [(0.05, :fine, 5), (0.1, :fine, 10), (0.25, :coarse, 5), (0.5, :coarse, 10), (1.0, :coarse, 20), (2.0, :coarse, 40)]
+lagsel = [(τl, lag_at(τl)) for τl in (0.05, 0.1, 0.25, 0.5, 1.0, 2.0)]
 S(th, a) = drift(th, a)
 D(th, a) = diffusion(th, a)          # HOS's D = Δ₀(a² + c²), the coefficient of ½∂²(Dp)/∂a², i.e. 2D⁽²⁾
 
@@ -61,8 +64,8 @@ emit("| a | " * join(["τ = $(l[1])" for l in lagsel], " | ") * " | S(a), run (c
 emit("|---|" * repeat("---|", length(lagsel) + 2))
 for (p, j) in zip(pts, jdx)
     cells = String[]
-    for (τl, which, i) in lagsel
-        d = kramers_moyal(which === :fine ? kmf : km; lags = i:i, method = :direct)
+    for (τl, i) in lagsel
+        d = kramers_moyal(km; lags = i:i, method = :direct)
         push!(cells, "$(fmt(d.D1[j])) ± $(fmt(d.D1_err[j]))")
     end
     emit("| $p | " * join(cells, " | ") * " | $(fmt(S(th_run, p))) | $(fmt(S(th_run0, p))) |")
@@ -74,8 +77,8 @@ emit("| a | " * join(["τ = $(l[1])" for l in lagsel], " | ") * " | D(a), run (c
 emit("|---|" * repeat("---|", length(lagsel) + 2))
 for (p, j) in zip(pts, jdx)
     cells = String[]
-    for (τl, which, i) in lagsel
-        d = kramers_moyal(which === :fine ? kmf : km; lags = i:i, method = :direct, variance = true)
+    for (τl, i) in lagsel
+        d = kramers_moyal(km; lags = i:i, method = :direct, variance = true)
         push!(cells, "$(fmt(2d.D2[j]; d = 4)) ± $(fmt(2d.D2_err[j]; d = 4))")
     end
     emit("| $p | " * join(cells, " | ") * " | $(fmt(D(th_run, p); d = 4)) | $(th_paper === nothing ? "—" : fmt(D(th_paper, p); d = 4)) |")
@@ -86,10 +89,10 @@ emit("### Regression through the origin over lag windows (Eq. 17), and the shape
 emit("")
 emit("| window (τ_d) | Λ_KM = dD⁽¹⁾/da at 0 | zero of D⁽¹⁾ (a > 0) | Δ₁ = 2D⁽²⁾(0) | Δ₀ + Δ₁ = 2D⁽²⁾(1) | even quadratic fit of 2D⁽²⁾ for \\|a\\| ≤ 1.1 | (c², γ)_KM | run D₁ fit (c², γ) |")
 emit("|---|---|---|---|---|---|---|---|")
-windows = [("0.05", kmf, 5:5), ("0.1–0.5", km, 2:10), ("0.25–1.0", km, 5:20), ("0.5–2.0", km, 10:40)]
+windows = [("0.05", (0.049, 0.051)), ("0.1–0.5", (0.1, 0.5)), ("0.25–1.0", (0.25, 1.0)), ("0.5–2.0", (0.5, 2.0))]
 curves = Dict{String,Any}()
-for (label, v, lags) in windows
-    d = kramers_moyal(v; lags, method = :regression, variance = true)
+for (label, window) in windows
+    d = kramers_moyal(km; window, method = :regression, variance = true)
     curves[label] = d
     j0, jp, jm, j1 = nearest(d.x, 0.0), nearest(d.x, 0.25), nearest(d.x, -0.25), nearest(d.x, 1.0)
     Λkm = (d.D1[jp] - d.D1[jm]) / 0.5
@@ -118,8 +121,8 @@ emit("|---|---|---|---|---|---|---|---|---|")
 for p in (0.025, 0.275, 0.525, 0.775, 1.025, 1.275)
     i = nearest(db.centers, p)
     cells = String[]
-    for (which, l) in ((kmf, 10), (km, 5), (km, 10))
-        d = kramers_moyal(which; lags = l:l, method = :direct, variance = true)
+    for τl in (0.1, 0.25, 0.5)
+        d = kramers_moyal(km; lags = lag_at(τl):lag_at(τl), method = :direct, variance = true)
         j = nearest(d.x, p)
         corr = 1 - τc / (3 * d.lags[1])
         push!(cells, "$(fmt(2d.D2[j] / corr; d = 4)) ± $(fmt(2d.D2_err[j] / corr; d = 4))")
@@ -136,11 +139,9 @@ h5open(h5path, "w") do h
     if th_paper !== nothing
         attrs(h)["gamma_paper"] = paper[f][1]; attrs(h)["c2_paper"] = paper[f][2]
     end
-    for (name, v) in (("coarse", km), ("fine", kmf))
-        g = create_group(h, name)
-        g["x"] = collect(v.x); g["lags"] = collect(v.lags); g["W"] = v.W; g["M1"] = v.M1; g["M2"] = v.M2; g["M2star"] = v.M2star; g["neff"] = v.neff
-        attrs(g)["n"] = v.n; attrs(g)["h"] = v.h
-    end
+    g = create_group(h, "km")
+    g["x"] = collect(km.x); g["lags"] = collect(km.lags); g["W"] = km.W; g["M1"] = km.M1; g["M2"] = km.M2; g["M2star"] = km.M2star; g["neff"] = km.neff
+    attrs(g)["n"] = km.n; attrs(g)["h"] = km.h; attrs(g)["steps"] = lagset
     g = create_group(h, "regression")
     for (label, d) in curves
         gg = create_group(g, label)
