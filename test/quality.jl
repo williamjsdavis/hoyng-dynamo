@@ -13,7 +13,8 @@ const HOT = Vector{Tuple{Any,Tuple}}()
 let model = Model(; kR = 0.5, Cm = 100.0, N = 60), cache = Cache(model)
     noise = BinnedNoise(model, 0.01; f = 6.4, seed = 1)
     ramped = BinnedNoise(model, 0.01; schedule = LinearRamp(4.0, 6.5, 0.0, 100.0), seed = 1)
-    for sp in (ExponentialStepper(model, 0.01), IMEXStepper(model, 0.01)), nz in (NoNoise(), noise)
+    for sp in (ExponentialStepper(model, 0.01), IMEXStepper(model, 0.01), BackwardEulerStepper(model, 0.01),
+               CrankNicolsonStepper(model, 0.01; implicit_noise = true)), nz in (NoNoise(), noise)
         push!(HOT, (step!, (State(model, 0.1 .* model.b0), sp, nz, cache)))
     end
     for nz in (noise, ramped), n in (0, 1)          # redraw step and quiet step
@@ -23,6 +24,7 @@ let model = Model(; kR = 0.5, Cm = 100.0, N = 60), cache = Cache(model)
         push!(HOT, (redraw!, (BinnedNoise(model, 0.01; distribution = dist, seed = 2),)))
     end
     push!(HOT, (noise_projection, (model, zeros(model.grid.M))))
+    push!(HOT, (mode_factor, (BackwardEulerStepper(model, 0.01), -2.16 + 5.88im)))
 end
 
 let aggs = (Moments(), Histogram(-3.0, 3.0, 600), AutoCorrelation(500; Δt = 0.01), Sampled(Moments(), 100), Series(; sizehint = 1000),
@@ -69,6 +71,9 @@ end
 push!(INFERRED, (ks_exponential, ([5.0, 7.5, 12.0, 30.0, 61.0, 140.0],)))
 push!(INFERRED, (density_fit, (collect(0.0:0.1:2.0), [0, 5, 40, 120, 300, 500, 600, 400, 150, 40, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0], 0.527, 0.763)))
 push!(INFERRED, (outside_events, ((1:5) .* 0.1, [Event{Float64}(:reversal, 0.2, 0.3, 0.0, 1, 0.25)])))
+let model = Model(; kR = 0.5, Cm = 100.0, N = 60)
+    push!(INFERRED, (amplification_matrix, (model, BackwardEulerStepper(model, 0.01))))
+end
 
 # Run driver: the stepping loop with the standard observers in stream mode, and the extractors.
 let sim = Simulation(RunSpec(; seed = 1)), obs = standard_observers(sim)

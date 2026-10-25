@@ -2,7 +2,7 @@
 
 Accepted by the user on 2026-10-18: the gates, the tolerance rules and the operational definitions below. Targets come from the three papers via `resources/`; notation is HOS's unless stated; *(derived here)* marks our own derivation rather than a statement in a paper. Gate IDs (T0.1, …) are the ones referenced from `QUESTIONS.md` and `DECISIONS.md`.
 
-Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence), the HSO runs T4.8, T4.9 and the SOH runs T4.10, T4.15 passed the same day; T4.14 passed and T4.13 was recorded on 2026-10-20 (the median parity outside events is −0.82, not below −0.9: `DISCREPANCIES.md` DR-7); only the stretch goal T4.16 remains. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.5, T5.6, T5.9, T5.10, T5.11, T5.12, T5.13 are rendered and await judgement; T5.3, T5.4 (HOS Figs. 3, 4) were rendered on 2026-10-20 and judged satisfactory by the user on 2026-10-24. Results in §4.
+Status: Tiers 0–3 passed (Tier 0 and Tier 1 on 2026-10-18, Tier 2 on 2026-10-19, Tier 3 on 2026-10-20); Tier 4's standard run and forcing sweep passed on 2026-10-20 (T4.1, T4.2, T4.5, T4.6, T4.11, T4.18; T4.12 recorded), with the D₁-fit intercept and c² of T4.3, T4.4, T4.7 outside the 10% gate at f ≤ 6.4 and recorded as `@test_broken` (`DISCREPANCIES.md` DR-5, attributed to the papers' unstated integrator); T4.17 (convergence), the HSO runs T4.8, T4.9 and the SOH runs T4.10, T4.15 passed the same day; T4.14 passed and T4.13 was recorded on 2026-10-20 (the median parity outside events is −0.82, not below −0.9: `DISCREPANCIES.md` DR-7); only the stretch goal T4.16 remains; the integrator-sensitivity stretch goal SG-1 was done on 2026-10-24 and excludes the time integrator as the cause of DR-5. Tier 5's T5.1, T5.2, T5.7, T5.8 were judged comparable by the user on 2026-10-20; T5.3, T5.4 (HOS Figs. 3, 4) were rendered on 2026-10-20 and judged satisfactory by the user on 2026-10-24, as were T5.5, T5.6, T5.9, T5.10, T5.11, T5.12, T5.13 (HOS Figs. 5, 6; HSO Figs. 3, 6, 7, 8; SOH Fig. 3) the same day: Tier 5 complete. Results in §4.
 
 ## 1. Conventions
 
@@ -386,6 +386,59 @@ Observations.
 - The distribution of F does not matter (the three agree within errors), as HOS state for the "other details" of the cell model.
 - The time integrator does: a first-order IMEX scheme at the same Δτ raises the D₁ intercept by 0.26 and c² by 0.05 while changing ⟨T_r⟩ by 6% and dv by 0.007. This is the size of the DR-5 gap and the most probable explanation of it: the paper's unstated scheme carries an O(|λ₁|Δτ) bias on the overtone content that the extrapolated intercept amplifies, while ⟨T_r⟩ and the variance, which the gates reproduce, are an order of magnitude less sensitive. See `DISCREPANCIES.md` DR-5.
 
+### Stretch goal SG-1, integrator sensitivity (2026-10-24): done; the DR-5 integrator hypothesis is not supported
+
+`scripts/sg1_integrators.jl` (`-t 4`, 35 min; the tables are also in `results/sg1_integrators.md`). Two further steppers in `src/stepper.jl` (`DECISIONS.md` D3 note): `ThetaStepper`, the θ-method on the whole linear operator G(C₀) + s(1 − a²)E, as backward Euler (θ = 1, first order) and Crank–Nicolson (θ = 1/2, second order), each with the noise term explicit or treated like the operator (`implicit_noise`; trapezoidal in the Crank–Nicolson case). Block elimination to one dense (N−2)×(N−2) LU per step, 18 µs against 2 µs for the exponential stepper; Tier 1 passes on both (backward Euler at the IMEX's 5%, Crank–Nicolson at 1%), the block solve is checked against the dense θ-method formula to 10⁻¹² (`test/stepper.jl`). Standard run at f = 6.4, 5.4 and 7.4, six steppers, three seeds × 5×10⁴ τ_d pooled; the Crank–Nicolson run with trapezoidal noise is now part of the T4.17 testset as a second-order control from another integrator family.
+
+**Analytic expectation.** The per-step factor each scheme applies to the leading modes, as (damping rate, frequency) per τ_d from ln|g|/Δτ and |arg g|/Δτ, against the exact (ℜλ, ℑλ):
+
+| operator | mode | exact | exponential | IMEX | backward Euler | Crank–Nicolson |
+|---|---|---|---|---|---|---|
+| C₀ (a = ±1) | first overtone | (−2.757, 4.409) | (−2.757, 4.409) | (−2.567, 4.332) | (−2.811, 4.288) | (−2.756, 4.409) |
+| C_m (a = 0) | fundamental | (0.528, 0) | (0.529, 0) | (0.521, 0) | (0.530, 0) | (0.528, 0) |
+| C_m (a = 0) | first overtone | (−2.159, 5.875) | (−2.158, 5.875) | (−1.899, 5.724) | (−2.301, 5.745) | (−2.157, 5.874) |
+| C_m (a = 0) | second overtone | (−8.201, 6.024) | (−8.201, 6.024) | (−7.644, 5.716) | (−8.037, 5.562) | (−8.198, 6.033) |
+
+The IMEX under-damps the first overtone by 12% and backward Euler over-damps it by 7%, both lowering its frequency by 2–3%; Crank–Nicolson is exact to 0.1%, the exponential stepper to 0.02% (the splitting of the sE term).
+
+**Runs.** Weighted and unweighted quadratic fits of D₁/ℱ for |a| ≤ 1.1, the direct mean for |a| ≤ 0.2, the bin average at |a| = 0.95–1.0, and the shape parameters:
+
+| f = 6.4 | ⟨T_r⟩ | §2 var | dv | weighted D₁ fit | unweighted fit | D₁(0) direct | D₁ bin 0.95–1.0 | (c², γ) |
+|---|---|---|---|---|---|---|---|---|
+| exponential | 104.7 ± 2.8 | 0.142 | 0.160 | 1.58 + 1.91a² | 1.46 + 2.08a² | 1.24 | 3.33 | (0.291, 3.02) |
+| IMEX | 98.3 ± 2.5 | 0.135 | 0.153 | 1.84 + 1.78a² | 1.71 + 1.97a² | 1.41 | 3.43 | (0.345, 3.09) |
+| backward Euler, noise explicit | 110.9 ± 3.0 | 0.135 | 0.152 | 1.58 + 1.72a² | 1.46 + 1.88a² | 1.24 | 3.13 | (0.300, 3.13) |
+| backward Euler, noise implicit | 129.5 ± 3.8 | 0.136 | 0.151 | 1.45 + 1.67a² | 1.31 + 1.86a² | 1.11 | 3.08 | (0.278, 3.15) |
+| Crank–Nicolson, noise explicit | 100.5 ± 2.6 | 0.143 | 0.161 | 1.64 + 1.88a² | 1.52 + 2.05a² | 1.27 | 3.38 | (0.303, 3.03) |
+| Crank–Nicolson, noise trapezoidal | 107.9 ± 2.9 | 0.143 | 0.160 | 1.57 + 1.87a² | 1.45 + 2.04a² | 1.24 | 3.30 | (0.290, 3.04) |
+| paper | 107 ± 5 | 0.16 | | 1.36 + 2.00a² | | | 3.26 (on the curve) | (0.246, 2.96) |
+
+| f = 5.4 | ⟨T_r⟩ | §2 var | dv | weighted D₁ fit | unweighted fit | D₁(0) direct | D₁ bin 0.95–1.0 | (c², γ) |
+|---|---|---|---|---|---|---|---|---|
+| exponential | 526 ± 31 | 0.068 | 0.073 | 1.64 + 0.75a² | 1.39 + 1.10a² | 1.06 | 2.32 | (0.382, 5.39) |
+| IMEX | 497 ± 29 | 0.066 | 0.071 | 1.79 + 0.67a² | 1.53 + 1.06a² | 1.25 | 2.33 | (0.427, 5.49) |
+| backward Euler, noise explicit | 588 ± 37 | 0.066 | 0.070 | 1.62 + 0.64a² | 1.38 + 0.97a² | 1.10 | 2.19 | (0.388, 5.53) |
+| backward Euler, noise implicit | 704 ± 48 | 0.065 | 0.069 | 1.54 + 0.62a² | 1.29 + 0.98a² | 1.00 | 2.11 | (0.370, 5.55) |
+| Crank–Nicolson, noise explicit | 500 ± 29 | 0.068 | 0.073 | 1.67 + 0.74a² | 1.43 + 1.09a² | 1.08 | 2.33 | (0.391, 5.41) |
+| Crank–Nicolson, noise trapezoidal | 542 ± 33 | 0.068 | 0.073 | 1.63 + 0.72a² | 1.38 + 1.08a² | 1.05 | 2.31 | (0.383, 5.42) |
+| paper | 519 ± 53 | 0.07 | | 1.34 + 0.94a² (implied) | | | | (0.299, 5.15) |
+
+| f = 7.4 | ⟨T_r⟩ | §2 var | dv | weighted D₁ fit | unweighted fit | D₁(0) direct | D₁ bin 0.95–1.0 | (c², γ) |
+|---|---|---|---|---|---|---|---|---|
+| exponential | 37.0 ± 0.6 | 0.263 | 0.301 | 1.62 + 3.37a² | 1.58 + 3.41a² | 1.40 | 4.66 | (0.234, 1.78) |
+| IMEX | 34.7 ± 0.5 | 0.241 | 0.280 | 2.03 + 3.15a² | 1.98 + 3.21a² | 1.79 | 4.79 | (0.304, 1.84) |
+| backward Euler, noise explicit | 39.3 ± 0.6 | 0.249 | 0.285 | 1.61 + 3.05a² | 1.57 + 3.10a² | 1.41 | 4.35 | (0.245, 1.87) |
+| backward Euler, noise implicit | 45.0 ± 0.8 | 0.256 | 0.290 | 1.38 + 2.99a² | 1.34 + 3.02a² | 1.13 | 4.10 | (0.211, 1.88) |
+| Crank–Nicolson, noise explicit | 35.5 ± 0.5 | 0.261 | 0.298 | 1.72 + 3.30a² | 1.69 + 3.33a² | 1.51 | 4.51 | (0.253, 1.80) |
+| Crank–Nicolson, noise trapezoidal | 37.9 ± 0.6 | 0.265 | 0.302 | 1.58 + 3.29a² | 1.55 + 3.33a² | 1.38 | 4.58 | (0.232, 1.80) |
+| paper | 37.6 ± 1 | 0.30 | | 1.62 + 3.20a² (implied) | | | | (0.240, 1.82) |
+
+- The second-order control agrees with the production stepper everywhere: Crank–Nicolson with trapezoidal noise moves the weighted intercept by −0.01 to −0.04, c² by ≤ 0.002, ⟨T_r⟩ by +2.5 to +3.1% (under 1σ) and dv by ≤ 0.001. The standard-run results are converged across integrator families, not only in Δτ and N (T4.17 now asserts this).
+- The first-order schemes move the intercept in both directions, by amounts set by their treatment of the noise term as much as by their overtone damping. The IMEX, which under-damps the first overtone by 12%, raises it by +0.25, +0.16 and +0.41 at f = 6.4, 5.4, 7.4. Backward Euler with the noise explicit over-damps that mode by 7% and lowers D₁ at |a| ≈ 1 by 6–7%, yet leaves the intercept unchanged (−0.01, −0.02, 0.00) while lengthening ⟨T_r⟩ by 6–12%. Fully implicit backward Euler lowers the intercept by −0.14, −0.10 and −0.24 but lengthens ⟨T_r⟩ by 24%, 34% and 21%: the implicit solve attenuates the noise injection itself, which acts like a smaller effective forcing (every D₁ value falls, 7–12% at |a| ≈ 1, with the intercept). Crank–Nicolson with the noise explicit, first order in that term alone, shifts the intercept by +0.06, +0.03, +0.11 and ⟨T_r⟩ by −4 to −5%.
+- The hypothesis fails its own test: no scheme reaches the paper's 1.36 ± 0.1 at f = 6.4 (1.34 at 5.4) while keeping ⟨T_r⟩ within 107 ± 5 (519 ± 53). The nearest, fully implicit backward Euler, gives 1.45 and 1.54 at ⟨T_r⟩ = 129.5 ± 3.8 and 704 ± 48, 3.6σ and 2.6σ from the paper's values; at f = 7.4, where the exponential stepper already matches the paper's intercept (1.62), the same scheme would spoil both numbers (1.38; 45.0 against 37.6 ± 1). The variances are insensitive to the scheme (dv within 0.01, §2 variance within 0.02), as DR-5 already noted of the IMEX.
+- The shape of D₁(a) is also not an integrator effect: c₂/c₀ of the weighted fit is 1.15–1.25 for every scheme but the IMEX (0.97) at f = 6.4, against the paper's 1.47. The unweighted fit through the bin means is within 0.05–0.10 of the paper's intercept at all three forcings (1.39, 1.46, 1.58 against 1.34, 1.36, 1.62), the weighted one only at f = 7.4.
+- Conclusion for DR-5: the papers' unstated time-integration scheme does not explain the intercept gap, within the family of implicit schemes a 2000-era code at Δτ = 0.01 could have used (the diffusion stiffness rules out explicit ones). The remaining candidates are the fit procedure (weighting, the range |a| ≤ 1.1, the paper's histogram binning), the alignment of the noise bins with the grid, and the finite-difference forms of L and of the shear term; DR-5 stays open as a reproduction gap.
+
 ### Tier 4, forcing-parameter invariance T4.12 (2026-10-20): recorded, the invariance is broken by the bin width
 
 Three configurations at f²τ_c/N_c² = 2.05×10⁻², three seeds × 5×10⁴ τ_d each (`test/tier4_stochastic.jl`). HOS p. 272 and Appendix E: all statistics depend on (f, τ_c, N_c) only through f²τ_c/N_c², in the δ-correlated, continuum-bin limit.
@@ -418,14 +471,14 @@ Three configurations at f²τ_c/N_c² = 2.05×10⁻², three seeds × 5×10⁴ �
 - T5.4 (HOS Fig. 4): the aborted reversal at τ = 276.5–280.21 (a to −0.44 and back, 2 crossings) and the excursion at τ = 13711.72–13714.21 (min |a| = 0.0006, no crossing) look alike, as the paper says: a sudden rise of |a₁| to 0.5–1, 𝒫 to +1, the toroidal field weak and symmetric for 1–3 τ_d, then the dipole regrows, with or without a sign change.
 - The user judged Figs. 3 and 4 satisfactory (2026-10-24): T5.3 and T5.4 pass.
 
-### Tier 5, sweep figures (2026-10-20): T5.5, T5.6 rendered, judgement pending
+### Tier 5, sweep figures (2026-10-20): T5.5, T5.6 passed, judged good by the user 2026-10-24
 
 `scripts/run_standard.jl 1 1e4 5.4` and `… 1 2000 7.4` write `results/standard_f5.4_seed1.h5` and `standard_f7.4_seed1.h5`; `viz/hos_fig05.py`, `hos_fig06.py`.
 
 - T5.5 (HOS Fig. 5): with the same noise series as Fig. 1 (seed 1), 6 reversals in 0–2000 τ_d at f = 5.4, the paper's count exactly, including a short reversed interval near 1760–1840 (paper: 1760–1790); 58 at f = 7.4 (paper: several tens).
 - T5.6 (HOS Fig. 6): ℜa₁ against a over ±50 τ_d around the reversal at τ = 833 (the one nearest the paper's 680): two clouds centred at a ≈ ±0.9 with |ℜa₁| ≲ 0.5 and a single jump through a ≈ 0, as described.
 
-### Tier 5, HSO and SOH figures (2026-10-20): T5.9, T5.10, T5.11, T5.12, T5.13 rendered, judgement pending
+### Tier 5, HSO and SOH figures (2026-10-20): T5.9, T5.10, T5.11, T5.12, T5.13 passed, judged good by the user 2026-10-24
 
 `scripts/run_standard.jl 1 5e4 5.4` (the reference run, 129 MB) and `… 1 1e4 7 0.3 120` (the second run, 26 MB); `viz/hso_fig03.py`, `hso_fig06.py`, `hso_fig07.py`, `hso_fig08.py`.
 

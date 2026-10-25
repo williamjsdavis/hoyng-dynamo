@@ -4,14 +4,20 @@
 # only). The stepper and the RNG never learn which mode is running, so the same seed gives
 # bitwise identical trajectories and aggregator values in both (gate T2.5).
 
+"The steppers `RunSpec` accepts; `make_stepper` builds them."
+const STEPPERS = (:exponential, :imex, :backward_euler, :crank_nicolson, :backward_euler_implicit_noise,
+                  :crank_nicolson_implicit_noise)
+
 """
     RunSpec(; kR = 0.5, Cm = 100.0, N = 60, Δτ = 0.01, f = 6.4, schedule = ConstantForcing(f),
             τc = 0.05, Nc = 10, distribution = GaussianF(), seed = 1, stepper = :exponential,
             a0 = 1.0, T = Float64)
 
 Every parameter of a run. `schedule` is the forcing f(τ) (`ConstantForcing`, `LinearRamp`);
-`stepper` is `:exponential` or `:imex`; the initial state is `a0 · b₀`, the fundamental mode
-at amplitude `a0` (a = ±1 is the nonlinear equilibrium). The defaults are HOS's standard
+`stepper` is one of `STEPPERS`: `:exponential` (production), `:imex`, and the SG-1 sensitivity
+steppers `:backward_euler`, `:crank_nicolson`, `:backward_euler_implicit_noise`,
+`:crank_nicolson_implicit_noise` (`ThetaStepper`); the initial state is `a0 · b₀`, the
+fundamental mode at amplitude `a0` (a = ±1 is the nonlinear equilibrium). The defaults are HOS's standard
 run (footnote 1, p. 273).
 """
 struct RunSpec{T<:AbstractFloat,D<:AbstractFDistribution,S<:AbstractForcing{T}}
@@ -31,7 +37,7 @@ end
 function RunSpec(; kR = 0.5, Cm = 100.0, N::Integer = 60, Δτ = 0.01, f = 6.4, schedule = nothing, τc = 0.05,
                  Nc::Integer = 10, distribution::AbstractFDistribution = GaussianF(), seed::Integer = 1,
                  stepper::Symbol = :exponential, a0 = 1.0, T::Type{<:AbstractFloat} = Float64)
-    stepper in (:exponential, :imex) || throw(ArgumentError("stepper must be :exponential or :imex, got $stepper"))
+    stepper in STEPPERS || throw(ArgumentError("stepper must be one of $STEPPERS, got $stepper"))
     sched = schedule === nothing ? ConstantForcing(T(f)) : schedule
     sched isa AbstractForcing{T} || throw(ArgumentError("the forcing schedule must have element type $T"))
     RunSpec{T,typeof(distribution),typeof(sched)}(T(kR), T(Cm), Int(N), T(Δτ), T(τc), Int(Nc), distribution, sched,
@@ -103,11 +109,19 @@ function Simulation(spec::RunSpec{T}) where {T}
     noise = BinnedNoise(model, spec.Δτ; schedule = spec.schedule, τc = spec.τc, Nc = spec.Nc,
                         distribution = spec.distribution, seed = spec.seed)
     state = State(model, spec.a0 .* model.b0)
-    if spec.stepper === :imex
-        return Simulation(spec, model, IMEXStepper(model, spec.Δτ), noise, state, Cache(model), Diagnostics(model))
-    else
-        return Simulation(spec, model, ExponentialStepper(model, spec.Δτ), noise, state, Cache(model), Diagnostics(model))
-    end
+    return Simulation(spec, model, make_stepper(spec, model), noise, state, Cache(model), Diagnostics(model))
+end
+
+"The stepper `spec.stepper` names, built for `model` (see `STEPPERS`)."
+function make_stepper(spec::RunSpec{T}, model::Model{T}) where {T}
+    s, Δτ = spec.stepper, spec.Δτ
+    s === :exponential && return ExponentialStepper(model, Δτ)
+    s === :imex && return IMEXStepper(model, Δτ)
+    s === :backward_euler && return ThetaStepper(model, Δτ; θ = 1)
+    s === :crank_nicolson && return ThetaStepper(model, Δτ; θ = 1 // 2)
+    s === :backward_euler_implicit_noise && return ThetaStepper(model, Δτ; θ = 1, implicit_noise = true)
+    s === :crank_nicolson_implicit_noise && return ThetaStepper(model, Δτ; θ = 1 // 2, implicit_noise = true)
+    throw(ArgumentError("unknown stepper $s"))
 end
 
 Base.show(io::IO, sim::Simulation) = print(io, "Simulation(", sim.spec, "; n = ", sim.state.n, ", τ = ", current_time(sim), ", a = ", sim.state.a, ")")

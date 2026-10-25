@@ -74,6 +74,8 @@ Recommendation: (b) as the production stepper, (a) alongside as the cheap cross-
 
 Affects: Tier 1, T4.17, run cost. Status: adopted 2026-10-18 as recommended.
 
+Implementation note (2026-10-24, `STRETCH_GOALS.md` SG-1): two further steppers exist for sensitivity work only, not for production: `ThetaStepper` is the θ-method on the whole linear operator G(C₀) + s(1 − a²)E with the noise term explicit or implicit (`BackwardEulerStepper`, θ = 1, first order and over-damping; `CrankNicolsonStepper`, θ = 1/2, second order, the option (c) above but on the whole operator). The implicit system is solved by block elimination: with D = I − θΔτL fixed and factorised once, the toroidal unknown satisfies a dense (N−2)×(N−2) system whose matrix changes with a and is LU-factorised in place every step (LAPACK `getrf!`/`getrs!` with preallocated pivots), then one tridiagonal solve gives P. 18 µs per step at N = 60, allocation-free, selected through `RunSpec(stepper = :backward_euler | :crank_nicolson | :backward_euler_implicit_noise | :crank_nicolson_implicit_noise)`. Tier 1 runs on them too (backward Euler at the 5% tolerance of the IMEX, Crank–Nicolson at 1%); `amplification_matrix` and `mode_factor` give each scheme's per-step factor on the modes.
+
 ### D4. Eigenproblem, adjoint modes, normalisation, C₀
 
 - Solver: dense non-symmetric (LAPACK `geev`) on the 2(N−2) interior matrix; N up to 240 for T0.11 is still trivial.

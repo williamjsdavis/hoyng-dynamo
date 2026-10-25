@@ -43,8 +43,10 @@ function measured_relaxation_rate(model, sp; δ = 1e-6)
     return -rate_between(a .- 1, Δτ, round(Int, 1 / Δτ) + 1, round(Int, 3 / Δτ) + 1)
 end
 
-# The 1% gates apply to the production stepper; the first-order IMEX cross-check is held to 5%.
-gate_tol(name) = name == :exponential ? 0.01 : 0.05
+# The 1% gates apply to the production stepper and the second-order Crank–Nicolson; the
+# first-order IMEX and backward Euler cross-checks are held to 5%.
+second_order(name) = Symbol(name) in (:exponential, :crank_nicolson)
+gate_tol(name) = second_order(name) ? 0.01 : 0.05
 
 @testset "Tier 1: deterministic nonlinear dynamics, f = 0" begin
     cases = ((kR = 0.5, Cm = 100.0, Λ = 0.527, twoμ = 1.526), (kR = 0.3, Cm = 120.0, Λ = 0.815, twoμ = 2.97))
@@ -52,7 +54,8 @@ gate_tol(name) = name == :exponential ? 0.01 : 0.05
         model = Model(; case.kR, case.Cm, N = 60)
         c = model.constants
         M = model.grid.M
-        steppers = (exponential = ExponentialStepper(model, 0.01), imex = IMEXStepper(model, 0.01))
+        steppers = (exponential = ExponentialStepper(model, 0.01), imex = IMEXStepper(model, 0.01),
+                    backward_euler = BackwardEulerStepper(model, 0.01), crank_nicolson = CrankNicolsonStepper(model, 0.01))
 
         for (name, sp) in pairs(steppers)
             label = "$name, kR = $(case.kR), C_m = $(case.Cm)"
@@ -93,7 +96,8 @@ gate_tol(name) = name == :exponential ? 0.01 : 0.05
         end
 
         @testset "T1.6 time-step convergence (kR = $(case.kR))" begin
-            for (name, make) in (("exponential", Δτ -> ExponentialStepper(model, Δτ)), ("imex", Δτ -> IMEXStepper(model, Δτ)))
+            for (name, make) in (("exponential", Δτ -> ExponentialStepper(model, Δτ)), ("imex", Δτ -> IMEXStepper(model, Δτ)),
+                                 ("backward_euler", Δτ -> BackwardEulerStepper(model, Δτ)), ("crank_nicolson", Δτ -> CrankNicolsonStepper(model, Δτ)))
                 errs = map((0.01, 0.001)) do Δτ
                     sp = make(Δτ)
                     (; Δτ, growth = relerr(measured_growth_rate(model, sp), c.Λ),
@@ -101,7 +105,7 @@ gate_tol(name) = name == :exponential ? 0.01 : 0.05
                 end
                 ratios = (growth = errs[1].growth / errs[2].growth, relaxation = errs[1].relaxation / errs[2].relaxation)
                 @info "T1.6 $name kR = $(case.kR)" errs ratios
-                if name == "exponential"
+                if second_order(name)
                     # second order: the growth-rate error falls ×100 per decade. The relaxation
                     # error cannot show that: at Δτ = 0.001 it sits on the measurement floor
                     # (round-off ~10⁻¹⁴ relative to the decayed perturbation δ e^{−2μ·3} ~ 10⁻¹⁰),
@@ -109,9 +113,15 @@ gate_tol(name) = name == :exponential ? 0.01 : 0.05
                     @test errs[1].growth < 1e-3 && errs[1].relaxation < 1e-3
                     @test ratios.growth > 30
                     @test errs[2].relaxation < errs[1].relaxation
-                else                          # first order: ×~10 per decade
+                else                          # first order: ×~10 per decade in the growth rate
                     @test errs[1].growth < 5e-2 && errs[1].relaxation < 5e-2
-                    @test 5 < ratios.growth < 20 && 5 < ratios.relaxation < 20
+                    @test 5 < ratios.growth < 20
+                    if name == "imex"             # overtones leak into a at O(Δτ): b̃₀ is not a left eigenvector of the IMEX map
+                        @test 5 < ratios.relaxation < 20
+                    else                          # backward Euler keeps b̃₀ as a left eigenvector (b̃₀ᵀG = 0), and the
+                        # midpoint-predicted quenching makes its relaxation rate second order like the exponential's
+                        @test errs[1].relaxation < 1e-3 && errs[2].relaxation < errs[1].relaxation
+                    end
                 end
             end
             # stability diagnostic for IMEX Euler at Δτ = 0.01: amplification matrix at C₀

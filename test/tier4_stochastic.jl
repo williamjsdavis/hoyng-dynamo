@@ -242,10 +242,13 @@ const TABLE_II = Dict(4.4 => (c2 = 0.318, γ = 9.04, var = 0.03, Tr = 10700.0, e
         end
     end
 
-    @testset "T4.17 convergence of the standard run at Δτ = 0.005 and N = 120 (diagnostic)" begin
-        # the Δτ = 0.005 run sees the same noise realisation (F is drawn per τ_c)
+    @testset "T4.17 convergence of the standard run at Δτ = 0.005, N = 120 and with a second-order scheme of another family (diagnostic)" begin
+        # the Δτ = 0.005 run sees the same noise realisation (F is drawn per τ_c); the Crank–Nicolson
+        # run with trapezoidal noise checks that the production stepper's results do not depend on
+        # the integrator family at second order (STRETCH_GOALS.md SG-1)
         ref = standard.summary
-        for (label, spec) in (("Δτ = 0.005", RunSpec(; Δτ = 0.005)), ("N = 120", RunSpec(; N = 120)))
+        for (label, spec) in (("Δτ = 0.005", RunSpec(; Δτ = 0.005)), ("N = 120", RunSpec(; N = 120)),
+                              ("Crank–Nicolson, trapezoidal noise", RunSpec(; stepper = :crank_nicolson_implicit_noise)))
             e = ensemble(spec, T4_LENGTH; seeds = T4_SEEDS)
             s = e.summary
             report("T4.17 $label", e)

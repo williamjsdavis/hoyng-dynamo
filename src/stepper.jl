@@ -118,6 +118,70 @@ function IMEXStepper(model::Model{T}, Δτ) where {T}
     IMEXStepper{T,typeof(F)}(T(Δτ), c.s, g.M, F, S, g.cosθ, model.ã)
 end
 
+"""
+    ThetaStepper(model, Δτ; θ = 1, implicit_noise = false)
+    BackwardEulerStepper(model, Δτ; implicit_noise = false)      θ = 1
+    CrankNicolsonStepper(model, Δτ; implicit_noise = false)      θ = 1/2
+
+Sensitivity steppers (dev/STRETCH_GOALS.md SG-1): the θ-method on the whole linear operator
+A = G(C₀) + cE, c = s(1 − a²) at the midpoint prediction (`quenching_coefficient`), with the
+noise term V explicit or, with `implicit_noise`, treated like A:
+
+    [I − θΔτ A] b_{n+1} = [I + (1 − θ)Δτ A] b_n + Δτ V_n b_n                (explicit noise)
+    [I − θΔτ (A + V_n)] b_{n+1} = [I + (1 − θ)Δτ (A + V_n)] b_n            (implicit noise)
+
+θ = 1 is backward Euler, first order and over-damping (an eigenmode of A with eigenvalue λ
+is multiplied by 1/(1 − Δτλ) per step instead of exp(Δτλ)); θ = 1/2 is Crank–Nicolson,
+second order, with the stiffest diffusion modes mapped to ≈ −1 instead of 0. Both are
+A-stable. They stand in for what an unstated implicit scheme of the papers' era does to the
+overtone content at Δτ = 0.01; the exponential stepper remains the production one.
+
+Solved by block elimination. With D = I − θΔτL (tridiagonal, fixed) and the α-coupling
+diagonal g = (1 + c) cos θ [+ v], the toroidal unknown satisfies the dense M×M system
+
+    [D − (θΔτ)² C₀ S D⁻¹ diag(g)] T_{n+1} = r_T + θΔτ C₀ S D⁻¹ r_P,
+
+factorised in place every step (LAPACK getrf/getrs; g changes with a), after which
+D P_{n+1} = r_P + θΔτ g ∘ T_{n+1} is one tridiagonal solve. About 25 µs per step at N = 60.
+The stepper carries its own per-step workspace, so one instance serves one simulation.
+"""
+struct ThetaStepper{T,F} <: AbstractStepper{T}
+    Δτ::T
+    s::T
+    M::Int
+    θ::T
+    implicit_noise::Bool
+    L::Tridiagonal{T,Vector{T}}              # the diffusion operator L
+    S::Tridiagonal{T,Vector{T}}              # C₀ ∂θ(sin θ ·), the shear term
+    F::F                                     # lu(I − θΔτ L)
+    Dm::Matrix{T}                            # I − θΔτ L, dense
+    Q::Matrix{T}                             # (θΔτ)² C₀ S D⁻¹, dense
+    K::Matrix{T}                             # workspace: Dm − Q diag(g), factorised in place
+    ipiv::Vector{LinearAlgebra.BLAS.BlasInt} # workspace: its pivots
+    g::Vector{T}                             # workspace: the α-coupling diagonal
+    y::Vector{T}                             # workspace: D⁻¹ r_P
+    cosθ::Vector{T}
+    ã::Vector{T}
+end
+
+function ThetaStepper(model::Model{T}, Δτ; θ::Real = 1, implicit_noise::Bool = false) where {T}
+    1 // 2 ≤ θ ≤ 1 || throw(ArgumentError("θ must lie in [1/2, 1], got $θ"))
+    g, c = model.grid, model.constants
+    M = g.M
+    L = diffusion_operator(g, c.kR)
+    S = c.C0 * shear_operator(g)
+    α = T(θ) * T(Δτ)
+    D = I - α * L
+    Dm = Matrix(D)
+    Q = α^2 .* (Matrix(S) * inv(Dm))
+    F = lu(D)
+    ThetaStepper{T,typeof(F)}(T(Δτ), c.s, M, T(θ), implicit_noise, L, S, F, Dm, Q, similar(Dm),
+                              Vector{LinearAlgebra.BLAS.BlasInt}(undef, M), zeros(T, M), zeros(T, M), g.cosθ, model.ã)
+end
+
+BackwardEulerStepper(model::Model, Δτ; implicit_noise::Bool = false) = ThetaStepper(model, Δτ; θ = 1, implicit_noise)
+CrankNicolsonStepper(model::Model, Δτ; implicit_noise::Bool = false) = ThetaStepper(model, Δτ; θ = 1 // 2, implicit_noise)
+
 timestep(sp::AbstractStepper) = sp.Δτ
 
 # s(1 − a²) at the midpoint of the step, from a_{n+½} = a_n + (Δτ/2) da/dτ with
@@ -179,8 +243,98 @@ function step!(st::State{T}, sp::IMEXStepper{T}, noise, cache::Cache{T}) where {
     return st
 end
 
+# y[oy+1:oy+M] += β (A x[ox+1:ox+M]) for a tridiagonal A of size M ≥ 2.
+@inline function add_tridiagonal!(y::AbstractVector{T}, oy::Int, β::T, A::Tridiagonal{T}, x::AbstractVector{T}, ox::Int, M::Int) where {T}
+    dl, d, du = A.dl, A.d, A.du
+    @inbounds begin
+        y[oy+1] += β * (d[1] * x[ox+1] + du[1] * x[ox+2])
+        for j in 2:M-1
+            y[oy+j] += β * (dl[j-1] * x[ox+j-1] + d[j] * x[ox+j] + du[j] * x[ox+j+1])
+        end
+        y[oy+M] += β * (dl[M-1] * x[ox+M-1] + d[M] * x[ox+M])
+    end
+    return y
+end
+
+function step!(st::State{T}, sp::ThetaStepper{T}, noise, cache::Cache{T}) where {T}
+    M, Δτ, θ = sp.M, sp.Δτ, sp.θ
+    b, tmp, v = st.b, cache.tmp, cache.v
+    g, y, K = sp.g, sp.y, sp.K
+    update_noise!(v, noise, st.n)
+    c = quenching_coefficient(sp, b, v, st.a)
+    α = θ * Δτ                                   # implicit weight
+    β = (1 - θ) * Δτ                             # explicit weight of A
+    ν = sp.implicit_noise ? β : Δτ               # explicit weight of V
+    ι = sp.implicit_noise ? one(T) : zero(T)     # V inside the implicit operator
+    # r = b + β A b + ν V b into tmp: the α-coupling of the P rows here, the tridiagonal
+    # parts (L on both fields, the shear) below; g is the implicit α-coupling diagonal
+    @inbounds @simd for j in 1:M
+        tmp[j] = b[j] + (β * (1 + c) * sp.cosθ[j] + ν * v[j]) * b[M+j]
+        tmp[M+j] = b[M+j]
+        g[j] = (1 + c) * sp.cosθ[j] + ι * v[j]
+    end
+    if θ != 1
+        add_tridiagonal!(tmp, 0, β, sp.L, b, 0, M)
+        add_tridiagonal!(tmp, M, β, sp.S, b, 0, M)
+        add_tridiagonal!(tmp, M, β, sp.L, b, M, M)
+    end
+    # toroidal system K T⁺ = r_T + α C₀ S D⁻¹ r_P with K = D − Q diag(g)
+    copyto!(y, 1, tmp, 1, M)
+    ldiv!(sp.F, y)
+    add_tridiagonal!(tmp, M, α, sp.S, y, 0, M)
+    @inbounds for j in 1:M
+        gj = g[j]
+        @simd for i in 1:M
+            K[i, j] = sp.Dm[i, j] - gj * sp.Q[i, j]
+        end
+    end
+    LinearAlgebra.LAPACK.getrf!(K, sp.ipiv)
+    LinearAlgebra.LAPACK.getrs!('N', K, sp.ipiv, view(tmp, M+1:2M))
+    # poloidal system D P⁺ = r_P + α g ∘ T⁺
+    @inbounds @simd for j in 1:M
+        tmp[j] += α * g[j] * tmp[M+j]
+    end
+    ldiv!(sp.F, view(tmp, 1:M))
+    copyto!(b, tmp)
+    st.a = dot(sp.ã, b)
+    st.n += 1
+    return st
+end
+
 "The current dipole amplitude a = (b̃₀, b)."
 dipole_amplitude(st::State) = st.a
 
 "‖b − a b₀‖₂: the part of the field not in the fundamental mode."
 overtone_residual(model::Model, st::State) = sqrt(sum(abs2, st.b .- st.a .* model.b0))
+
+"""
+    amplification_matrix(model, stepper) -> Matrix
+
+The one-step map b ↦ b_{n+1} of `stepper` for the linear dynamo at C₀ (a = ±1 frozen, so
+c = 0, and no noise): exp(ΔτG) for the exponential stepper, (I − ΔτL̂)⁻¹(I + Δτ(G − L̂)) with
+L̂ = diag(L, L) for the IMEX, (I − θΔτG)⁻¹(I + (1 − θ)ΔτG) for the θ-method. Its eigenvalues
+against exp(Δτλ_k) give each scheme's per-step bias on the modes (dev/STRETCH_GOALS.md SG-1).
+"""
+amplification_matrix(::Model, sp::ExponentialStepper) = copy(sp.X)
+
+function amplification_matrix(model::Model{T}, sp::IMEXStepper{T}) where {T}
+    M = model.grid.M
+    L = diffusion_operator(model.grid, model.constants.kR)
+    Lbd = zeros(T, 2M, 2M)
+    Lbd[1:M, 1:M] .= L
+    Lbd[M+1:2M, M+1:2M] .= L
+    return (I - sp.Δτ * Lbd) \ (I + sp.Δτ * (model.G - Lbd))
+end
+
+amplification_matrix(model::Model{T}, sp::ThetaStepper{T}) where {T} =
+    (I - sp.θ * sp.Δτ * model.G) \ (I + (1 - sp.θ) * sp.Δτ * model.G)
+
+"""
+    mode_factor(stepper, λ)
+
+The factor the scheme applies per step to an eigenmode of the linear operator with
+eigenvalue λ, for the schemes where it is a function of λ alone: exp(Δτλ) for the
+exponential stepper, (1 + (1 − θ)Δτλ)/(1 − θΔτλ) for the θ-method.
+"""
+mode_factor(sp::ExponentialStepper, λ::Number) = exp(sp.Δτ * λ)
+mode_factor(sp::ThetaStepper, λ::Number) = (1 + (1 - sp.θ) * sp.Δτ * λ) / (1 - sp.θ * sp.Δτ * λ)
