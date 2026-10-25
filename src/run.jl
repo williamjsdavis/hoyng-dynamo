@@ -200,6 +200,53 @@ end
 "(|a|, D₁/ℱ) for a `BinnedMean` (the D₁ measurement of HOS Fig. 8)."
 @inline d1_pair(sim::Simulation) = (absamplitude(sim), d1_sample(sim))
 
+"""
+    noise_diffusion_sample(sim)
+
+The exact diffusion coefficient of a for the current field under the binned noise,
+D_b = τ_c f² Σ_k (Σ_{j∈k} ã_j g_j T_j)² (the formula of `binned_D0` with the current T in place
+of T₀): the variance per unit time of the noise-driven increments of a, whose conditional
+mean over |a| is what HOS's D(a) = D₀a² + D₁(a) (Eqs. 36–37) represents in the δ-correlated
+limit N_c → ∞. Allocation-free (the bins are contiguous in θ).
+"""
+@inline function noise_diffusion_sample(sim::Simulation{T}) where {T}
+    nz, ã, b, M = sim.noise, sim.model.ã, sim.state.b, sim.model.grid.M
+    total = zero(T)
+    acc = zero(T)
+    current = @inbounds nz.bin[1]
+    @inbounds for j in 1:M
+        k = nz.bin[j]
+        if k != current
+            total += acc * acc
+            acc = zero(T)
+            current = k
+        end
+        acc += ã[j] * nz.g[j] * b[M+j]
+    end
+    total += acc * acc
+    return nz.τc * nz.f^2 * total
+end
+
+"""
+    continuum_diffusion_sample(sim)
+
+The δ-correlated-limit counterpart of `noise_diffusion_sample`: ℱ ∫ sin θ P̃₀² T² dθ with the
+full toroidal field, i.e. HOS's D₀a² + D₁ (Eqs. 36–37, cross term included) evaluated on the
+current field, ℱ = πf²τ_c/(2N_c²) at the current f.
+"""
+@inline function continuum_diffusion_sample(sim::Simulation{T}) where {T}
+    d, b, M, nz = sim.diag, sim.state.b, sim.model.grid.M, sim.noise
+    s = zero(T)
+    @inbounds @simd for j in 1:M
+        s += d.d1w[j] * b[M+j]^2
+    end
+    return diffusion_prefactor(nz.f, nz.τc, nz.Nc) * s
+end
+
+"(|a|, D_b) and (|a|, D_c) for `BinnedMean`s: the exact binned and the continuum diffusion of a against |a|."
+@inline noise_diffusion_pair(sim::Simulation) = (absamplitude(sim), noise_diffusion_sample(sim))
+@inline continuum_diffusion_pair(sim::Simulation) = (absamplitude(sim), continuum_diffusion_sample(sim))
+
 # ---------------------------------------------------------------------------------------
 # Observers
 # ---------------------------------------------------------------------------------------
@@ -338,6 +385,32 @@ function standard_observers(sim::Simulation{T}; file = nothing, snapshots::Bool 
 end
 
 """
+    drift_diffusion_observers(sim; x = range(-1.5, 1.5; length = 61), h = 0.1, every = n_c, lags = 40,
+                              kernel = Epanechnikov())
+
+The conditional moments of the dipole amplitude a by online kernel-based regression
+(`ConditionalMoments`, Davis 2023), as a NamedTuple of probes to `merge` with
+`standard_observers`: in `km`, a is fed every `every` steps and its increments over `1:lags`
+samples are conditioned on a at the evaluation points `x` with bandwidth `h`. The defaults
+sample at the redraw interval n_c (Δt = τ_c) with lags to 2 τ_d, so that `kramers_moyal` can
+follow D⁽¹⁾(a; τ) and D⁽²⁾(a; τ) from the correlated-noise regime τ ≈ τ_c through the overtone
+relaxation time to the drift time 1/Λ, for comparison with the drift S(a) and the diffusion
+D(a) = 2D⁽²⁾(a) of the Fokker–Planck reduction (HOS Eqs. 33 and 39, `BistableTheory`).
+Beside it, `d_binned` and `d_continuum` bin the exact noise diffusion of a for the current
+field (`noise_diffusion_sample`) and its δ-correlated-limit value (`continuum_diffusion_sample`,
+HOS Eqs. 36–37) against |a| once per τ_d, like the D₁ measurement of the standard observers.
+"""
+function drift_diffusion_observers(sim::Simulation{T}; x::AbstractRange = range(T(-1.5), T(1.5); length = 61), h::Real = 0.1,
+                                   every::Integer = redraw_interval(sim.noise), lags::Integer = 40,
+                                   kernel::AbstractKernel = Epanechnikov()) where {T}
+    Δτ = timestep(sim)
+    nd = round(Int, 1 / Δτ)
+    return (km = Probe(amplitude, ConditionalMoments(x; h, lags, Δt = every * Δτ, kernel, T), every),
+            d_binned = Probe(noise_diffusion_pair, BinnedMean(zero(T), T(1.5), 30), nd),
+            d_continuum = Probe(continuum_diffusion_pair, BinnedMean(zero(T), T(1.5), 30), nd))
+end
+
+"""
     summarize(observers, sim) -> NamedTuple
 
 The headline statistics of a run with the standard observers: reversal counts and ⟨T_r⟩
@@ -414,19 +487,21 @@ function pool!(target::NamedTuple, others)
 end
 
 """
-    ensemble(spec::RunSpec, τ; seeds = 1:3) -> (runs, pooled, summary, intervals)
+    ensemble(spec::RunSpec, τ; seeds = 1:3, observers = standard_observers) -> (runs, pooled, summary, intervals)
 
-`spec` with each of `seeds`, run for `τ` diffusion times in stream mode with the standard
-observers, in parallel over the available threads (the result does not depend on the thread
-count: every seed is its own simulation and the aggregators are pooled in seed order).
-`runs[i]` is `(seed, sim, observers, summary, seconds)`; `pooled` holds the pooled
-aggregators (a copy of the first set), `summary = summarize(pooled, sim)` and `intervals`
-the polarity intervals of all runs, each run's own.
+`spec` with each of `seeds`, run for `τ` diffusion times in stream mode with the observer
+set `observers(sim)` (the standard observers by default; a set that extends them, e.g.
+`sim -> merge(standard_observers(sim), drift_diffusion_observers(sim))`, must keep their
+keys for `summarize`), in parallel over the available threads (the result does not depend
+on the thread count: every seed is its own simulation and the aggregators are pooled in
+seed order). `runs[i]` is `(seed, sim, observers, summary, seconds)`; `pooled` holds the
+pooled aggregators (a copy of the first set), `summary = summarize(pooled, sim)` and
+`intervals` the polarity intervals of all runs, each run's own.
 """
-function ensemble(spec::RunSpec, τ::Real; seeds = 1:3)
+function ensemble(spec::RunSpec, τ::Real; seeds = 1:3, observers = standard_observers)
     seeds = collect(seeds)
     sims = [Simulation(RunSpec(spec; seed)) for seed in seeds]
-    obs = [standard_observers(sim) for sim in sims]
+    obs = [observers(sim) for sim in sims]
     seconds = zeros(length(sims))
     Threads.@threads for i in eachindex(sims)
         seconds[i] = @elapsed run!(sims[i], steps(sims[i], τ), obs[i])

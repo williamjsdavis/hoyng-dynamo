@@ -39,6 +39,9 @@ let aggs = (("Moments", Moments()), ("Histogram", Histogram(-3.0, 3.0, 600)), ("
     tuple = map(last, aggs)
     SUITE["aggregators"]["all seven (Tuple)"] = @benchmarkable fit!($tuple, 0.9)
     SUITE["aggregators"]["BinnedMean"] = @benchmarkable fit!($(BinnedMean(0.0, 1.5, 30)), (0.9, 2.5))
+    cm = ConditionalMoments(range(-1.5, 1.5; length = 61); h = 0.1, lags = 40, Δt = 0.05)
+    foreach(v -> fit!(cm, v), 0.9 .+ 0.1 .* sin.(1:50))          # ring buffer full: every lag updated
+    SUITE["aggregators"]["ConditionalMoments 61 points, 40 lags"] = @benchmarkable fit!($cm, 0.9)
 end
 
 let sim = Simulation(RunSpec(; seed = 1)), obs = standard_observers(sim)

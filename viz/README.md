@@ -29,6 +29,12 @@ to `../figures/` (git-ignored):
 | `soh_fig03.py` | SOH Fig. 3: polarity bar code of the ramped run with the windowed rms variability and reversal counts | `ramp_f4.0-6.5_seed1.h5` (`run_ramp.jl`) |
 | `hos_fig08.py` | HOS Fig. 8: D₁/ℱ against \|a\| with the bin averages and fits | the `d1` and `a` streams, `results/d1`, `results/summary` |
 | `hos_fig09.py` | HOS Fig. 9: simulated p(\|a\|) against Eq. 43 | `results/histogram`, `results/summary` |
+| `hso_fig01.py` | HSO Fig. 1: the Sint-800 VADM record with its errors, sign flipped beyond 780 ka | `sint800.h5` (`sint800_comparison.jl`; falls back to `data/sint800.tsv`) |
+| `sint800_fits.py` | HSO Fig. 6 top panels, HOS Fig. 10 and SOH Fig. 4: the VADM histograms with the χ² fits of Eq. 10, A.1 and 43 | `sint800.h5` |
+| `sint800_tau_d.py` | the systematic τ_d scan behind HSO §5.1: misfit against τ_d, best τ_d per window, the data curve against the model curves | `sint800.h5` |
+| `km_drift_diffusion.py` | drift and diffusion of a by online kernel-based regression against HOS's S(a) and D(a), and their lag dependence | `km_f<f>.h5` (`km_streaming.jl`) |
+
+`hso_fig07.py` overlays the Sint-800 autocorrelation with its Monte-Carlo error bars when `sint800.h5` exists.
 
 Shared modules: `runfile.py` (reader for the HDF5 layout of `dev/DECISIONS.md` D7),
 `eventwindows.py` (reader and the two-window figure for the files of `scripts/run_events.jl`) and
