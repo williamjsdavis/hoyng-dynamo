@@ -193,6 +193,8 @@ function density_fit(edges::AbstractVector{T}, counts::AbstractVector{<:Integer}
     end
     x, χ² = nelder_mead(chi2, T[log(start.γ - 1), log(start.c2)]; step = T(0.3))
     ν = length(b.n) - 3
-    return (γ = 1 + exp(x[1]), c2 = exp(x[2]), chi2 = χ², ν = ν, sigma = abs(χ² - ν) / sqrt(2ν),
+    # fewer than four bins (a histogram too narrow or too sparse to bin): the shape fit is meaningless and σ undefined
+    sigma = ν > 0 ? abs(χ² - ν) / sqrt(2ν) : T(NaN)
+    return (γ = 1 + exp(x[1]), c2 = exp(x[2]), chi2 = χ², ν = ν, sigma = sigma,
             nbins = length(b.n), n = total)
 end

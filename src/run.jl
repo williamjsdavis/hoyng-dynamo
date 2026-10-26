@@ -329,6 +329,11 @@ function run!(sim::Simulation, nsteps::Integer, observers = nothing; file = noth
             checkpoint!(file, sim, observers)
         end
     end
+    # A small mutable aggregator that never escapes (read back only through an inlined
+    # `value`) can be scalar-replaced by the optimiser, which then drops the `fit!` mutations
+    # made inside the loop and reports it unfed. Seen with `Moments` in a downstream loop of
+    # the same shape (hoyng-dynamo-sde, 2026-10-25); kept alive here as a precaution.
+    observers === nothing || Base.donotdelete(observers)
     return sim
 end
 

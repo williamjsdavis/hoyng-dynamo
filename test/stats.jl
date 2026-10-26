@@ -61,5 +61,10 @@
             @test fit.chi2 < 0.2 * fit.ν                 # rounding noise only (σ is two-sided, so it is large here)
             @test 85 ≤ fit.nbins ≤ 115                 # "about 100" equal-population bins
         end
+        # a dead dynamo: every sample in the first bin, one equal-population bin, no degrees of
+        # freedom; the fit is meaningless but must not throw (σ is NaN)
+        counts = zeros(Int, 500); counts[1] = 5000
+        fit = density_fit(edges, counts, 0.527)
+        @test fit.nbins == 1 && fit.ν < 0 && isnan(fit.sigma)
     end
 end
