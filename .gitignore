@@ -16,4 +16,5 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Figures rendered by viz/ are regenerated from results/ and never committed.
+# The copies that README.md embeds live in assets/ (viz/readme_assets.py) and are tracked.
 figures/

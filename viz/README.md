@@ -38,7 +38,8 @@ The figures of the drift-and-diffusion investigation live with it, in the siblin
 
 Shared modules: `runfile.py` (reader for the HDF5 layout of `dev/DECISIONS.md` D7),
 `eventwindows.py` (reader and the two-window figure for the files of `scripts/run_events.jl`) and
-`style.py` (rcParams, output paths, the reversal-bar helper). Every script takes the run file
+`style.py` (rcParams, output paths, the reversal-bar helper). `readme_assets.py` copies the
+figures that the top-level `README.md` embeds into `../assets/` (tracked). Every script takes the run file
 as its first argument and defaults to `../results/standard_f6.4_seed1.h5`, written by
 
 ```sh
